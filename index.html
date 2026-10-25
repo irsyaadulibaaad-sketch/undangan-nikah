@@ -53,7 +53,6 @@
         <p class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</p>
         <div class="bismillah-line"></div>
       </div>
-      
       <div class="hero-title-wrapper" data-anim="title">
         <span class="hero-sub">We Are Getting Married</span>
         <h1 class="hero-names">
@@ -63,13 +62,11 @@
         </h1>
         <div class="gold-underline"></div>
       </div>
-      
       <div class="hero-info" data-anim="fade">
         <p class="hero-date">Sabtu, 24 Desember 2026</p>
         <p class="hero-time">08.00 WIB — 13.00 WIB</p>
         <div class="gold-underline-short"></div>
       </div>
-      
       <div class="countdown-wrapper" data-anim="fade">
         <div class="countdown" id="countdown">
           <div class="cd-box"><span id="cd-days">--</span><small>Days</small></div>
@@ -91,7 +88,6 @@
       <div class="gold-underline-light"></div>
       <p id="venueName" class="venue-name light bold-text" data-anim="fade"></p>
       <p id="venueAddr" class="venue-addr light" data-anim="fade"></p>
-      
       <div class="map-wrap" data-anim="zoom">
         <iframe id="gmap" loading="lazy" allowfullscreen></iframe>
       </div>
@@ -109,7 +105,6 @@
       <div class="gold-underline-dark"></div>
       <p class="sub" data-anim="fade">Kindly confirm your attendance</p>
       <p class="quota" data-anim="fade">Remaining seats: <b id="sisaKuota">--</b> / 100</p>
-      
       <form id="rsvpForm" class="rsvp-form" data-anim="form">
         <div class="input-group"><label>Full Name</label><input id="rsvpNama" type="text" required maxlength="60" placeholder="Your name"></div>
         <div class="input-group"><label>Attendance</label><select id="rsvpHadir" required><option value="">-- select --</option><option value="1">Attending</option><option value="0">Not Attending</option></select></div>
@@ -129,13 +124,19 @@
     </div>
   </section>
 
-  <!-- SECTION 4: TAMAN DOA -->
+  <!-- SECTION 4: TAMAN DOA (VIRTUAL 2D) -->
   <section class="taman-section bg-cream" data-anim="taman">
     <div class="container">
       <h2 class="section-title" data-anim="fade">Garden of Prayers</h2>
       <div class="gold-underline-dark"></div>
       <p class="sub" data-anim="fade">Every prayer blooms into a flower</p>
-      <div class="garden" id="garden" data-anim="fade"></div>
+      
+      <!-- CANVAS UNTUK TAMAN VIRTUAL -->
+      <div class="virtual-garden-wrapper" data-anim="fade">
+        <canvas id="gardenCanvas" width="800" height="400"></canvas>
+        <div id="gardenLoading" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); color:#9E7A3E; font-style:italic;">Memuat Taman...</div>
+      </div>
+      
     </div>
     <div class="curve-divider">
       <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,0 C480,100 960,100 1440,0 L1440,100 L0,100 Z" fill="var(--bg-dark)"/></svg>
@@ -145,17 +146,14 @@
   <!-- SECTION 5: MINI GAME & PHOTOBOOTH -->
   <section class="interactive-section bg-dark" data-anim="interactive">
     <div class="container">
-      <!-- JUDUL DIGANTI JADI MINI GAME -->
       <h2 class="section-title light" data-anim="fade">Mini Game</h2>
       <div class="gold-underline-light"></div>
-      
       <div class="interactive-grid">
         <div class="interactive-item" data-anim="fade">
           <h3 class="sub-title light">The Journey</h3>
           <p class="sub light-text">Help the prince carry his princess</p>
           <iframe src="game/dino.html" class="game-frame" loading="lazy"></iframe>
         </div>
-        
         <div class="interactive-item" data-anim="fade">
           <h3 class="sub-title light">Photobooth</h3>
           <p class="sub light-text">Capture the moment, choose a frame</p>
@@ -192,7 +190,6 @@
         <img id="qrImage" alt="QR Code" class="qr-img">
       </div>
     </div>
-    
     <footer>
       <svg class="divider" viewBox="0 0 200 20" xmlns="http://www.w3.org/2000/svg"><path d="M0,10 L80,10 M120,10 L200,10" stroke="currentColor" stroke-width="0.5"/><path d="M90,10 L95,5 L100,10 L105,15 Z" fill="currentColor"/></svg>
       <p>Irsyaadul & Refalina</p>
@@ -204,6 +201,7 @@
 
 <script src="supabase.js"></script>
 <script src="app.js"></script>
+<script src="garden.js"></script>
 <script>
   const savedTheme = localStorage.getItem('wedding_theme') || 'luxury';
   document.documentElement.setAttribute('data-theme', savedTheme);
