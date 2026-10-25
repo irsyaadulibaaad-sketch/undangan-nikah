@@ -6,53 +6,68 @@
 <title>Irsyaadul Ibaad & Refalina Putri Nursiami</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </head>
 <body>
 
-<!-- COVER PEMBUKA (GAYA MEWAH) -->
+<!-- COVER PEMBUKA (LUXURY) -->
 <div id="cover" class="cover">
-  <!-- Efek Cahaya Emas dari Tengah -->
   <div class="golden-glow"></div>
   
   <div class="luxury-envelope" id="luxuryEnvelope">
-    <!-- Kertas Belakang (Tempat teks) -->
     <div class="paper-back">
+      <!-- SVG Ornamen Atas -->
+      <svg class="ornament-top" viewBox="0 0 100 20" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,10 Q25,0 50,10 T100,10" fill="none" stroke="currentColor" stroke-width="0.5"/>
+        <circle cx="50" cy="10" r="1.5" fill="currentColor"/>
+      </svg>
       <p class="cover-sub">The Wedding Of</p>
-      <h1 class="cover-title">Irsyaadul & Refalina</h1>
+      <h1 class="cover-title">Irsyaadul<br><span>&</span><br>Refalina</h1>
       <p class="cover-date">24 . 12 . 2026</p>
+      <!-- SVG Ornamen Bawah -->
+      <svg class="ornament-bottom" viewBox="0 0 100 20" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0,10 Q25,20 50,10 T100,10" fill="none" stroke="currentColor" stroke-width="0.5"/>
+        <circle cx="50" cy="10" r="1.5" fill="currentColor"/>
+      </svg>
     </div>
 
-    <!-- Kertas Depan Kiri (Yang akan terbuka) -->
     <div class="paper-front left" id="paperLeft">
       <div class="emboss-pattern"></div>
     </div>
 
-    <!-- Kertas Depan Kanan (Yang akan terbuka) -->
     <div class="paper-front right" id="paperRight">
       <div class="emboss-pattern"></div>
     </div>
 
-    <!-- Segel Lilin Emas (Tombol Buka) -->
     <div class="wax-seal" id="openBtn">
-      <span class="seal-initials">I & R</span>
+      <span class="seal-initials">I&R</span>
       <div class="seal-shine"></div>
     </div>
     
-    <!-- Teks Petunjuk -->
     <div class="tap-hint">Tap to open</div>
   </div>
 </div>
 
 <!-- KONTEN UTAMA -->
 <div id="mainContent" class="hidden">
+  
+  <!-- HERO -->
   <section class="hero" data-anim="fade-up">
     <p class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</p>
-    <p class="hero-sub">Kami akan menikah</p>
-    <h1 class="hero-names">Irsyaadul Ibaad<br><span>&</span><br>Refalina Putri Nursiami</h1>
+    <p class="hero-sub">We Are Getting Married</p>
+    <h1 class="hero-names">Irsyaadul Ibaad<br><span class="ampersand">&</span><br>Refalina Putri Nursiami</h1>
+    
+    <!-- SVG Divider Kustom -->
+    <svg class="divider" viewBox="0 0 200 20" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,10 L80,10 M120,10 L200,10" stroke="currentColor" stroke-width="0.5"/>
+      <path d="M90,10 L95,5 L100,10 L105,15 Z" fill="currentColor"/>
+      <circle cx="100" cy="10" r="1" fill="var(--bg-body)"/>
+    </svg>
+
     <div class="countdown" id="countdown">
       <div><span id="cd-days">--</span><small>Hari</small></div>
       <div><span id="cd-hours">--</span><small>Jam</small></div>
@@ -61,45 +76,54 @@
     </div>
   </section>
 
+  <!-- VENUE -->
   <section class="venue" data-anim="fade-up">
-    <h2 class="section-title">Lokasi Acara</h2>
+    <h2 class="section-title">The Venue</h2>
     <p id="venueName" class="venue-name"></p>
     <p id="venueAddr" class="venue-addr"></p>
-    <div class="map-wrap" data-anim="zoom-in"><iframe id="gmap" loading="lazy" allowfullscreen></iframe></div>
-    <a id="gmapLink" class="btn-outline" target="_blank">Buka di Google Maps</a>
+    <div class="map-wrap" data-anim="zoom-in">
+      <iframe id="gmap" loading="lazy" allowfullscreen></iframe>
+    </div>
+    <a id="gmapLink" class="btn-outline" target="_blank">Open Maps</a>
   </section>
 
+  <!-- RSVP -->
   <section class="rsvp" data-anim="fade-up">
-    <h2 class="section-title">Konfirmasi Kehadiran</h2>
-    <p class="quota">Sisa kuota: <b id="sisaKuota">--</b> / 100 pax</p>
+    <h2 class="section-title">RSVP</h2>
+    <p class="sub">Kindly confirm your attendance</p>
+    <p class="quota">Remaining seats: <b id="sisaKuota">--</b> / 100</p>
+    
     <form id="rsvpForm" class="rsvp-form">
-      <label>Nama<input id="rsvpNama" type="text" required maxlength="60" placeholder="Nama Lengkap"></label>
-      <label>Kehadiran<select id="rsvpHadir" required><option value="">-- pilih --</option><option value="1">Hadir</option><option value="0">Tidak Hadir</option></select></label>
+      <label>Full Name<input id="rsvpNama" type="text" required maxlength="60" placeholder="Your name"></label>
+      <label>Attendance<select id="rsvpHadir" required><option value="">-- select --</option><option value="1">Attending</option><option value="0">Not Attending</option></select></label>
       <div id="hadirFields" hidden>
-        <label>Datang sebagai<select id="rsvpKategori"><option value="sendiri">Sendiri</option><option value="pasangan">Dengan Pasangan</option><option value="keluarga">Dengan Keluarga</option></select></label>
-        <label>Total orang (termasuk diri)<input id="rsvpPax" type="number" min="1" value="1" max="100"></label>
+        <label>Coming As<select id="rsvpKategori"><option value="sendiri">Alone</option><option value="pasangan">With Partner</option><option value="keluarga">With Family</option></select></label>
+        <label>Total Guests (incl. yourself)<input id="rsvpPax" type="number" min="1" value="1" max="100"></label>
       </div>
-      <div id="doaFields" hidden><label>Doa & Ucapan<textarea id="rsvpDoa" rows="3" maxlength="200" placeholder="Tulis doa/ucapan..."></textarea></label></div>
-      <button type="submit" class="btn-primary">Kirim Konfirmasi</button>
+      <div id="doaFields" hidden><label>Prayers & Wishes<textarea id="rsvpDoa" rows="3" maxlength="200" placeholder="Write your wishes..."></textarea></label></div>
+      <button type="submit" class="btn-primary">Send RSVP</button>
       <p id="rsvpMsg" class="msg"></p>
     </form>
   </section>
 
+  <!-- TAMAN DOA -->
   <section class="taman" data-anim="fade-up">
-    <h2 class="section-title">Taman Doa</h2>
-    <p class="sub">Setiap doa menumbuhkan bunga</p>
+    <h2 class="section-title">Garden of Prayers</h2>
+    <p class="sub">Every prayer blooms into a flower</p>
     <div class="garden" id="garden"></div>
   </section>
 
+  <!-- GAME DINO -->
   <section class="game-section" data-anim="fade-up">
-    <h2 class="section-title">Main Yuk!</h2>
-    <p class="sub">Bantu pangeran menggendong putri</p>
+    <h2 class="section-title">The Journey</h2>
+    <p class="sub">Help the prince carry his princess</p>
     <iframe src="game/dino.html" class="game-frame" loading="lazy"></iframe>
   </section>
 
+  <!-- PHOTOBOOTH -->
   <section class="photobooth" data-anim="fade-up">
-    <h2 class="section-title">Photobooth Virtual</h2>
-    <p class="sub">Abadikan momen, pilih template, download & share!</p>
+    <h2 class="section-title">Photobooth</h2>
+    <p class="sub">Capture the moment, choose a frame</p>
     <input type="file" id="photoInput" accept="image/*" capture="user" class="file-input">
     <div class="template-picker">
       <label><input type="radio" name="tpl" value="classic" checked> Classic</label>
@@ -113,46 +137,59 @@
     </div>
   </section>
 
+  <!-- QR CHECK-IN -->
   <section class="qr-info" data-anim="fade-up">
-    <h2 class="section-title">Registrasi Hari-H</h2>
-    <p class="sub">Scan QR di pintu masuk untuk check-in:</p>
-    <div class="qr-wrap"><img id="qrImage" alt="QR Code" class="qr-img"></div>
+    <h2 class="section-title">Day-of Registration</h2>
+    <p class="sub">Scan at the entrance to check-in</p>
+    <div class="qr-wrap">
+      <!-- Ikon SVG Pengganti Emoji -->
+      <svg class="qr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="3" y="3" width="7" height="7" rx="1"/>
+        <rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/>
+        <path d="M14 14h3v3h-3z M18 18h3v3h-3z M14 18h3v3h-3z M18 14h3v3h-3z"/>
+      </svg>
+      <img id="qrImage" alt="QR Code" class="qr-img">
+    </div>
   </section>
 
-  <footer><p>Irsyaadul Ibaad & Refalina Putri Nursiami</p></footer>
+  <footer>
+    <svg class="divider" viewBox="0 0 200 20" xmlns="http://www.w3.org/2000/svg" style="max-width: 150px; margin: 0 auto 20px;">
+      <path d="M0,10 L80,10 M120,10 L200,10" stroke="currentColor" stroke-width="0.5"/>
+      <path d="M90,10 L95,5 L100,10 L105,15 Z" fill="currentColor"/>
+    </svg>
+    <p>Irsyaadul & Refalina</p>
+  </footer>
 </div>
 
 <script src="supabase.js"></script>
 <script src="app.js"></script>
 <script>
-  const savedTheme = localStorage.getItem('wedding_theme') || 'sage';
+  // Tema
+  const savedTheme = localStorage.getItem('wedding_theme') || 'luxury';
   document.documentElement.setAttribute('data-theme', savedTheme);
 
-  // Animasi Scroll Sederhana
+  // GSAP Animasi Scroll
+  gsap.registerPlugin(ScrollTrigger);
   document.querySelectorAll('[data-anim]').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(30px)';
-    el.style.transition = 'all 0.8s cubic-bezier(0.22, 1, 0.36, 1)';
-    
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if(entry.isIntersecting) {
-          el.style.opacity = '1';
-          el.style.transform = 'translateY(0)';
-        }
-      });
-    }, { threshold: 0.1 });
-    observer.observe(el);
+    const type = el.getAttribute('data-anim');
+    gsap.fromTo(el, 
+      type === 'zoom-in' ? { scale: 0.95, opacity: 0 } : { y: 50, opacity: 0 },
+      {
+        scale: 1, y: 0, opacity: 1, duration: 1.5, ease: "power3.out",
+        scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" }
+      }
+    );
   });
 
-  // Animasi Buka Kertas Terbelah (GSAP)
+  // Animasi Amplop
   const tl = gsap.timeline({ paused: true });
-  tl.to(".wax-seal", { scale: 1.2, opacity: 0, duration: 0.5, ease: "power2.in" })
-    .to(".golden-glow", { opacity: 1, duration: 0.8 }, "-=0.3")
-    .to("#paperLeft", { rotationY: -180, duration: 1.2, ease: "power3.inOut" }, "-=0.5")
-    .to("#paperRight", { rotationY: 180, duration: 1.2, ease: "power3.inOut" }, "-=1.2")
+  tl.to(".wax-seal", { scale: 1.3, opacity: 0, duration: 0.6, ease: "power2.in" })
+    .to(".golden-glow", { opacity: 1, duration: 1 }, "-=0.4")
+    .to("#paperLeft", { rotationY: -180, duration: 1.4, ease: "power3.inOut" }, "-=0.6")
+    .to("#paperRight", { rotationY: 180, duration: 1.4, ease: "power3.inOut" }, "-=1.4")
     .to(".tap-hint", { opacity: 0, duration: 0.3 }, "-=1")
-    .to(".luxury-envelope", { scale: 1.1, duration: 1 }, "-=0.5");
+    .to(".luxury-envelope", { scale: 1.15, duration: 1 }, "-=0.6");
 
   document.getElementById('openBtn').addEventListener('click', function() {
     tl.play();
@@ -162,7 +199,7 @@
         document.getElementById('mainContent').classList.remove('hidden');
         window.scrollTo(0, 0);
       }});
-    }, 2200);
+    }, 2500);
   });
 </script>
 </body>

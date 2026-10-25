@@ -1,147 +1,151 @@
-/* Tema Default (Bisa diubah di Admin) */
+/* =========================================
+   TEMA LUXURY (DEFAULT)
+   ========================================= */
 :root {
-  --bg-body: #f8f6f0;
-  --text-main: #333;
-  --gold-light: #fdf5e6;
-  --gold-mid: #d4af37;
-  --gold-dark: #b8860b;
-  --paper-color: #faf8f5;
-  --shadow: rgba(0, 0, 0, 0.15);
+  --bg-body: #F9F6F0;
+  --text-main: #2C2A28;
+  --text-muted: #7A7570;
+  --gold-light: #F4E8D1;
+  --gold-mid: #C5A059;
+  --gold-dark: #9E7A3E;
+  --paper-color: #FDFCFA;
+  --shadow: rgba(0, 0, 0, 0.08);
   --font-serif: 'Cormorant Garamond', serif;
   --font-sans: 'Montserrat', sans-serif;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: var(--font-sans); background: var(--bg-body); color: var(--text-main); line-height: 1.7; overflow-x: hidden; }
+body { font-family: var(--font-sans); background: var(--bg-body); color: var(--text-main); line-height: 1.8; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
 .hidden { display: none !important; }
 
 /* =========================================
-   LUXURY ENVELOPE (Efek Emboss & Cahaya)
+   LUXURY ENVELOPE (Emboss & Glow)
    ========================================= */
 .cover {
-  position: fixed; inset: 0; background: #e8e4db; /* Warna dasar luar */
+  position: fixed; inset: 0; 
+  background: linear-gradient(135deg, #F9F6F0 0%, #E8E2D6 100%);
   display: flex; justify-content: center; align-items: center;
   z-index: 9999; perspective: 2000px; overflow: hidden;
 }
 
-/* Cahaya Emas di tengah */
 .golden-glow {
   position: absolute; width: 100%; height: 100%;
-  background: radial-gradient(circle at center, rgba(212,175,55,0.4) 0%, transparent 60%);
+  background: radial-gradient(circle at center, rgba(197, 160, 89, 0.4) 0%, transparent 60%);
   opacity: 0; pointer-events: none; z-index: 10;
   mix-blend-mode: overlay;
 }
 
 .luxury-envelope {
-  position: relative; width: 320px; height: 450px;
+  position: relative; width: 320px; height: 440px;
   transform-style: preserve-3d;
 }
 
-/* Kertas Belakang (Tempat Teks) */
 .paper-back {
-  position: absolute; inset: 0; background: var(--paper-color);
+  position: absolute; inset: 0; 
+  background: linear-gradient(180deg, #FFFFFF 0%, #F4F0EA 100%);
   border-radius: 4px; display: flex; flex-direction: column;
   justify-content: center; align-items: center; padding: 30px;
-  box-shadow: inset 0 0 50px rgba(0,0,0,0.05), 0 20px 40px var(--shadow);
+  box-shadow: inset 0 0 60px rgba(0,0,0,0.03), 0 30px 60px var(--shadow);
   z-index: 1;
 }
 
-/* Teks Ukiran (Emboss Effect) */
-.cover-sub { font-family: var(--font-sans); font-size: 0.7rem; letter-spacing: 4px; text-transform: uppercase; color: #999; margin-bottom: 20px; text-shadow: 1px 1px 0px #fff; }
-.cover-title { font-family: var(--font-serif); font-size: 2.5rem; color: #555; font-weight: 600; text-align: center; line-height: 1.1; margin-bottom: 20px; text-shadow: 1px 1px 0px #fff, -1px -1px 0px rgba(0,0,0,0.1); }
-.cover-date { font-family: var(--font-sans); font-size: 1rem; letter-spacing: 3px; color: var(--gold-dark); font-weight: 500; }
+.ornament-top, .ornament-bottom { width: 120px; height: 24px; color: var(--gold-mid); margin: 15px 0; opacity: 0.8; }
+.cover-sub { font-family: var(--font-sans); font-size: 0.65rem; letter-spacing: 5px; text-transform: uppercase; color: var(--gold-dark); margin-bottom: 15px; font-weight: 400; }
+.cover-title { font-family: var(--font-serif); font-size: 2.2rem; color: var(--text-main); font-weight: 300; text-align: center; line-height: 1.1; margin-bottom: 15px; }
+.cover-title span { font-family: var(--font-serif); font-style: italic; font-size: 2.5rem; color: var(--gold-mid); display: block; margin: 5px 0; }
+.cover-date { font-family: var(--font-sans); font-size: 0.85rem; letter-spacing: 4px; color: var(--text-muted); font-weight: 300; }
 
-/* Kertas Depan (Kiri & Kanan) */
 .paper-front {
   position: absolute; top: 0; bottom: 0; width: 50%;
-  background: var(--paper-color);
-  box-shadow: 0 10px 30px var(--shadow);
+  background: linear-gradient(90deg, #FDFCFA, #F4F0EA);
+  box-shadow: 0 15px 40px var(--shadow);
   z-index: 5; backface-visibility: hidden;
   display: flex; justify-content: center; align-items: center;
   overflow: hidden;
 }
-.paper-front.left { left: 0; transform-origin: left center; border-right: 1px solid rgba(0,0,0,0.05); }
-.paper-front.right { right: 0; transform-origin: right center; border-left: 1px solid rgba(0,0,0,0.05); }
+.paper-front.left { left: 0; transform-origin: left center; border-right: 1px solid rgba(0,0,0,0.03); background: linear-gradient(to right, #F4F0EA, #FDFCFA); }
+.paper-front.right { right: 0; transform-origin: right center; border-left: 1px solid rgba(0,0,0,0.03); background: linear-gradient(to left, #F4F0EA, #FDFCFA); }
 
-/* Pola Ukiran (Emboss Pattern) menggunakan Gradien */
 .emboss-pattern {
   width: 100%; height: 100%;
   background-image: 
-    radial-gradient(circle at 50% 50%, transparent 40%, rgba(255,255,255,0.8) 41%, rgba(255,255,255,0.8) 42%, transparent 43%),
-    radial-gradient(circle at 50% 50%, transparent 50%, rgba(200,200,200,0.2) 51%, rgba(200,200,200,0.2) 52%, transparent 53%);
-  background-size: 80px 80px;
-  opacity: 0.8;
-  box-shadow: inset 0 0 30px rgba(0,0,0,0.05);
+    radial-gradient(circle at 50% 50%, transparent 40%, rgba(197,160,89,0.05) 41%, rgba(197,160,89,0.05) 42%, transparent 43%),
+    linear-gradient(45deg, transparent 45%, rgba(255,255,255,0.5) 50%, transparent 55%);
+  background-size: 60px 60px, 100% 100%;
+  opacity: 0.7;
 }
 
-/* Segel Lilin Emas (Wax Seal) */
 .wax-seal {
   position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  width: 80px; height: 80px;
-  background: radial-gradient(circle at 30% 30%, #fdf5e6, var(--gold-mid) 60%, var(--gold-dark));
+  width: 75px; height: 75px;
+  background: radial-gradient(circle at 30% 30%, #F4E8D1, var(--gold-mid) 60%, var(--gold-dark));
   border-radius: 50%; z-index: 20;
   display: flex; justify-content: center; align-items: center;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.3), inset 0 -3px 5px rgba(0,0,0,0.2), inset 0 3px 5px rgba(255,255,255,0.8);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2), inset 0 -3px 6px rgba(0,0,0,0.15), inset 0 3px 6px rgba(255,255,255,0.6);
   cursor: pointer; transition: transform 0.3s;
 }
 .wax-seal:active { transform: translate(-50%, -50%) scale(0.95); }
-.seal-initials { font-family: var(--font-serif); font-size: 1.8rem; color: #8a6d1c; text-shadow: 1px 1px 1px rgba(255,255,255,0.5), -1px -1px 1px rgba(0,0,0,0.3); font-weight: 600; }
-.seal-shine { position: absolute; top: 10%; left: 20%; width: 30%; height: 30%; background: rgba(255,255,255,0.6); border-radius: 50%; filter: blur(4px); }
+.seal-initials { font-family: var(--font-serif); font-size: 1.6rem; color: #6B4E1F; text-shadow: 1px 1px 1px rgba(255,255,255,0.4); font-weight: 600; letter-spacing: 1px; }
+.seal-shine { position: absolute; top: 10%; left: 20%; width: 30%; height: 30%; background: rgba(255,255,255,0.5); border-radius: 50%; filter: blur(3px); }
 
-/* Teks Petunjuk */
-.tap-hint { position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%); font-family: var(--font-sans); font-size: 0.8rem; letter-spacing: 2px; color: #888; text-transform: uppercase; white-space: nowrap; animation: pulse 2s infinite; }
-@keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+.tap-hint { position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%); font-family: var(--font-sans); font-size: 0.7rem; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; white-space: nowrap; animation: pulse 2.5s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
 
 /* =========================================
-   KONTEN UTAMA (Sama seperti sebelumnya)
+   KONTEN UTAMA (Elegant Layout)
    ========================================= */
-section { padding: 80px 20px; max-width: 600px; margin: 0 auto; text-align: center; }
-.section-title { font-family: var(--font-serif); font-size: 2.2rem; color: var(--gold-dark); margin-bottom: 20px; font-weight: 600; text-shadow: 1px 1px 0 #fff; }
-.sub { font-size: 0.9rem; color: #777; margin-bottom: 30px; }
-.hero { padding-top: 100px; }
-.bismillah { font-family: var(--font-serif); font-size: 1.5rem; color: var(--gold-dark); margin-bottom: 30px; }
-.hero-sub { font-family: var(--font-sans); letter-spacing: 3px; text-transform: uppercase; font-size: 0.8rem; color: #888; margin-bottom: 10px; }
-.hero-names { font-family: var(--font-serif); font-size: 2.8rem; line-height: 1.2; color: #444; margin-bottom: 40px; font-weight: 600; text-shadow: 1px 1px 0 #fff; }
-.hero-names span { font-size: 1.5rem; color: var(--gold-mid); display: block; margin: 10px 0; }
+section { padding: 100px 25px; max-width: 600px; margin: 0 auto; text-align: center; }
+.section-title { font-family: var(--font-serif); font-size: 2.2rem; color: var(--text-main); margin-bottom: 10px; font-weight: 400; letter-spacing: 1px; }
+.sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 35px; font-weight: 300; letter-spacing: 0.5px; }
 
-.countdown { display: flex; gap: 15px; justify-content: center; }
-.countdown div { background: #fff; border: 1px solid rgba(0,0,0,0.05); border-radius: 50%; width: 65px; height: 65px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
-.countdown span { font-family: var(--font-serif); font-size: 1.4rem; font-weight: 600; color: var(--gold-dark); display: block; line-height: 1; }
-.countdown small { font-size: 0.6rem; color: #888; text-transform: uppercase; margin-top: 2px; }
+.divider { width: 150px; height: 20px; color: var(--gold-mid); margin: 20px auto 40px; display: block; }
 
-.venue-name { font-family: var(--font-serif); font-size: 1.5rem; margin-bottom: 5px; color: #444; }
-.venue-addr { font-size: 0.9rem; color: #777; margin-bottom: 20px; }
-.map-wrap { border-radius: 12px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-.map-wrap iframe { width: 100%; height: 250px; border: 0; display: block; }
+.hero { padding-top: 120px; }
+.bismillah { font-family: var(--font-serif); font-size: 1.4rem; color: var(--gold-dark); margin-bottom: 30px; }
+.hero-sub { font-family: var(--font-sans); letter-spacing: 4px; text-transform: uppercase; font-size: 0.7rem; color: var(--gold-mid); margin-bottom: 15px; font-weight: 400; }
+.hero-names { font-family: var(--font-serif); font-size: 2.8rem; line-height: 1.1; color: var(--text-main); margin-bottom: 20px; font-weight: 300; }
+.hero-names span.ampersand { font-size: 2rem; color: var(--gold-mid); display: block; margin: 10px 0; font-style: italic; }
+
+.countdown { display: flex; gap: 12px; justify-content: center; margin-top: 30px; }
+.countdown div { background: #fff; border: 1px solid rgba(197,160,89,0.2); border-radius: 8px; width: 65px; height: 75px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.02); }
+.countdown span { font-family: var(--font-serif); font-size: 1.6rem; font-weight: 400; color: var(--gold-dark); display: block; line-height: 1; margin-bottom: 5px; }
+.countdown small { font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+.venue-name { font-family: var(--font-serif); font-size: 1.6rem; margin-bottom: 5px; color: var(--text-main); font-weight: 400; }
+.venue-addr { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 25px; font-weight: 300; line-height: 1.6; }
+.map-wrap { border-radius: 12px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 15px 40px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.03); }
+.map-wrap iframe { width: 100%; height: 250px; border: 0; display: block; filter: grayscale(100%) contrast(1.1); transition: filter 0.5s; }
+.map-wrap:hover iframe { filter: grayscale(0%) contrast(1); }
 
 .rsvp-form { text-align: left; max-width: 400px; margin: 0 auto; }
-.rsvp-form label { display: block; margin-bottom: 15px; font-size: 0.85rem; color: #555; }
-.rsvp-form input, .rsvp-form select, .rsvp-form textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid rgba(0,0,0,0.1); border-radius: 6px; font-family: var(--font-sans); font-size: 0.9rem; background: #fff; color: #333; outline: none; }
-.rsvp-form input:focus, .rsvp-form select:focus, .rsvp-form textarea:focus { border-color: var(--gold-mid); }
-.quota { font-size: 0.9rem; color: #777; margin-bottom: 20px; }
-.quota b { color: var(--gold-dark); }
+.rsvp-form label { display: block; margin-bottom: 20px; font-size: 0.8rem; color: var(--text-muted); font-weight: 400; letter-spacing: 0.5px; }
+.rsvp-form input, .rsvp-form select, .rsvp-form textarea { width: 100%; padding: 15px; margin-top: 8px; border: 1px solid rgba(0,0,0,0.08); border-radius: 6px; font-family: var(--font-sans); font-size: 0.9rem; background: #fff; color: var(--text-main); outline: none; transition: border 0.3s, box-shadow 0.3s; }
+.rsvp-form input:focus, .rsvp-form select:focus, .rsvp-form textarea:focus { border-color: var(--gold-mid); box-shadow: 0 0 0 3px rgba(197,160,89,0.1); }
+.quota { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 25px; font-weight: 300; }
+.quota b { color: var(--gold-dark); font-weight: 500; }
 
-.btn-primary, .btn-outline { display: inline-block; padding: 12px 30px; border-radius: 4px; font-family: var(--font-sans); font-weight: 500; font-size: 0.85rem; cursor: pointer; text-decoration: none; letter-spacing: 1px; text-transform: uppercase; transition: 0.3s; text-align: center; width: 100%; margin-top: 10px; }
-.btn-primary { background: var(--gold-mid); color: #fff; border: 1px solid var(--gold-mid); box-shadow: 0 4px 10px rgba(212,175,55,0.3); }
-.btn-primary:hover { background: var(--gold-dark); }
+.btn-primary, .btn-outline { display: inline-block; padding: 15px 35px; border-radius: 4px; font-family: var(--font-sans); font-weight: 400; font-size: 0.8rem; cursor: pointer; text-decoration: none; letter-spacing: 2px; text-transform: uppercase; transition: 0.3s; text-align: center; width: 100%; margin-top: 10px; }
+.btn-primary { background: linear-gradient(135deg, var(--gold-mid), var(--gold-dark)); color: #fff; border: none; box-shadow: 0 8px 20px rgba(197,160,89,0.3); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(197,160,89,0.4); }
 .btn-outline { background: transparent; color: var(--gold-dark); border: 1px solid var(--gold-dark); }
 .btn-outline:hover { background: var(--gold-dark); color: #fff; }
 
-.garden { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px,1fr)); gap: 5px; background: rgba(0,0,0,0.02); border-radius: 12px; padding: 20px; min-height: 150px; margin-top: 20px; }
-.bunga { font-size: 1.5rem; background: none; border: none; cursor: pointer; transition: transform 0.2s; }
-.bunga:hover { transform: scale(1.3); }
-.empty { grid-column: 1/-1; color: #aaa; font-style: italic; font-size: 0.9rem; }
+.garden { display: grid; grid-template-columns: repeat(auto-fill, minmax(45px,1fr)); gap: 8px; background: #fff; border-radius: 12px; padding: 25px; min-height: 180px; margin-top: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.02); }
+.bunga { font-size: 1.8rem; background: none; border: none; cursor: pointer; transition: transform 0.3s; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1)); }
+.bunga:hover { transform: scale(1.2) rotate(5deg); }
+.empty { grid-column: 1/-1; color: var(--text-muted); font-style: italic; font-size: 0.85rem; font-weight: 300; }
 
-.popup { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 90%; z-index: 999; font-size: 0.9rem; text-align: center; border-left: 4px solid var(--gold-mid); }
-.popup small { display: block; color: #aaa; margin-top: 10px; font-size: 0.7rem; }
+.popup { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #fff; padding: 25px 30px; border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.15); max-width: 90%; z-index: 999; font-size: 0.9rem; text-align: center; border-top: 3px solid var(--gold-mid); }
+.popup small { display: block; color: var(--text-muted); margin-top: 15px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
 
-.game-frame { width: 100%; height: 300px; border: 0; border-radius: 12px; background: #f4f4f4; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-.file-input { margin-bottom: 15px; font-size: 0.9rem; }
-#photoCanvas { max-width: 100%; border-radius: 12px; margin-top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-.template-picker { display: flex; gap: 15px; justify-content: center; margin: 15px 0; font-size: 0.9rem; }
-.photo-actions { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
+.game-frame { width: 100%; height: 300px; border: 0; border-radius: 12px; background: #f4f4f4; box-shadow: 0 15px 40px rgba(0,0,0,0.05); }
+.file-input { margin-bottom: 15px; font-size: 0.85rem; color: var(--text-muted); }
+#photoCanvas { max-width: 100%; border-radius: 12px; margin-top: 25px; box-shadow: 0 15px 40px rgba(0,0,0,0.1); }
+.template-picker { display: flex; gap: 20px; justify-content: center; margin: 20px 0; font-size: 0.85rem; color: var(--text-muted); }
+.photo-actions { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
 
-.qr-wrap { background: #fff; padding: 20px; display: inline-block; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+.qr-wrap { background: #fff; padding: 30px; display: inline-block; border-radius: 16px; box-shadow: 0 15px 40px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.02); }
+.qr-icon { width: 40px; height: 40px; color: var(--gold-mid); margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; opacity: 0.6; }
 .qr-img { width: 200px; height: 200px; }
 
-footer { text-align: center; padding: 40px 20px; font-family: var(--font-serif); font-size: 1.2rem; color: var(--gold-dark); }
+footer { text-align: center; padding: 60px 20px; font-family: var(--font-serif); font-size: 1.5rem; color: var(--gold-dark); font-weight: 300; letter-spacing: 1px; }
