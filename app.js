@@ -354,3 +354,27 @@ if (qrImage) {
     g.parentNode.insertBefore(hint, g.nextSibling);
   }
 })();
+// ====== TALI PENGIKAT COVER (simpul terurai saat di-tap) ======
+(function () {
+  const env = document.getElementById("luxuryEnvelope");
+  if (!env || document.getElementById("envTie")) return;
+
+  env.insertAdjacentHTML("beforeend", `
+    <div class="env-tie" id="envTie">
+      <div class="tie-strap tie-h"></div>
+      <div class="tie-strap tie-v"></div>
+      <div class="tie-knot">
+        <span class="knot-loop left"></span>
+        <span class="knot-loop right"></span>
+        <span class="knot-tail left"></span>
+        <span class="knot-tail right"></span>
+      </div>
+    </div>`);
+
+  function untie() {
+    const tie = document.getElementById("envTie");
+    if (tie) tie.classList.add("untied");
+  }
+  env.addEventListener("click", untie);
+  env.addEventListener("touchstart", untie, { passive: true });
+})();

@@ -990,3 +990,94 @@ EOF
 .emboss-shadow {
   background: linear-gradient(to right, rgba(44,42,40,0.05), transparent 22%, transparent 78%, rgba(44,42,40,0.05));
 }
+/* ============================================================
+   COVER: hapus emboss cincin, garis gold, & segel lama
+   ============================================================ */
+.paper-front::before, .paper-front::after { content: none !important; }
+.emboss-pattern { background: none !important; }
+.wax-seal { opacity: 0 !important; pointer-events: none; }
+
+/* ============================================================
+   TALI PENGIKAT — simpul tali yang terurai saat di-tap
+   ============================================================ */
+.env-tie {
+  position: absolute; inset: 0; z-index: 15; pointer-events: none;
+}
+
+/* tali horizontal mengelilingi amplop */
+.tie-h {
+  position: absolute; top: 50%; left: -6%;
+  width: 112%; height: 13px; transform: translateY(-50%);
+  background:
+    repeating-linear-gradient(90deg, rgba(90,70,40,0.20) 0 2px, transparent 2px 5px),
+    linear-gradient(180deg, #D2B787 0%, #A8895A 50%, #7E6238 100%);
+  border-radius: 7px;
+  box-shadow: 0 3px 6px rgba(60,45,20,0.35), inset 0 1px 0 rgba(255,240,210,0.5);
+}
+
+/* tali vertikal */
+.tie-v {
+  position: absolute; left: 50%; top: -5%;
+  height: 110%; width: 13px; transform: translateX(-50%);
+  background:
+    repeating-linear-gradient(0deg, rgba(90,70,40,0.20) 0 2px, transparent 2px 5px),
+    linear-gradient(90deg, #D2B787 0%, #A8895A 50%, #7E6238 100%);
+  border-radius: 7px;
+  box-shadow: 3px 0 6px rgba(60,45,20,0.3), inset 1px 0 0 rgba(255,240,210,0.5);
+}
+
+/* simpul di persilangan tali */
+.tie-knot {
+  position: absolute; top: 50%; left: 50%;
+  width: 34px; height: 34px; margin: -17px 0 0 -17px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #D9C29A 0%, #A8895A 60%, #7A5F3A 100%);
+  box-shadow: 0 4px 8px rgba(60,45,20,0.4), inset 0 -3px 5px rgba(0,0,0,0.25), inset 0 3px 5px rgba(255,240,210,0.5);
+  z-index: 2;
+}
+.knot-loop {
+  position: absolute; top: 50%; width: 28px; height: 16px;
+  border: 5px solid #A8895A; border-radius: 50%;
+  margin-top: -8px;
+  box-shadow: 0 2px 3px rgba(60,45,20,0.25);
+}
+.knot-loop.left  { right: 58%; transform: rotate(-32deg); border-color: #B89A6C; }
+.knot-loop.right { left: 58%;  transform: rotate(32deg); }
+.knot-tail {
+  position: absolute; top: 68%; width: 7px; height: 28px;
+  background: linear-gradient(180deg, #B89A6C 0%, #8A6D42 100%);
+  border-radius: 3px;
+  box-shadow: 0 2px 3px rgba(60,45,20,0.3);
+}
+.knot-tail.left  { left: 28%;  transform: rotate(20deg); }
+.knot-tail.right { right: 28%; transform: rotate(-20deg); }
+
+/* ===== ANIMASI TERURAI saat di-tap ===== */
+.env-tie.untied .knot-loop {
+  transition: all 0.45s ease;
+  opacity: 0;
+}
+.env-tie.untied .knot-loop.left  { transform: rotate(-32deg) scale(0.2) translateY(24px); }
+.env-tie.untied .knot-loop.right { transform: rotate(32deg) scale(0.2) translateY(24px); }
+.env-tie.untied .knot-tail {
+  transition: all 0.5s 0.1s ease;
+  opacity: 0;
+}
+.env-tie.untied .knot-tail.left  { transform: rotate(70deg) translateY(34px); }
+.env-tie.untied .knot-tail.right { transform: rotate(-70deg) translateY(34px); }
+.env-tie.untied .tie-knot {
+  animation: knotFall 0.8s 0.15s ease-in forwards;
+}
+@keyframes knotFall {
+  to { transform: translateY(150px) rotate(140deg); opacity: 0; }
+}
+.env-tie.untied .tie-h {
+  transition: transform 0.9s 0.3s ease-in, opacity 0.9s 0.3s;
+  transform: translateY(-50%) translateX(-140%) rotate(-8deg);
+  opacity: 0.9;
+}
+.env-tie.untied .tie-v {
+  transition: transform 0.9s 0.3s ease-in, opacity 0.9s 0.3s;
+  transform: translateX(-50%) translateY(-140%) rotate(8deg);
+  opacity: 0.9;
+}
