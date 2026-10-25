@@ -1,8 +1,8 @@
 // ====== CONFIG ======
-const TANGGAL_NIKAH = "2026-12-24T09:00:00+07:00"; 
-const VENUE_NAME = "Rumah Makan Alam Pilemburan"; 
-const VENUE_ADDR = "Jl. Raya Gadobangkong No.112, Gadobangkong, Kec. Ngamprah, Kabupaten Bandung Barat, Jawa Barat 40552"; 
-const GMAP_QUERY = "-6.866054,107.517273"; 
+const TANGGAL_NIKAH = "2026-12-24T09:00:00+07:00";
+const VENUE_NAME = "Rumah Makan Alam Pilemburan";
+const VENUE_ADDR = "Jl. Raya Gadobangkong No.112, Gadobangkong, Kec. Ngamprah, Kabupaten Bandung Barat, Jawa Barat 40552";
+const GMAP_QUERY = "-6.866054,107.517273";
 
 // ====== COUNTDOWN ======
 function updateCountdown() {
@@ -12,7 +12,7 @@ function updateCountdown() {
   if (isNaN(target)) return;
   if (diff <= 0) {
     document.getElementById("countdown").innerHTML =
-      "<div><span>🎉</span><small>Selamat!</small></div>";
+      '<div class="cd-done">Alhamdulillah, The Day Has Come</div>';
     return;
   }
   const d = Math.floor(diff / 86400000);
@@ -78,7 +78,7 @@ document.getElementById("rsvpForm").addEventListener("submit", async (e) => {
   } else {
     const pesan = document.getElementById("rsvpDoa").value.trim();
     if (!pesan) { msg.textContent = "Mohon tulis doa/ucapan."; return; }
-    // simpan doa
+    // simpan doa (jenis bunga acak untuk variasi taman)
     await supabaseClient.from("doa").insert({
       nama, pesan, sumber: "rsvp",
       bunga: ["mawar","tulip","matahari","sakura","lily"][Math.floor(Math.random()*5)]
@@ -89,8 +89,8 @@ document.getElementById("rsvpForm").addEventListener("submit", async (e) => {
   if (error) { msg.textContent = "Gagal kirim: " + error.message; return; }
 
   msg.textContent = hadir
-    ? "Terima kasih! Kami tunggu kehadiranmu 💐"
-    : "Terima kasih doanya, bunga telah tumbuh 🌸";
+    ? "Terima kasih! Kami tunggu kehadiran Anda."
+    : "Terima kasih atas doanya — sebuah bunga telah mekar di taman.";
   e.target.reset();
   hadirFields.hidden = true;
   doaFields.hidden = true;
@@ -98,71 +98,119 @@ document.getElementById("rsvpForm").addEventListener("submit", async (e) => {
   loadTaman();
 });
 
-// ====== TAMAN DOA (RENDER BUNGA CSS) ======
+// ====== POPUP DOA ELEGAN ======
+const prayerModal = document.getElementById("prayerModal");
+const prayerCard = document.getElementById("prayerCard");
+
+function openPrayerModal(nama, pesan) {
+  document.getElementById("prayerName").textContent = nama;
+  document.getElementById("prayerMessage").textContent = "\u201C" + pesan + "\u201D";
+  prayerModal.hidden = false;
+  document.body.style.overflow = "hidden";
+  if (window.gsap) {
+    gsap.fromTo(".prayer-modal-backdrop", { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power2.out" });
+    gsap.fromTo(prayerCard,
+      { opacity: 0, y: 46, scale: 0.92, rotateX: 8 },
+      { opacity: 1, y: 0, scale: 1, rotateX: 0, duration: 0.65, ease: "back.out(1.6)" });
+  }
+}
+
+function closePrayerModal() {
+  if (window.gsap) {
+    gsap.to(prayerCard, { opacity: 0, y: 30, scale: 0.94, duration: 0.32, ease: "power2.in" });
+    gsap.to(".prayer-modal-backdrop", {
+      opacity: 0, duration: 0.35, ease: "power2.in",
+      onComplete: () => { prayerModal.hidden = true; document.body.style.overflow = ""; }
+    });
+  } else {
+    prayerModal.hidden = true;
+    document.body.style.overflow = "";
+  }
+}
+
+document.getElementById("prayerClose").addEventListener("click", closePrayerModal);
+document.getElementById("prayerBackdrop").addEventListener("click", closePrayerModal);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !prayerModal.hidden) closePrayerModal();
+});
+
+// ====== TAMAN DOA (BUNGA CSS MURNI: BATANG + DAUN + 6 KELOPAK + PUSAT) ======
+const BUNGA_TYPES = ["mawar", "tulip", "matahari", "sakura", "lily"];
+
+// Posisi deterministik berdasarkan id supaya bunga tidak "lompat" saat realtime refresh
+function flowerPosition(seed) {
+  let h = 0;
+  const s = String(seed);
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return {
+    x: 4 + (h % 840) / 10,          // 4% .. 88%
+    h: 58 + (h % 30),               // tinggi batang 58..87px
+    scale: 0.8 + ((h >> 4) % 40) / 100, // 0.8 .. 1.2
+    swayDelay: (h % 40) / 10        // jeda goyang 0..4s
+  };
+}
+
+function buildFlower(d) {
+  const pos = flowerPosition(d.id);
+  const type = BUNGA_TYPES.includes(d.bunga) ? d.bunga : "mawar";
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "flower-wrapper flower-" + type;
+  wrapper.style.left = pos.x + "%";
+  wrapper.style.height = pos.h + "px";
+  wrapper.style.scale = String(pos.scale);
+  wrapper.style.animationDelay = "0s, " + pos.swayDelay + "s";
+
+  const stem = document.createElement("div");
+  stem.className = "flower-stem";
+
+  const leafL = document.createElement("div");
+  leafL.className = "flower-leaf left";
+  const leafR = document.createElement("div");
+  leafR.className = "flower-leaf right";
+
+  const head = document.createElement("div");
+  head.className = "flower-head";
+  for (let i = 0; i < 6; i++) {
+    const petal = document.createElement("div");
+    petal.className = "flower-petal";
+    head.appendChild(petal);
+  }
+  const center = document.createElement("div");
+  center.className = "flower-center";
+  head.appendChild(center);
+
+  stem.appendChild(leafL);
+  stem.appendChild(leafR);
+  wrapper.appendChild(stem);
+  wrapper.appendChild(head);
+
+  // Klik bunga -> popup elegan berisi nama & pesan
+  wrapper.addEventListener("click", () => openPrayerModal(d.nama, d.pesan));
+
+  return wrapper;
+}
+
 async function loadTaman() {
   const { data, error } = await supabaseClient
     .from("doa").select("*").order("created_at", { ascending: true });
   if (error) return;
-  
+
   const container = document.getElementById("flowerContainer");
   container.innerHTML = ""; // Bersihkan taman
 
   if (data && data.length > 0) {
     data.forEach((d, index) => {
-      // Buat div untuk batang
-      const stem = document.createElement("div");
-      stem.className = "flower-stem";
-      
-      // Buat div untuk kelopak
-      const bloom = document.createElement("div");
-      bloom.className = "flower-bloom";
-      
-      // Bungkus dalam satu container
-      const flower = document.createElement("div");
-      flower.className = "flower-wrapper";
-      
-      // Simpan data pesan di atribut
-      flower.dataset.nama = d.nama;
-      flower.dataset.pesan = d.pesan;
-      
-      // Posisi acak
-      const posX = 10 + Math.random() * 80; 
-      const delay = (index % 10) * 0.1; 
-      
-      flower.style.left = `${posX}%`;
-      flower.style.animationDelay = `${delay}s`;
-      
-      // Warna acak untuk kelopak
-      const colors = ["#FFB6C1", "#FF69B4", "#FFD700", "#FFA07A", "#E6E6FA"];
-      const randomColor = colors[Math.floor(Math.random() * colors.length)];
-      bloom.style.backgroundColor = randomColor;
-      
-      stem.appendChild(bloom);
-      flower.appendChild(stem);
-      
-      // Fitur Klik untuk melihat pesan
-      flower.addEventListener("click", () => {
-        showPopup(`<b>${d.nama}</b><br><br>"${d.pesan}"`);
-      });
-      
+      const flower = buildFlower(d);
+      // Bunga baru (realtime) tumbuh paling akhir dengan jeda dramatis
+      flower.style.animationDelay = Math.min(index * 0.08, 2) + "s, " +
+        (flowerPosition(d.id).swayDelay + Math.min(index * 0.08, 2)) + "s";
       container.appendChild(flower);
     });
   }
 }
 loadTaman();
 
-// popup sederhana
-function showPopup(html) {
-  let p = document.getElementById("popup");
-  if (!p) {
-    p = document.createElement("div");
-    p.id = "popup";
-    p.className = "popup";
-    p.onclick = () => p.remove();
-    document.body.appendChild(p);
-  }
-  p.innerHTML = html + "<br><small>(klik untuk tutup)</small>";
-}
 // realtime taman
 supabaseClient.channel("doa-rt")
   .on("postgres_changes", { event: "INSERT", schema: "public", table: "doa" },
@@ -205,6 +253,26 @@ function drawPhoto() {
   document.getElementById("shareBtn").hidden = false;
 }
 
+// Bunga vektor di-draw manual di canvas (tanpa emoji)
+function drawCanvasFlower(c, x, y, size, petalColor, centerColor) {
+  c.save();
+  c.translate(x, y);
+  for (let i = 0; i < 6; i++) {
+    c.save();
+    c.rotate((Math.PI / 3) * i);
+    c.beginPath();
+    c.ellipse(0, -size * 0.62, size * 0.30, size * 0.60, 0, 0, Math.PI * 2);
+    c.fillStyle = petalColor;
+    c.fill();
+    c.restore();
+  }
+  c.beginPath();
+  c.arc(0, 0, size * 0.30, 0, Math.PI * 2);
+  c.fillStyle = centerColor;
+  c.fill();
+  c.restore();
+}
+
 function drawTemplate(tpl, W, H) {
   if (tpl === "classic") {
     ctx.strokeStyle = "#fff"; ctx.lineWidth = 24;
@@ -218,11 +286,12 @@ function drawTemplate(tpl, W, H) {
   } else if (tpl === "floral") {
     ctx.strokeStyle = "#e8a0b8"; ctx.lineWidth = 18;
     ctx.strokeRect(9, 9, W - 18, H - 18);
-    ctx.font = "40px serif";
-    ["🌸","🌷","🌹","🌺"].forEach((f,i)=>{
-      ctx.fillText(f, 30 + i*(W-60)/3, 55);
-    });
-    ctx.fillStyle = "rgba(255,255,255,.7)";
+    // Rangkaian bunga vektor di sudut-sudut (bukan emoji)
+    drawCanvasFlower(ctx, 52, 62, 26, "#F4B8C9", "#E3B94E");
+    drawCanvasFlower(ctx, W - 52, 62, 26, "#E58BA6", "#FDE9EE");
+    drawCanvasFlower(ctx, 52, H - 150, 26, "#CE8BD6", "#E3B94E");
+    drawCanvasFlower(ctx, W - 52, H - 150, 26, "#F4B8C9", "#E3B94E");
+    ctx.fillStyle = "rgba(255,255,255,.75)";
     ctx.fillRect(0, H - 90, W, 90);
     ctx.fillStyle = "#a04a68"; ctx.font = "bold 24px serif"; ctx.textAlign = "center";
     ctx.fillText("Irsyaadul & Refalina", W / 2, H - 45);
