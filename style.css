@@ -28,7 +28,7 @@
   /* Shadow & Glow */
   --shadow-soft: 0 15px 35px rgba(0, 0, 0, 0.05);
   --shadow-medium: 0 25px 50px rgba(0, 0, 0, 0.1);
-  --shadow-hard: 0 35px 70px rgba(0, 0, 0, 0.2);
+  --shadow-hard: 0 35px 70px rgba(0, 0, 0, 0.15); /* Opacity shadow diturunkan sedikit */
   --glow-gold: 0 0 20px rgba(197, 160, 89, 0.4);
 }
 
@@ -66,14 +66,14 @@ img, iframe {
 }
 
 /* ==========================================================================
-   3. OVERLAY EFEK (NOISE & VIGNETTE)
+   3. OVERLAY EFEK (NOISE & VIGNETTE) - OPACITY DIPERHALUS
    ========================================================================== */
 .noise-overlay {
   position: fixed; 
   inset: 0; 
   z-index: 9998; 
   pointer-events: none; 
-  opacity: 0.35;
+  opacity: 0.25; /* Diturunkan dari 0.35 agar lebih subtle */
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   mix-blend-mode: multiply;
 }
@@ -83,7 +83,7 @@ img, iframe {
   inset: 0;
   z-index: 9997;
   pointer-events: none;
-  background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.05) 100%);
+  background: radial-gradient(circle, transparent 60%, rgba(0,0,0,0.08) 100%); /* Lebih halus */
 }
 
 /* ==========================================================================
@@ -105,7 +105,7 @@ img, iframe {
   position: absolute; 
   width: 100%; 
   height: 100%; 
-  background: radial-gradient(circle at center, rgba(197, 160, 89, 0.6) 0%, transparent 60%); 
+  background: radial-gradient(circle at center, rgba(197, 160, 89, 0.4) 0%, transparent 60%); /* Opacity diturunkan */
   opacity: 0; 
   pointer-events: none; 
   z-index: 10; 
@@ -130,8 +130,9 @@ img, iframe {
   justify-content: center; 
   align-items: center; 
   padding: 40px; 
-  box-shadow: inset 0 0 80px rgba(0,0,0,0.04), var(--shadow-hard); 
+  box-shadow: inset 0 0 80px rgba(0,0,0,0.03), var(--shadow-hard); 
   z-index: 1; 
+  opacity: 0.98; /* Sedikit transparan */
 }
 
 .ornament-frame { 
@@ -141,7 +142,7 @@ img, iframe {
   width: 100%; 
   height: 100%; 
   color: var(--gold-mid); 
-  opacity: 0.35; 
+  opacity: 0.25; /* Diturunkan dari 0.35 */
   pointer-events: none; 
 }
 
@@ -159,6 +160,7 @@ img, iframe {
   color: var(--gold-dark); 
   margin-bottom: 25px; 
   font-weight: 600; 
+  opacity: 0.85;
 }
 
 .cover-title { 
@@ -169,6 +171,7 @@ img, iframe {
   line-height: 1; 
   margin-bottom: 20px; 
   text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+  opacity: 1;
 }
 
 .ampersand-cover { 
@@ -179,6 +182,7 @@ img, iframe {
   display: block; 
   margin: 10px 0; 
   font-weight: 700;
+  opacity: 0.9;
 }
 
 .cover-date { 
@@ -187,6 +191,7 @@ img, iframe {
   letter-spacing: 5px; 
   color: var(--text-muted); 
   font-weight: 600; 
+  opacity: 0.8;
 }
 
 /* Kertas Depan (Kiri & Kanan) */
@@ -196,7 +201,7 @@ img, iframe {
   bottom: 0; 
   width: 50%; 
   background: linear-gradient(90deg, #FDFCFA, #F4F0EA); 
-  box-shadow: 0 15px 40px rgba(0,0,0,0.08); 
+  box-shadow: 0 15px 40px rgba(0,0,0,0.06); /* Shadow lebih halus */
   z-index: 5; 
   backface-visibility: hidden; 
   overflow: hidden; 
@@ -205,27 +210,27 @@ img, iframe {
 .paper-front.left { 
   left: 0; 
   transform-origin: left center; 
-  border-right: 1px solid rgba(0,0,0,0.03); 
+  border-right: 1px solid rgba(0,0,0,0.02); 
 }
 
 .paper-front.right { 
   right: 0; 
   transform-origin: right center; 
-  border-left: 1px solid rgba(0,0,0,0.03); 
+  border-left: 1px solid rgba(0,0,0,0.02); 
 }
 
 .emboss-pattern { 
   width: 100%; 
   height: 100%; 
-  background-image: radial-gradient(circle at 50% 50%, transparent 40%, rgba(197,160,89,0.05) 41%, rgba(197,160,89,0.05) 42%, transparent 43%), linear-gradient(45deg, transparent 45%, rgba(255,255,255,0.5) 50%, transparent 55%); 
+  background-image: radial-gradient(circle at 50% 50%, transparent 40%, rgba(197,160,89,0.03) 41%, rgba(197,160,89,0.03) 42%, transparent 43%), linear-gradient(45deg, transparent 45%, rgba(255,255,255,0.4) 50%, transparent 55%); 
   background-size: 60px 60px, 100% 100%; 
-  opacity: 0.8; 
+  opacity: 0.7; 
 }
 
 .emboss-shadow {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to right, rgba(0,0,0,0.05), transparent 20%, transparent 80%, rgba(0,0,0,0.05));
+  background: linear-gradient(to right, rgba(0,0,0,0.03), transparent 20%, transparent 80%, rgba(0,0,0,0.03));
   pointer-events: none;
 }
 
@@ -243,21 +248,22 @@ img, iframe {
   display: flex; 
   justify-content: center; 
   align-items: center; 
-  box-shadow: var(--shadow-medium), inset 0 -4px 8px rgba(0,0,0,0.2), inset 0 4px 8px rgba(255,255,255,0.7); 
+  box-shadow: var(--shadow-medium), inset 0 -4px 8px rgba(0,0,0,0.15), inset 0 4px 8px rgba(255,255,255,0.5); 
   cursor: pointer; 
   transition: transform 0.3s, box-shadow 0.3s; 
+  opacity: 0.95;
 }
 
 .wax-seal:active { 
   transform: translate(-50%, -50%) scale(0.95); 
-  box-shadow: var(--shadow-soft), inset 0 -2px 4px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.7); 
+  box-shadow: var(--shadow-soft), inset 0 -2px 4px rgba(0,0,0,0.15), inset 0 2px 4px rgba(255,255,255,0.5); 
 }
 
 .seal-initials { 
   font-family: var(--font-serif); 
   font-size: 1.8rem; 
   color: var(--gold-darkest); 
-  text-shadow: 1px 1px 1px rgba(255,255,255,0.4), -1px -1px 1px rgba(0,0,0,0.2); 
+  text-shadow: 1px 1px 1px rgba(255,255,255,0.3), -1px -1px 1px rgba(0,0,0,0.1); 
   font-weight: 700; 
   letter-spacing: 1px; 
 }
@@ -268,16 +274,18 @@ img, iframe {
   left: 25%; 
   width: 30%; 
   height: 30%; 
-  background: rgba(255,255,255,0.6); 
+  background: rgba(255,255,255,0.5); 
   border-radius: 50%; 
   filter: blur(4px); 
+  opacity: 0.8;
 }
 
 .seal-rim {
   position: absolute;
   inset: 5px;
-  border: 1px dashed rgba(0,0,0,0.1);
+  border: 1px dashed rgba(0,0,0,0.08);
   border-radius: 50%;
+  opacity: 0.7;
 }
 
 .tap-hint { 
@@ -293,11 +301,12 @@ img, iframe {
   white-space: nowrap; 
   animation: pulse 2.5s infinite; 
   font-weight: 500;
+  opacity: 0.6;
 }
 
 @keyframes pulse { 
   0%, 100% { opacity: 0.3; transform: translateX(-50%) scale(1); } 
-  50% { opacity: 1; transform: translateX(-50%) scale(1.05); } 
+  50% { opacity: 0.8; transform: translateX(-50%) scale(1.05); } 
 }
 
 /* ==========================================================================
@@ -334,6 +343,7 @@ section {
   font-weight: 700; 
   letter-spacing: 3px; 
   text-transform: uppercase;
+  opacity: 0.95;
 }
 
 .sub { 
@@ -342,13 +352,14 @@ section {
   margin-bottom: 50px; 
   font-weight: 500; 
   letter-spacing: 1.5px; 
+  opacity: 0.8;
 }
 
 /* Garis Aksen Emas (Underline) */
-.gold-underline { width: 120px; height: 2px; background: linear-gradient(to right, transparent, var(--gold-mid), transparent); margin: 20px auto; }
-.gold-underline-short { width: 60px; height: 2px; background: var(--gold-mid); margin: 15px auto 0; }
-.gold-underline-light { width: 100px; height: 2px; background: linear-gradient(to right, transparent, var(--gold-light), transparent); margin: 0 auto 30px; }
-.gold-underline-dark { width: 100px; height: 2px; background: linear-gradient(to right, transparent, var(--gold-dark), transparent); margin: 0 auto 30px; }
+.gold-underline { width: 120px; height: 2px; background: linear-gradient(to right, transparent, var(--gold-mid), transparent); margin: 20px auto; opacity: 0.8; }
+.gold-underline-short { width: 60px; height: 2px; background: var(--gold-mid); margin: 15px auto 0; opacity: 0.8; }
+.gold-underline-light { width: 100px; height: 2px; background: linear-gradient(to right, transparent, var(--gold-light), transparent); margin: 0 auto 30px; opacity: 0.7; }
+.gold-underline-dark { width: 100px; height: 2px; background: linear-gradient(to right, transparent, var(--gold-dark), transparent); margin: 0 auto 30px; opacity: 0.7; }
 
 /* Pembatas SVG */
 .wave-divider, .curve-divider { 
@@ -358,6 +369,7 @@ section {
   width: 100%; 
   line-height: 0; 
   z-index: 1; 
+  opacity: 0.9;
 }
 
 .wave-divider svg, .curve-divider svg { 
@@ -384,6 +396,7 @@ section {
   color: var(--gold-dark); 
   margin-bottom: 15px; 
   font-weight: 600;
+  opacity: 0.9;
 }
 
 .bismillah-line {
@@ -391,6 +404,7 @@ section {
   height: 1px;
   background: linear-gradient(to right, transparent, var(--gold-mid), transparent);
   margin: 0 auto;
+  opacity: 0.6;
 }
 
 .hero-title-wrapper { 
@@ -406,6 +420,7 @@ section {
   margin-bottom: 25px; 
   font-weight: 600; 
   display: block; 
+  opacity: 0.9;
 }
 
 .hero-names { 
@@ -433,6 +448,7 @@ section {
   display: block; 
   margin: 5px 0; 
   font-weight: 700;
+  opacity: 0.8;
 }
 
 .hero-info { 
@@ -447,6 +463,7 @@ section {
   margin-bottom: 10px; 
   font-weight: 600; 
   text-transform: uppercase; 
+  opacity: 0.9;
 }
 
 .hero-time { 
@@ -455,6 +472,7 @@ section {
   letter-spacing: 3px; 
   color: var(--gold-dark); 
   font-weight: 600; 
+  opacity: 0.9;
 }
 
 /* Countdown */
@@ -470,7 +488,7 @@ section {
 
 .cd-box { 
   background: #fff; 
-  border: 1px solid rgba(197,160,89,0.15); 
+  border: 1px solid rgba(197,160,89,0.1); /* Border lebih transparan */
   border-radius: 10px; 
   width: 80px; 
   height: 90px; 
@@ -479,6 +497,7 @@ section {
   justify-content: center; 
   align-items: center; 
   box-shadow: var(--shadow-soft); 
+  opacity: 0.95;
 }
 
 .cd-box span { 
@@ -497,6 +516,7 @@ section {
   text-transform: uppercase; 
   letter-spacing: 2px; 
   font-weight: 600;
+  opacity: 0.8;
 }
 
 /* ==========================================================================
@@ -514,7 +534,7 @@ section {
   line-height: 1.3; 
   letter-spacing: 1px; 
   text-decoration: underline;
-  text-decoration-color: var(--gold-mid);
+  text-decoration-color: rgba(197, 160, 89, 0.7); /* Underline transparan */
   text-underline-offset: 8px;
 }
 
@@ -523,7 +543,7 @@ section {
   margin-bottom: 50px; 
   font-weight: 400; 
   line-height: 1.8; 
-  opacity: 0.8; 
+  opacity: 0.7; 
   letter-spacing: 0.5px; 
 }
 
@@ -532,7 +552,7 @@ section {
   overflow: hidden; 
   margin-bottom: 50px; 
   box-shadow: var(--shadow-hard); 
-  border: 4px solid rgba(255,255,255,0.05); 
+  border: 4px solid rgba(255,255,255,0.03); /* Border transparan */
 }
 
 .map-wrap iframe { 
@@ -541,6 +561,7 @@ section {
   border: 0; 
   display: block; 
   filter: none; 
+  opacity: 0.95;
 }
 
 /* ==========================================================================
@@ -568,6 +589,7 @@ section {
   letter-spacing: 1.5px; 
   margin-bottom: 8px;
   text-transform: uppercase;
+  opacity: 0.9;
 }
 
 .rsvp-form input, 
@@ -575,12 +597,12 @@ section {
 .rsvp-form textarea { 
   width: 100%; 
   padding: 18px; 
-  border: 1px solid rgba(0,0,0,0.08); 
+  border: 1px solid rgba(0,0,0,0.05); 
   border-radius: 8px; 
   font-family: var(--font-sans); 
   font-size: 0.95rem; 
   font-weight: 500;
-  background: var(--bg-cream); 
+  background: rgba(249, 247, 242, 0.7); /* Background form transparan */
   color: var(--text-main); 
   outline: none; 
   transition: all 0.3s; 
@@ -589,7 +611,7 @@ section {
 .rsvp-form input:focus, 
 .rsvp-form select:focus, 
 .rsvp-form textarea:focus { 
-  border-color: var(--gold-mid); 
+  border-color: rgba(197,160,89,0.8); 
   background: #fff; 
   box-shadow: 0 0 0 4px rgba(197,160,89,0.1); 
 }
@@ -609,6 +631,7 @@ section {
   margin-bottom: 40px; 
   font-weight: 500; 
   letter-spacing: 1px; 
+  opacity: 0.9;
 }
 
 .quota b { 
@@ -638,31 +661,33 @@ section {
 }
 
 .btn-primary { 
-  background: linear-gradient(135deg, var(--gold-mid), var(--gold-dark)); 
+  background: linear-gradient(135deg, rgba(197,160,89,0.9), rgba(158,122,62,0.9)); 
   color: #fff; 
   border: none; 
-  box-shadow: 0 10px 25px rgba(197,160,89,0.3); 
+  box-shadow: 0 10px 25px rgba(197,160,89,0.2); 
 }
 
 .btn-primary:hover { 
   transform: translateY(-3px); 
-  box-shadow: 0 15px 35px rgba(197,160,89,0.4); 
+  box-shadow: 0 15px 35px rgba(197,160,89,0.3); 
+  background: linear-gradient(135deg, rgba(197,160,89,1), rgba(158,122,62,1)); 
 }
 
 .btn-outline { 
   background: transparent; 
   color: var(--gold-mid); 
-  border: 1px solid var(--gold-mid); 
+  border: 1px solid rgba(197, 160, 89, 0.6); 
 }
 
 .btn-outline.light { 
   color: var(--gold-light); 
-  border-color: var(--gold-light); 
+  border-color: rgba(244, 232, 209, 0.6); 
 }
 
 .btn-outline:hover { 
   background: var(--gold-mid); 
   color: #fff; 
+  border-color: var(--gold-mid);
 }
 
 /* ==========================================================================
@@ -676,7 +701,7 @@ section {
   display: grid; 
   grid-template-columns: repeat(auto-fill, minmax(60px,1fr)); 
   gap: 15px; 
-  background: #fff; 
+  background: rgba(255,255,255,0.8); /* Background taman transparan */
   border-radius: 20px; 
   padding: 40px; 
   min-height: 250px; 
@@ -692,10 +717,12 @@ section {
   cursor: pointer; 
   transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
   filter: drop-shadow(0 6px 8px rgba(0,0,0,0.1)); 
+  opacity: 0.9;
 }
 
 .bunga:hover { 
   transform: scale(1.5) rotate(15deg); 
+  opacity: 1;
 }
 
 .empty { 
@@ -706,6 +733,7 @@ section {
   font-weight: 500; 
   text-align: center;
   margin-top: 40px;
+  opacity: 0.6;
 }
 
 /* ==========================================================================
@@ -729,7 +757,7 @@ section {
   font-weight: 700; 
   letter-spacing: 1.5px; 
   text-decoration: underline;
-  text-decoration-color: var(--gold-mid);
+  text-decoration-color: rgba(197, 160, 89, 0.7);
   text-underline-offset: 6px;
 }
 
@@ -741,6 +769,7 @@ section {
   background: #1a1a1a; 
   box-shadow: var(--shadow-hard); 
   margin-top: 30px; 
+  opacity: 0.95;
 }
 
 .file-upload-wrapper {
@@ -752,8 +781,8 @@ section {
 .file-input { 
   width: 100%;
   padding: 15px;
-  background: rgba(255,255,255,0.05);
-  border: 1px dashed rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.03); 
+  border: 1px dashed rgba(255,255,255,0.15); 
   border-radius: 8px;
   color: var(--text-light-muted);
   cursor: pointer;
@@ -772,6 +801,7 @@ section {
   color: var(--text-light-muted);
   letter-spacing: 1px;
   font-weight: 500;
+  opacity: 0.7;
 }
 
 #photoCanvas { 
@@ -779,6 +809,7 @@ section {
   border-radius: 16px; 
   margin-top: 35px; 
   box-shadow: var(--shadow-hard); 
+  opacity: 0.95;
 }
 
 .template-picker { 
@@ -790,6 +821,7 @@ section {
   color: var(--text-light-muted); 
   letter-spacing: 1.5px; 
   font-weight: 500;
+  opacity: 0.8;
 }
 
 .template-picker label {
@@ -814,12 +846,12 @@ section {
 }
 
 .qr-wrap { 
-  background: var(--bg-cream); 
+  background: rgba(249, 247, 242, 0.8); 
   padding: 60px; 
   display: inline-block; 
   border-radius: 24px; 
   box-shadow: var(--shadow-medium); 
-  border: 1px solid rgba(0,0,0,0.03); 
+  border: 1px solid rgba(0,0,0,0.02); 
 }
 
 .qr-icon { 
@@ -830,12 +862,13 @@ section {
   display: block; 
   margin-left: auto; 
   margin-right: auto; 
-  opacity: 0.8; 
+  opacity: 0.6; 
 }
 
 .qr-img { 
   width: 240px; 
   height: 240px; 
+  opacity: 0.95;
 }
 
 footer { 
@@ -844,6 +877,7 @@ footer {
   font-family: var(--font-serif); 
   color: var(--gold-dark); 
   font-weight: 300; 
+  opacity: 0.9;
 }
 
 footer p { 
@@ -861,6 +895,7 @@ footer small {
   letter-spacing: 4px; 
   color: var(--text-muted); 
   font-weight: 600;
+  opacity: 0.6;
 }
 
 .divider { 
@@ -871,6 +906,7 @@ footer small {
   display: block; 
   margin-left: auto; 
   margin-right: auto; 
+  opacity: 0.7;
 }
 
 /* ==========================================================================
@@ -881,7 +917,8 @@ footer small {
   bottom: 40px; 
   left: 50%; 
   transform: translateX(-50%); 
-  background: #fff; 
+  background: rgba(255, 255, 255, 0.95); 
+  backdrop-filter: blur(10px); 
   padding: 35px 45px; 
   border-radius: 16px; 
   box-shadow: var(--shadow-hard); 
@@ -889,7 +926,7 @@ footer small {
   z-index: 999; 
   font-size: 1rem; 
   text-align: center; 
-  border-top: 5px solid var(--gold-mid); 
+  border-top: 5px solid rgba(197, 160, 89, 0.8); 
   color: var(--text-main); 
 }
 
@@ -901,6 +938,7 @@ footer small {
   text-transform: uppercase; 
   letter-spacing: 2px; 
   font-weight: 600;
+  opacity: 0.7;
 }
 
 /* ==========================================================================
