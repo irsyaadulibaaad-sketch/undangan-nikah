@@ -1081,3 +1081,60 @@ EOF
   transform: translateX(-50%) translateY(-140%) rotate(8deg);
   opacity: 0.9;
 }
+/* ============================================================
+   TALI SIMPUL v2 — pita mengintip di balik cap lilin
+   (cap lilin I&R dikembalikan, hanya emboss bola yg dihapus)
+   ============================================================ */
+
+/* kembalikan cap lilin */
+.wax-seal { opacity: 1 !important; pointer-events: auto !important; }
+
+/* buang tali vertikal, sisakan tali melintang saja */
+.tie-v { display: none !important; }
+
+/* tali melintang: lebih halus, tetap membungkus amplop */
+.tie-h {
+  height: 9px;
+  background:
+    repeating-linear-gradient(90deg, rgba(90,70,40,0.22) 0 2px, transparent 2px 5px),
+    linear-gradient(180deg, #D8BD8F 0%, #A98A5C 50%, #7A5F38 100%);
+  box-shadow: 0 2px 4px rgba(60,45,20,0.35), inset 0 1px 0 rgba(255,240,210,0.55);
+}
+
+/* ===== SIMPUL PITA (model pita hadiah, bukan bola) ===== */
+.env-tie { z-index: 12; }
+
+/* inti simpul kecil — tertutup penuh oleh cap lilin */
+.tie-knot {
+  width: 30px; height: 30px; margin: -15px 0 0 -15px;
+  z-index: 14;
+}
+
+/* dua kuntum pita — mengintip di tepi atas cap lilin */
+.knot-loop {
+  top: -16px; width: 34px; height: 19px; margin-top: 0;
+  border: none; border-radius: 50%;
+  background: radial-gradient(ellipse at 40% 32%, #DCC296 0%, #A8895A 62%, #7A5F38 100%);
+  box-shadow:
+    inset -3px -4px 6px rgba(60,45,20,0.38),
+    inset 2px 3px 5px rgba(255,240,210,0.55),
+    0 3px 5px rgba(60,45,20,0.3);
+}
+.knot-loop::after {
+  content: ''; position: absolute; top: 50%; left: 12%; right: 12%; height: 2px;
+  margin-top: -1px; border-radius: 2px;
+  background: rgba(90,68,36,0.45);
+}
+.knot-loop.left  { right: 58%; transform: rotate(-30deg); transform-origin: right center; }
+.knot-loop.right { left: 58%;  transform: rotate(30deg);  transform-origin: left center; }
+
+/* dua ujung pita menjuntai di bawah cap, ujung bergunting-V */
+.knot-tail {
+  top: 22px; width: 9px; height: 46px;
+  background: linear-gradient(180deg, #B89A6C 0%, #96784C 100%);
+  clip-path: polygon(0 0, 100% 0, 100% 82%, 50% 100%, 0 82%);
+  box-shadow: 2px 3px 4px rgba(60,45,20,0.28);
+  border-radius: 0;
+}
+.knot-tail.left  { left: 26%;  transform: rotate(14deg);  transform-origin: top center; }
+.knot-tail.right { right: 26%; transform: rotate(-14deg); transform-origin: top center; }
