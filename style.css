@@ -930,3 +930,63 @@ EOF
   vertical-align: middle;
   margin-left: 10px;
 }
+/* ============================================================
+   PREMIUM PAPER FRONT — linen, pita gold foil, emboss buta
+   ============================================================ */
+
+/* Kertas linen premium: serat halus + gradasi sutra */
+.paper-front {
+  background:
+    repeating-linear-gradient(0deg, rgba(120,100,60,0.028) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(120,100,60,0.028) 0 1px, transparent 1px 3px),
+    radial-gradient(circle at 30% 18%, rgba(255,255,255,0.55) 0%, transparent 55%),
+    linear-gradient(90deg, #FCFAF4 0%, #F3EDDE 55%, #E7DDC7 100%);
+}
+
+/* Pita gold foil: dua garis halus + titik emas di tengah */
+.emboss-pattern {
+  opacity: 1;
+  background:
+    radial-gradient(circle 2.5px at 50% 33%, rgba(197,160,89,0.9) 98%, transparent) no-repeat,
+    radial-gradient(circle 2.5px at 50% 67%, rgba(197,160,89,0.9) 98%, transparent) no-repeat,
+    linear-gradient(to right, rgba(158,122,62,0) 0%, rgba(197,160,89,0.75) 12%, rgba(243,229,190,0.95) 50%, rgba(197,160,89,0.75) 88%, rgba(158,122,62,0) 100%) no-repeat 0 33% / 100% 1px,
+    linear-gradient(to right, rgba(158,122,62,0) 0%, rgba(197,160,89,0.75) 12%, rgba(243,229,190,0.95) 50%, rgba(197,160,89,0.75) 88%, rgba(158,122,62,0) 100%) no-repeat 0 67% / 100% 1px;
+}
+
+/* Cincin emboss tanpa tinta — mengintip di keliling segel,
+   terbuka sempurna saat kertas dibuka */
+.paper-front::before {
+  content: ''; position: absolute; top: 50%;
+  width: 150px; height: 150px; border-radius: 50%;
+  border: 1px solid rgba(107,78,31,0.10);
+  outline: 1px solid rgba(107,78,31,0.07);
+  outline-offset: -12px;
+  box-shadow:
+    2px 2px 3px rgba(255,255,255,0.9),
+    -2px -2px 3px rgba(107,78,31,0.12),
+    inset 2px 2px 3px rgba(255,255,255,0.9),
+    inset -2px -2px 3px rgba(107,78,31,0.12);
+  pointer-events: none;
+}
+.paper-front.left::before  { right: 0; transform: translate(50%, -50%); }
+.paper-front.right::before { left: 0;  transform: translate(-50%, -50%); }
+
+/* Monogram buta I & R — tersimpan di balik segel,
+   lalu terpisah anggun ke kiri-kanan saat amplop terbuka */
+.paper-front::after {
+  position: absolute; top: 50%;
+  font-family: var(--font-serif); font-weight: 700;
+  font-size: 74px; line-height: 1;
+  color: rgba(107,78,31,0.13);
+  text-shadow:
+    1px 1px 1px rgba(255,255,255,0.85),
+    -1px -1px 1px rgba(107,78,31,0.22);
+  pointer-events: none;
+}
+.paper-front.left::after  { content: 'I'; right: 12px; transform: translateY(-50%); }
+.paper-front.right::after { content: 'R'; left: 12px;  transform: translateY(-50%); }
+
+/* Bayangan lipatan di sekitar garis tengah, lebih lembut */
+.emboss-shadow {
+  background: linear-gradient(to right, rgba(44,42,40,0.05), transparent 22%, transparent 78%, rgba(44,42,40,0.05));
+}
