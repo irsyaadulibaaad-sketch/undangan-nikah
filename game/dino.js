@@ -30,23 +30,23 @@ function reset() {
 // FUNGSI GAMBAR KARAKTER 2D (PANGERAN & PUTRI)
 function drawCouple(x, y) {
   // Pangeran (Badan)
-  ctx.fillStyle = "#1A231B"; // Jas warna dark green (sesuai tema)
+  ctx.fillStyle = "#1A231B"; 
   ctx.fillRect(x + 10, y - 40, 22, 40);
   
   // Pangeran (Kepala)
   ctx.beginPath(); 
   ctx.arc(x + 21, y - 48, 8, 0, Math.PI * 2);
-  ctx.fillStyle = "#F4E8D1"; // Warna kulit
+  ctx.fillStyle = "#F4E8D1"; 
   ctx.fill();
   
-  // Pangeran (Rambut/Mahkota)
-  ctx.fillStyle = "#C5A059"; // Emas
+  // Pangeran (Mahkota Emas)
+  ctx.fillStyle = "#C5A059"; 
   ctx.beginPath();
   ctx.moveTo(x + 14, y - 54); ctx.lineTo(x + 21, y - 62);
   ctx.lineTo(x + 28, y - 54); ctx.closePath(); ctx.fill();
 
   // Putri (Gaun)
-  ctx.fillStyle = "#FFFFFF"; // Gaun putih
+  ctx.fillStyle = "#FFFFFF"; 
   ctx.fillRect(x + 28, y - 35, 38, 18);
   
   // Putri (Kepala)
@@ -70,27 +70,25 @@ function drawCouple(x, y) {
   ctx.stroke();
 }
 
-// FUNGSI GAMBAR RINTANGAN (BUKAN EMOJI)
+// FUNGSI GAMBAR RINTANGAN
 function drawObstacle(o) {
   if (o.type === "ring") {
     ctx.strokeStyle = "#C5A059"; ctx.lineWidth = 4;
     ctx.beginPath(); ctx.arc(o.x + 15, o.y - 20, 12, 0, Math.PI * 2); ctx.stroke();
-    ctx.fillStyle = "#F4E8D1"; // Berlian
+    ctx.fillStyle = "#F4E8D1"; 
     ctx.beginPath(); ctx.arc(o.x + 15, o.y - 32, 4, 0, Math.PI * 2); ctx.fill();
   } else if (o.type === "cake") {
-    ctx.fillStyle = "#F4E8D1"; // Kue
+    ctx.fillStyle = "#F4E8D1"; 
     ctx.fillRect(o.x, o.y - 30, 26, 30);
-    ctx.fillStyle = "#C5A059"; // Icing emas
+    ctx.fillStyle = "#C5A059"; 
     ctx.fillRect(o.x, o.y - 34, 26, 6);
   } else if (o.type === "bouquet") {
-    // Buket Bunga (Lingkaran hijau & putih)
     ctx.fillStyle = "#8A9A7B"; 
     ctx.beginPath(); ctx.arc(o.x + 15, o.y - 20, 10, 0, Math.PI * 2); ctx.fill();
     ctx.fillStyle = "#FFFFFF";
     ctx.beginPath(); ctx.arc(o.x + 10, o.y - 25, 5, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(o.x + 20, o.y - 15, 5, 0, Math.PI * 2); ctx.fill();
   } else {
-    // Gelas Toast
     ctx.strokeStyle = "#C5A059"; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.moveTo(o.x + 10, o.y - 30); ctx.lineTo(o.x + 15, o.y - 10); ctx.lineTo(o.x + 20, o.y - 30); ctx.stroke();
     ctx.fillStyle = "#F4E8D1"; ctx.fillRect(o.x + 13, o.y - 10, 4, 10);
@@ -105,8 +103,9 @@ function loop() {
   ctx.beginPath(); ctx.moveTo(0, GROUND + 4); ctx.lineTo(W, GROUND + 4); ctx.stroke();
 
   if (state === "ready") {
-    ctx.fillStyle = "#a04a68"; ctx.font = "bold 22px serif"; ctx.textAlign = "center";
-    ctx.fillText("Tap to Start", W / 2, H / 2);
+    // HAPUS EMOJI & GANTI TEKS
+    ctx.fillStyle = "#9E7A3E"; ctx.font = "bold 20px 'Montserrat', sans-serif"; ctx.textAlign = "center";
+    ctx.fillText("Tap untuk Mulai", W / 2, H / 2);
     drawCouple(player.x, player.y);
   } else if (state === "play") {
     frame++;
@@ -135,15 +134,16 @@ function loop() {
     obstacles.forEach(drawObstacle);
     drawCouple(player.x, player.y);
 
-    ctx.fillStyle = "#C5A059"; ctx.font = "bold 16px monospace"; ctx.textAlign = "left";
+    // SKOR TANPA EMOJI
+    ctx.fillStyle = "#9E7A3E"; ctx.font = "bold 14px 'Montserrat', sans-serif"; ctx.textAlign = "left";
     ctx.fillText("Score: " + score, 20, 30);
-    ctx.fillText("High: " + highScore, 20, 55);
+    ctx.fillText("High: " + highScore, 20, 50);
   } else if (state === "over") {
-    ctx.fillStyle = "#a04a68"; ctx.font = "bold 26px serif"; ctx.textAlign = "center";
+    ctx.fillStyle = "#9E7A3E"; ctx.font = "bold 24px 'Cormorant Garamond', serif"; ctx.textAlign = "center";
     ctx.fillText("Game Over", W / 2, H / 2 - 30);
-    ctx.font = "16px sans-serif";
+    ctx.font = "14px 'Montserrat', sans-serif";
     ctx.fillText("Score: " + score + " | High: " + highScore, W / 2, H / 2 + 10);
-    ctx.fillText("Tap to try again", W / 2, H / 2 + 45);
+    ctx.fillText("Tap untuk coba lagi", W / 2, H / 2 + 45);
     drawCouple(player.x, player.y);
   }
 
