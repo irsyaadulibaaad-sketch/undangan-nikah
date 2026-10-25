@@ -821,3 +821,112 @@ cat >> ~/undangan-nikah/style.css << 'EOF'
   100% { transform: translateY(-14px) scale(1.1); opacity: 0; }
 }
 EOF
+
+/* ============================================================
+   FOUNTAIN CENTERED FIX — tiang tenggelam di tengah kolam
+   ============================================================ */
+.fountain { bottom: 76px; }
+
+/* kolam lebih dalam & sedikit turun */
+.water-pool { height: 58px; }
+
+/* tiang turun: dasar tenggelam ~35px di bawah permukaan air */
+.water-spout {
+  bottom: 20px;
+  box-shadow:
+    inset -4px 0 8px rgba(60,50,30,0.3),
+    0 6px 10px rgba(25,35,20,0.15);
+}
+
+/* mangkuk mengikuti posisi tiang baru */
+.tier-2 { bottom: 104px; }
+.tier-2::after { top: 72%; height: 48px; }
+.tier-3 { bottom: 144px; }
+.fountain::after { bottom: 169px; }
+
+/* cipratan menyesuaikan permukaan air baru */
+.drop1 { bottom: 50px; }
+.drop2 { bottom: 50px; }
+.drop3 { bottom: 54px; }
+
+/* Keterangan di bawah taman */
+.garden-hint {
+  text-align: center;
+  font-size: 0.72rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  opacity: 0.75;
+  margin-top: 18px;
+}
+.garden-hint::before {
+  content: '';
+  display: inline-block;
+  width: 26px; height: 1px;
+  background: var(--gold-mid);
+  vertical-align: middle;
+  margin-right: 10px;
+}
+.garden-hint::after {
+  content: '';
+  display: inline-block;
+  width: 26px; height: 1px;
+  background: var(--gold-mid);
+  vertical-align: middle;
+  margin-left: 10px;
+}
+/* ============================================================
+   FOUNTAIN CENTERED FIX — tiang tenggelam di tengah kolam
+   ============================================================ */
+.fountain { bottom: 76px; }
+
+/* kolam lebih dalam & sedikit turun */
+.water-pool { height: 58px; }
+
+/* tiang turun: dasar tenggelam ~35px di bawah permukaan air */
+.water-spout {
+  bottom: 20px;
+  box-shadow:
+    inset -4px 0 8px rgba(60,50,30,0.3),
+    0 6px 10px rgba(25,35,20,0.15);
+}
+
+/* mangkuk mengikuti posisi tiang baru */
+.tier-2 { bottom: 104px; }
+.tier-2::after { top: 72%; height: 48px; }
+.tier-3 { bottom: 144px; }
+.fountain::after { bottom: 169px; }
+
+/* cipratan menyesuaikan permukaan air baru */
+.drop1 { bottom: 50px; }
+.drop2 { bottom: 50px; }
+.drop3 { bottom: 54px; }
+
+/* Keterangan di bawah taman */
+.garden-hint {
+  text-align: center;
+  font-size: 0.72rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 600;
+  opacity: 0.75;
+  margin-top: 18px;
+}
+.garden-hint::before {
+  content: '';
+  display: inline-block;
+  width: 26px; height: 1px;
+  background: var(--gold-mid);
+  vertical-align: middle;
+  margin-right: 10px;
+}
+.garden-hint::after {
+  content: '';
+  display: inline-block;
+  width: 26px; height: 1px;
+  background: var(--gold-mid);
+  vertical-align: middle;
+  margin-left: 10px;
+}

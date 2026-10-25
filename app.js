@@ -331,3 +331,26 @@ const qrImage = document.getElementById("qrImage");
 if (qrImage) {
   qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(checkinUrl)}`;
 }
+
+// ====== KETERANGAN TAMAN DOA ======
+(function () {
+  const g = document.getElementById("garden");
+  if (g && !document.getElementById("gardenHint")) {
+    const hint = document.createElement("p");
+    hint.id = "gardenHint";
+    hint.className = "garden-hint";
+    hint.textContent = "Ketuk bunga untuk melihat doa";
+    g.parentNode.insertBefore(hint, g.nextSibling);
+  }
+})();
+// ====== KETERANGAN TAMAN DOA ======
+(function () {
+  const g = document.getElementById("garden");
+  if (g && !document.getElementById("gardenHint")) {
+    const hint = document.createElement("p");
+    hint.id = "gardenHint";
+    hint.className = "garden-hint";
+    hint.textContent = "Ketuk bunga untuk melihat doa";
+    g.parentNode.insertBefore(hint, g.nextSibling);
+  }
+})();
