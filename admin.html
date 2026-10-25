@@ -15,24 +15,42 @@
   .admin-container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; position: relative; z-index: 10; }
   .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
   .admin-title { font-family: var(--font-serif); font-size: 2.2rem; color: var(--gold-dark); font-weight: 400; }
-  
+
   table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border-radius: 8px; overflow: hidden; }
   th, td { border-bottom: 1px solid #eee; padding: 15px; text-align: left; }
   th { background-color: var(--bg-dark); color: var(--text-light); font-weight: 400; letter-spacing: 1px; }
-  
+
   .badge { padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 500; color: white; letter-spacing: 0.5px; }
   .bg-green { background-color: #8A9A7B; }
   .bg-red { background-color: #d9534f; }
   .bg-blue { background-color: #5bc0de; }
-  
+
   .btn-sm { padding: 8px 15px; font-size: 11px; border-radius: 4px; cursor: pointer; border: none; margin-right: 5px; font-family: var(--font-sans); transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
   .btn-edit { background-color: var(--gold-mid); color: white; }
   .btn-del { background-color: #d9534f; color: white; }
   .btn-save { background-color: #8A9A7B; color: white; }
   .btn-sm:hover { opacity: 0.8; transform: translateY(-1px); }
-  
+
   input[type="text"], input[type="number"], select { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; font-family: var(--font-sans); background: var(--bg-cream); }
   .hidden { display: none !important; }
+
+  /* ===== MULTI-SELECT ===== */
+  .chk { width: 17px; height: 17px; accent-color: var(--gold-dark); cursor: pointer; }
+  th .chk { accent-color: #C5A059; }
+  .bulk-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #fff; border: 1px solid #eee; border-left: 4px solid #d9534f;
+    padding: 12px 18px; border-radius: 8px; margin-bottom: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+  }
+  .bulk-bar span { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .bulk-bar b { color: #d9534f; }
+  .btn-bulk {
+    padding: 10px 22px; font-size: 11px; border-radius: 6px; cursor: pointer; border: none;
+    font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;
+    background-color: #d9534f; color: #fff; transition: 0.2s;
+  }
+  .btn-bulk:hover { opacity: 0.85; transform: translateY(-1px); }
 </style>
 </head>
 <body>
@@ -68,10 +86,16 @@
     <strong style="font-family: var(--font-serif); font-size: 1.2rem; color: var(--gold-dark);">Remaining Seats: <span id="adminSisaKuota" style="font-size: 1.5rem;">--</span> / 100</strong>
   </div>
 
+  <!-- RSVP -->
+  <div class="bulk-bar" id="bulkBarRsvp" style="display:none;">
+    <span><b id="countRsvp">0</b> selected</span>
+    <button class="btn-bulk" onclick="deleteSelected('rsvp')">Delete Selected</button>
+  </div>
   <div style="overflow-x: auto; background: #fff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee;">
     <table>
       <thead>
         <tr>
+          <th style="width:36px; text-align:center;"><input type="checkbox" class="chk" id="chkAllRsvp" onchange="toggleAll('rsvp', this.checked)"></th>
           <th>Name</th>
           <th>Status</th>
           <th>Pax</th>
@@ -81,17 +105,22 @@
         </tr>
       </thead>
       <tbody id="tamuTbody">
-        <tr><td colspan="6" style="text-align:center;">Loading data...</td></tr>
+        <tr><td colspan="7" style="text-align:center;">Loading data...</td></tr>
       </tbody>
     </table>
   </div>
 
   <div style="margin-top: 50px;">
     <h3 class="admin-title" style="font-size: 1.5rem; margin-bottom: 15px;">Garden of Prayers</h3>
+    <div class="bulk-bar" id="bulkBarDoa" style="display:none;">
+      <span><b id="countDoa">0</b> selected</span>
+      <button class="btn-bulk" onclick="deleteSelected('doa')">Delete Selected</button>
+    </div>
     <div style="overflow-x: auto; background: #fff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee;">
       <table>
         <thead>
           <tr>
+            <th style="width:36px; text-align:center;"><input type="checkbox" class="chk" id="chkAllDoa" onchange="toggleAll('doa', this.checked)"></th>
             <th>Name</th>
             <th>Prayer / Wishes</th>
             <th>Source</th>
@@ -99,7 +128,7 @@
           </tr>
         </thead>
         <tbody id="doaTbody">
-          <tr><td colspan="4" style="text-align:center;">Loading data...</td></tr>
+          <tr><td colspan="5" style="text-align:center;">Loading data...</td></tr>
         </tbody>
       </table>
     </div>
@@ -108,7 +137,7 @@
 
 <script src="supabase.js"></script>
 <script>
-  const ADMIN_PIN = "123456"; 
+  const ADMIN_PIN = "123456";
 
   const themeSelect = document.getElementById('themeSelect');
   const currentTheme = localStorage.getItem('wedding_theme') || 'luxury';
@@ -133,6 +162,39 @@
 
   function logout() { location.reload(); }
 
+  // ===== MULTI-SELECT HELPERS =====
+  function getChecked(table) {
+    return Array.from(document.querySelectorAll(`.chk-row[data-table="${table}"]:checked`))
+                .map(cb => cb.value);
+  }
+
+  function updateBulkBar(table) {
+    const ids = getChecked(table);
+    const bar = document.getElementById(table === 'rsvp' ? 'bulkBarRsvp' : 'bulkBarDoa');
+    const count = document.getElementById(table === 'rsvp' ? 'countRsvp' : 'countDoa');
+    const chkAll = document.getElementById(table === 'rsvp' ? 'chkAllRsvp' : 'chkAllDoa');
+    count.textContent = ids.length;
+    bar.style.display = ids.length > 0 ? 'flex' : 'none';
+    // sinkronkan "select all" kalau dicentang manual
+    const boxes = document.querySelectorAll(`.chk-row[data-table="${table}"]`);
+    chkAll.checked = boxes.length > 0 && ids.length === boxes.length;
+  }
+
+  function toggleAll(table, checked) {
+    document.querySelectorAll(`.chk-row[data-table="${table}"]`).forEach(cb => cb.checked = checked);
+    updateBulkBar(table);
+  }
+
+  async function deleteSelected(table) {
+    const ids = getChecked(table);
+    if (ids.length === 0) return;
+    const label = table === 'rsvp' ? 'RSVP' : 'prayer';
+    if (!confirm(`Delete ${ids.length} selected ${label}(s)?`)) return;
+    const { error } = await supabaseClient.from(table).delete().in("id", ids);
+    if (error) alert("Failed to delete: " + error.message);
+    else loadAdminData();
+  }
+
   async function loadAdminData() {
     const { data: kuotaData } = await supabaseClient.from("total_pax").select("terpakai").single();
     const sisa = 100 - (kuotaData?.terpakai || 0);
@@ -142,16 +204,17 @@
     const tbody = document.getElementById("tamuTbody");
     tbody.innerHTML = "";
     if (!rsvpData || rsvpData.length === 0) {
-      tbody.innerHTML = "<tr><td colspan='6' style='text-align:center;'>No data yet.</td></tr>";
+      tbody.innerHTML = "<tr><td colspan='7' style='text-align:center;'>No data yet.</td></tr>";
     } else {
       rsvpData.forEach(t => {
         const isHadir = t.hadir;
         const badgeStatus = isHadir ? '<span class="badge bg-green">Attending</span>' : '<span class="badge bg-red">Not Attending</span>';
         const badgeCheckin = t.checked_in ? '<span class="badge bg-blue">Yes</span>' : '-';
-        
+
         const tr = document.createElement("tr");
         tr.id = `row-${t.id}`;
         tr.innerHTML = `
+          <td style="text-align:center;"><input type="checkbox" class="chk chk-row" data-table="rsvp" value="${t.id}" onchange="updateBulkBar('rsvp')"></td>
           <td style="font-weight:500;">${t.nama}</td>
           <td>${badgeStatus}</td>
           <td>${isHadir ? t.jumlah_pax : '-'}</td>
@@ -165,16 +228,18 @@
         tbody.appendChild(tr);
       });
     }
+    updateBulkBar('rsvp');
 
     const { data: doaData } = await supabaseClient.from("doa").select("*").order("created_at", { ascending: false });
     const dtbody = document.getElementById("doaTbody");
     dtbody.innerHTML = "";
     if (!doaData || doaData.length === 0) {
-      dtbody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>No prayers yet.</td></tr>";
+      dtbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>No prayers yet.</td></tr>";
     } else {
       doaData.forEach(d => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
+          <td style="text-align:center;"><input type="checkbox" class="chk chk-row" data-table="doa" value="${d.id}" onchange="updateBulkBar('doa')"></td>
           <td style="font-weight:500;">${d.nama}</td>
           <td style="font-size:13px; color:#555; font-style:italic;">"${d.pesan}"</td>
           <td><span class="badge ${d.sumber === 'checkin' ? 'bg-blue' : 'bg-green'}" style="text-transform:capitalize;">${d.sumber}</span></td>
@@ -183,11 +248,13 @@
         dtbody.appendChild(tr);
       });
     }
+    updateBulkBar('doa');
   }
 
   function editRow(id, nama, pax, kategori) {
     const tr = document.getElementById(`row-${id}`);
     tr.innerHTML = `
+      <td></td>
       <td><input type="text" id="edit-nama-${id}" value="${nama}"></td>
       <td colspan="2"><input type="number" id="edit-pax-${id}" value="${pax}" min="1"></td>
       <td>
@@ -212,7 +279,7 @@
 
     const { error } = await supabaseClient.from("rsvp").update({ nama, jumlah_pax: pax, kategori }).eq("id", id);
     if (error) alert("Failed to update: " + error.message);
-    else loadAdminData(); 
+    else loadAdminData();
   }
 
   async function deleteRsvp(id) {
