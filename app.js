@@ -1,8 +1,8 @@
 // ====== CONFIG ======
-const TANGGAL_NIKAH = "2026-06-20T09:00:00+07:00"; // GANTI NANTI
-const VENUE_NAME = "Nama Resto / Venue"; // GANTI NANTI
-const VENUE_ADDR = "Alamat lengkap, Kota"; // GANTI NANTI
-const GMAP_QUERY = encodeURIComponent("Nama Resto Kota"); // GANTI NANTI
+const TANGGAL_NIKAH = "2026-12-24T09:00:00+07:00"; 
+const VENUE_NAME = "Rumah Makan Alam Pilemburan"; 
+const VENUE_ADDR = "Jl. Raya Gadobangkong No.112, Gadobangkong, Kec. Ngamprah, Kabupaten Bandung Barat, Jawa Barat 40552"; 
+const GMAP_QUERY = "-6.866054,107.517273"; 
 
 // ====== COUNTDOWN ======
 function updateCountdown() {
@@ -185,7 +185,7 @@ function drawTemplate(tpl, W, H) {
     ctx.fillStyle = "#fff"; ctx.font = "bold 26px serif"; ctx.textAlign = "center";
     ctx.fillText("Irsyaadul & Refalina", W / 2, H - 60);
     ctx.font = "16px serif";
-    ctx.fillText("20 . 06 . 2026", W / 2, H - 30);
+    ctx.fillText("24 . 12 . 2026", W / 2, H - 30);
   } else if (tpl === "floral") {
     ctx.strokeStyle = "#e8a0b8"; ctx.lineWidth = 18;
     ctx.strokeRect(9, 9, W - 18, H - 18);
