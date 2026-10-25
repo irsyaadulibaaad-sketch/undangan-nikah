@@ -4,27 +4,36 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Check-in — Irsyaadul & Refalina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  /* Sedikit penyesuaian agar form check-in pas di tengah layar */
+  body { display: flex; align-items: center; justify-content: center; min-height: 100vh; background-color: var(--cream); }
+  .checkin-container { width: 100%; max-width: 400px; padding: 30px; background: #fff; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.05); }
+  .checkin-title { font-family: var(--font-serif); font-size: 2rem; color: var(--sage); text-align: center; margin-bottom: 5px; }
+  .checkin-sub { text-align: center; font-size: 0.85rem; color: #888; margin-bottom: 25px; }
+</style>
 </head>
 <body>
-<section class="rsvp">
-  <h2>Registrasi Kehadiran</h2>
-  <p class="sub">Masukkan nama sesuai RSVP, lalu tulis doa untuk mempelai.</p>
+<div class="checkin-container">
+  <h2 class="checkin-title">Registrasi Kehadiran</h2>
+  <p class="checkin-sub">Masukkan nama sesuai RSVP, lalu tulis doa untuk mempelai.</p>
 
-  <form id="checkinForm">
+  <form id="checkinForm" class="rsvp-form">
     <label>Nama
-      <input id="ciNama" type="text" required maxlength="60">
+      <input id="ciNama" type="text" required maxlength="60" placeholder="Nama Lengkap">
     </label>
-    <div id="ciInfo" class="msg"></div>
+    <div id="ciInfo" class="msg" style="margin-bottom: 15px; font-weight: 500;"></div>
     <label>Doa & Ucapan
-      <textarea id="ciDoa" rows="3" required maxlength="200"
-        placeholder="Tulis doa/ucapan..."></textarea>
+      <textarea id="ciDoa" rows="3" required maxlength="200" placeholder="Tulis doa/ucapan..."></textarea>
     </label>
-    <button type="submit" class="btn-primary">Check-in</button>
+    <button type="submit" class="btn-primary">Check-in Sekarang</button>
     <p id="ciMsg" class="msg"></p>
   </form>
-</section>
+</div>
 <script src="supabase.js"></script>
 <script src="checkin.js"></script>
 </body>

@@ -4,127 +4,156 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Irsyaadul Ibaad & Refalina Putri Nursiami</title>
+<!-- Font Mewah & AOS -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-<!-- HERO -->
-<section class="hero">
-  <p class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</p>
-  <h1>Irsyaadul Ibaad<br><span>&</span><br>Refalina Putri Nursiami</h1>
-  <p class="tanggal" id="tanggalNikah">Segera Menikah • Tanggal Menyusul</p>
-
-  <div class="countdown" id="countdown">
-    <div><span id="cd-days">--</span><small>Hari</small></div>
-    <div><span id="cd-hours">--</span><small>Jam</small></div>
-    <div><span id="cd-mins">--</span><small>Menit</small></div>
-    <div><span id="cd-secs">--</span><small>Detik</small></div>
+<!-- COVER PEMBUKA -->
+<div id="cover" class="cover">
+  <div class="cover-content">
+    <p class="cover-sub">The Wedding Of</p>
+    <h1 class="cover-title">Irsyaadul & Refalina</h1>
+    <p class="cover-date">24 . 12 . 2026</p>
+    <button id="openBtn" class="btn-cover">Buka Undangan</button>
   </div>
-</section>
+</div>
 
-<!-- VENUE -->
-<section class="venue">
-  <h2>Lokasi Acara</h2>
-  <p id="venueName">Nama Resto / Venue</p>
-  <p id="venueAddr">Alamat lengkap, Kota</p>
-  <div class="map-wrap">
-    <iframe id="gmap" loading="lazy" allowfullscreen
-      referrerpolicy="no-referrer-when-downgrade"></iframe>
-  </div>
-  <a id="gmapLink" class="btn-outline" target="_blank">Buka di Google Maps</a>
-</section>
+<!-- KONTEN UTAMA (Tersembunyi awalnya) -->
+<div id="mainContent" class="hidden">
+  
+  <!-- HERO -->
+  <section class="hero" data-aos="fade-up">
+    <p class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</p>
+    <p class="hero-sub">Kami akan menikah</p>
+    <h1 class="hero-names">Irsyaadul Ibaad<br><span>&</span><br>Refalina Putri Nursiami</h1>
+    
+    <div class="countdown" id="countdown">
+      <div><span id="cd-days">--</span><small>Hari</small></div>
+      <div><span id="cd-hours">--</span><small>Jam</small></div>
+      <div><span id="cd-mins">--</span><small>Menit</small></div>
+      <div><span id="cd-secs">--</span><small>Detik</small></div>
+    </div>
+  </section>
 
-<!-- RSVP -->
-<section class="rsvp">
-  <h2>Konfirmasi Kehadiran</h2>
-  <p class="quota">Sisa kuota: <b id="sisaKuota">--</b> / 100 pax</p>
+  <!-- VENUE -->
+  <section class="venue" data-aos="fade-up">
+    <h2 class="section-title">Lokasi Acara</h2>
+    <p id="venueName" class="venue-name">Rumah Makan Alam Pilemburan</p>
+    <p id="venueAddr" class="venue-addr">Jl. Raya Gadobangkong No.112, Gadobangkong, Kec. Ngamprah, Kabupaten Bandung Barat, Jawa Barat 40552</p>
+    <div class="map-wrap" data-aos="zoom-in">
+      <iframe id="gmap" loading="lazy" allowfullscreen referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+    <a id="gmapLink" class="btn-outline" target="_blank">Buka di Google Maps</a>
+  </section>
 
-  <form id="rsvpForm">
-    <label>Nama
-      <input id="rsvpNama" type="text" required maxlength="60">
-    </label>
+  <!-- RSVP -->
+  <section class="rsvp" data-aos="fade-up">
+    <h2 class="section-title">Konfirmasi Kehadiran</h2>
+    <p class="quota">Sisa kuota: <b id="sisaKuota">--</b> / 100 pax</p>
 
-    <label>Kehadiran
-      <select id="rsvpHadir" required>
-        <option value="">-- pilih --</option>
-        <option value="1">Hadir</option>
-        <option value="0">Tidak Hadir</option>
-      </select>
-    </label>
-
-    <div id="hadirFields" hidden>
-      <label>Datang sebagai
-        <select id="rsvpKategori">
-          <option value="sendiri">Sendiri</option>
-          <option value="pasangan">Dengan Pasangan</option>
-          <option value="keluarga">Dengan Keluarga</option>
+    <form id="rsvpForm" class="rsvp-form">
+      <label>Nama
+        <input id="rsvpNama" type="text" required maxlength="60" placeholder="Nama Lengkap">
+      </label>
+      <label>Kehadiran
+        <select id="rsvpHadir" required>
+          <option value="">-- pilih --</option>
+          <option value="1">Hadir</option>
+          <option value="0">Tidak Hadir</option>
         </select>
       </label>
-      <label>Total orang (termasuk diri)
-        <input id="rsvpPax" type="number" min="1" value="1" max="100">
-      </label>
+
+      <div id="hadirFields" hidden>
+        <label>Datang sebagai
+          <select id="rsvpKategori">
+            <option value="sendiri">Sendiri</option>
+            <option value="pasangan">Dengan Pasangan</option>
+            <option value="keluarga">Dengan Keluarga</option>
+          </select>
+        </label>
+        <label>Total orang (termasuk diri)
+          <input id="rsvpPax" type="number" min="1" value="1" max="100">
+        </label>
+      </div>
+
+      <div id="doaFields" hidden>
+        <label>Doa & Ucapan
+          <textarea id="rsvpDoa" rows="3" maxlength="200" placeholder="Tulis doa/ucapan..."></textarea>
+        </label>
+      </div>
+
+      <button type="submit" class="btn-primary">Kirim Konfirmasi</button>
+      <p id="rsvpMsg" class="msg"></p>
+    </form>
+  </section>
+
+  <!-- TAMAN DOA -->
+  <section class="taman" data-aos="fade-up">
+    <h2 class="section-title">Taman Doa</h2>
+    <p class="sub">Setiap doa menumbuhkan bunga</p>
+    <div class="garden" id="garden"></div>
+  </section>
+
+  <!-- GAME DINO -->
+  <section class="game-section" data-aos="fade-up">
+    <h2 class="section-title">Main Yuk!</h2>
+    <p class="sub">Bantu pangeran menggendong putri melewati rintangan</p>
+    <iframe src="game/dino.html" class="game-frame" loading="lazy"></iframe>
+  </section>
+
+  <!-- PHOTOBOOTH -->
+  <section class="photobooth" data-aos="fade-up">
+    <h2 class="section-title">Photobooth Virtual</h2>
+    <p class="sub">Abadikan momen, pilih template, download & share!</p>
+    <input type="file" id="photoInput" accept="image/*" capture="user" class="file-input">
+    <div class="template-picker">
+      <label><input type="radio" name="tpl" value="classic" checked> Classic</label>
+      <label><input type="radio" name="tpl" value="floral"> Floral</label>
+      <label><input type="radio" name="tpl" value="gold"> Gold</label>
     </div>
-
-    <div id="doaFields" hidden>
-      <label>Doa & Ucapan
-        <textarea id="rsvpDoa" rows="3" maxlength="200"
-          placeholder="Tulis doa/ucapan untuk kedua mempelai..."></textarea>
-      </label>
+    <canvas id="photoCanvas" width="600" height="800"></canvas>
+    <div class="photo-actions">
+      <button id="downloadBtn" class="btn-primary" hidden>Download</button>
+      <button id="shareBtn" class="btn-outline" hidden>Share</button>
     </div>
+  </section>
 
-    <button type="submit" class="btn-primary">Kirim</button>
-    <p id="rsvpMsg" class="msg"></p>
-  </form>
-</section>
+  <!-- QR CHECK-IN -->
+  <section class="qr-info" data-aos="fade-up">
+    <h2 class="section-title">Registrasi Hari-H</h2>
+    <p class="sub">Scan QR di pintu masuk untuk check-in:</p>
+    <div class="qr-wrap">
+      <img id="qrImage" alt="QR Code Check-in" class="qr-img">
+    </div>
+  </section>
 
-<!-- TAMAN DOA -->
-<section class="taman">
-  <h2>Taman Doa</h2>
-  <p class="sub">Setiap doa menumbuhkan bunga 🌸</p>
-  <div class="garden" id="garden"></div>
-</section>
+  <footer>
+    <p>Irsyaadul Ibaad & Refalina Putri Nursiami</p>
+  </footer>
 
-<!-- GAME DINO -->
-<section class="game-section">
-  <h2>Main Yuk! 🦖</h2>
-  <p class="sub">Bantu pangeran menggendong putri melewati rintangan</p>
-  <iframe src="game/dino.html" class="game-frame" loading="lazy"></iframe>
-</section>
+</div>
 
-<!-- PHOTOBOOTH -->
-<section class="photobooth">
-  <h2>Photobooth Virtual</h2>
-  <p class="sub">Abadikan momen, pilih template, download & share!</p>
-
-  <input type="file" id="photoInput" accept="image/*" capture="user">
-  <div class="template-picker">
-    <label><input type="radio" name="tpl" value="classic" checked> Classic</label>
-    <label><input type="radio" name="tpl" value="floral"> Floral</label>
-    <label><input type="radio" name="tpl" value="gold"> Gold</label>
-  </div>
-  <canvas id="photoCanvas" width="600" height="800"></canvas>
-  <div class="photo-actions">
-    <button id="downloadBtn" class="btn-primary" hidden>Download</button>
-    <button id="shareBtn" class="btn-outline" hidden>Share</button>
-  </div>
-</section>
-
-<!-- QR CHECK-IN (info untuk panitia) -->
-<section class="qr-info">
-  <h2>Registrasi Hari-H</h2>
-  <p>Scan QR di pintu masuk untuk check-in:</p>
-  <div id="qrContainer" style="display:flex; justify-content:center; margin-top:16px;">
-    <img id="qrImage" alt="QR Code Check-in" style="width:200px; height:200px; background:#fff; padding:10px; border-radius:12px;">
-  </div>
-</section>
-
-<footer>
-  <p>Irsyaadul Ibaad & Refalina Putri Nursiami</p>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Library AOS -->
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 <script src="supabase.js"></script>
 <script src="app.js"></script>
+<script>
+  // Inisialisasi AOS
+  AOS.init({ duration: 1000, once: true, offset: 100 });
+
+  // Logika Cover
+  document.getElementById('openBtn').addEventListener('click', function() {
+    document.getElementById('cover').style.display = 'none';
+    document.getElementById('mainContent').classList.remove('hidden');
+    // Scroll ke atas setelah dibuka
+    window.scrollTo(0, 0);
+  });
+</script>
 </body>
 </html>
