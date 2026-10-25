@@ -14,13 +14,23 @@
 </head>
 <body>
 
-<!-- COVER PEMBUKA -->
+<!-- COVER PEMBUKA (AMPLOP) -->
 <div id="cover" class="cover">
-  <div class="cover-content">
-    <p class="cover-sub">The Wedding Of</p>
-    <h1 class="cover-title">Irsyaadul & Refalina</h1>
-    <p class="cover-date">24 . 12 . 2026</p>
-    <button id="openBtn" class="btn-cover">Buka Undangan</button>
+  <div class="envelope-wrapper">
+    <div class="envelope" id="envelope">
+      <!-- Isi Surat (di dalam amplop) -->
+      <div class="letter">
+        <p class="cover-sub">The Wedding Of</p>
+        <h1 class="cover-title">Irsyaadul & Refalina</h1>
+        <p class="cover-date">24 . 12 . 2026</p>
+      </div>
+      <!-- Tutup Amplop -->
+      <div class="envelope-flap"></div>
+      <!-- Tali Emas -->
+      <div class="envelope-rope"></div>
+      <!-- Segel Lilin -->
+      <div class="envelope-seal" id="openBtn">Buka</div>
+    </div>
   </div>
 </div>
 
@@ -147,12 +157,24 @@
   // Inisialisasi AOS
   AOS.init({ duration: 1000, once: true, offset: 100 });
 
-  // Logika Cover
+  // Logika Animasi Amplop
   document.getElementById('openBtn').addEventListener('click', function() {
-    document.getElementById('cover').style.display = 'none';
-    document.getElementById('mainContent').classList.remove('hidden');
-    // Scroll ke atas setelah dibuka
-    window.scrollTo(0, 0);
+    const envelope = document.getElementById('envelope');
+    const cover = document.getElementById('cover');
+    const mainContent = document.getElementById('mainContent');
+    
+    // 1. Animasi Tali Lepas & Amplop Terbuka
+    envelope.classList.add('open');
+    
+    // 2. Setelah animasi selesai (1.5 detik), sembunyikan cover dan tampilkan konten
+    setTimeout(() => {
+      cover.style.opacity = '0';
+      setTimeout(() => {
+        cover.style.display = 'none';
+        mainContent.classList.remove('hidden');
+        window.scrollTo(0, 0);
+      }, 500); // Waktu fade out cover
+    }, 1500); // Waktu animasi amplop
   });
 </script>
 </body>
