@@ -124,17 +124,34 @@
     </div>
   </section>
 
-  <!-- SECTION 4: TAMAN DOA (VIRTUAL 2D) -->
+  <!-- SECTION 4: TAMAN DOA (VIRTUAL 2D DENGAN CSS) -->
   <section class="taman-section bg-cream" data-anim="taman">
     <div class="container">
       <h2 class="section-title" data-anim="fade">Garden of Prayers</h2>
       <div class="gold-underline-dark"></div>
       <p class="sub" data-anim="fade">Every prayer blooms into a flower</p>
       
-      <!-- CANVAS UNTUK TAMAN VIRTUAL -->
-      <div class="virtual-garden-wrapper" data-anim="fade">
-        <canvas id="gardenCanvas" width="800" height="400"></canvas>
-        <div id="gardenLoading" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); color:#9E7A3E; font-style:italic;">Memuat Taman...</div>
+      <!-- TAMAN VIRTUAL HTML/CSS -->
+      <div class="css-garden" id="garden">
+        <!-- Langit & Matahari -->
+        <div class="sky"></div>
+        <div class="sun"></div>
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+        
+        <!-- Air Mancur -->
+        <div class="fountain">
+          <div class="water-spout"></div>
+          <div class="water-pool"></div>
+        </div>
+        
+        <!-- Tanah -->
+        <div class="grass"></div>
+        
+        <!-- Tempat Bunga Tumbuh (Diisi oleh JS) -->
+        <div id="flowerContainer" class="flower-container">
+          <!-- Bunga akan muncul di sini -->
+        </div>
       </div>
       
     </div>
@@ -201,7 +218,6 @@
 
 <script src="supabase.js"></script>
 <script src="app.js"></script>
-<script src="garden.js"></script>
 <script>
   const savedTheme = localStorage.getItem('wedding_theme') || 'luxury';
   document.documentElement.setAttribute('data-theme', savedTheme);

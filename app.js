@@ -98,26 +98,34 @@ document.getElementById("rsvpForm").addEventListener("submit", async (e) => {
   loadTaman();
 });
 
-// ====== TAMAN DOA ======
+// ====== TAMAN DOA (RENDER HTML CSS) ======
 const BUNGA_EMOJI = { mawar:"🌹", tulip:"🌷", matahari:"🌻", sakura:"🌸", lily:"🌺" };
 
 async function loadTaman() {
   const { data, error } = await supabaseClient
     .from("doa").select("*").order("created_at", { ascending: true });
   if (error) return;
-  const garden = document.getElementById("garden");
-  garden.innerHTML = "";
-  data.forEach((d, i) => {
-    const el = document.createElement("button");
-    el.className = "bunga";
-    el.style.animationDelay = `${(i % 10) * 0.08}s`;
-    el.innerHTML = `<span>${BUNGA_EMOJI[d.bunga] || "🌸"}</span>`;
-    el.title = d.nama;
-    el.addEventListener("click", () =>
-      showPopup(`<b>${d.nama}</b><br>${d.pesan}`));
-    garden.appendChild(el);
-  });
-  if (!data.length) garden.innerHTML = "<p class='empty'>Jadilah yang pertama menanam doa 🌱</p>";
+  
+  const container = document.getElementById("flowerContainer");
+  container.innerHTML = ""; // Bersihkan taman
+
+  if (data && data.length > 0) {
+    data.forEach((d, index) => {
+      const flower = document.createElement("div");
+      flower.className = "bunga";
+      flower.innerHTML = BUNGA_EMOJI[d.bunga] || "🌸";
+      flower.title = `${d.nama}: ${d.pesan}`;
+      
+      // Posisi acak agar natural
+      const posX = 10 + Math.random() * 80; // 10% - 90% lebar
+      const delay = (index % 10) * 0.1; // Animasi muncul bergantian
+      
+      flower.style.left = `${posX}%`;
+      flower.style.animationDelay = `${delay}s`;
+      
+      container.appendChild(flower);
+    });
+  }
 }
 loadTaman();
 
@@ -164,7 +172,6 @@ function drawPhoto() {
   const W = canvas.width, H = canvas.height;
   ctx.clearRect(0, 0, W, H);
 
-  // gambar foto cover
   const r = Math.max(W / currentImage.width, H / currentImage.height);
   const dw = currentImage.width * r, dh = currentImage.height * r;
   ctx.drawImage(currentImage, (W - dw) / 2, (H - dh) / 2, dw, dh);
@@ -228,8 +235,8 @@ document.getElementById("shareBtn").addEventListener("click", async () => {
 });
 
 // ====== QR HARI-H ======
-const checkinUrl = encodeURIComponent(location.origin + location.pathname.replace("index.html","") + "checkin.html");
+const checkinUrl = location.origin + location.pathname.replace("index.html","") + "checkin.html";
 const qrImage = document.getElementById("qrImage");
 if (qrImage) {
-  qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${checkinUrl}`;
+  qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(checkinUrl)}`;
 }
