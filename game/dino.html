@@ -4,14 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
-  html,body{margin:0;height:100%;background:#F6F1E8;font-family:'Montserrat',sans-serif;overflow:hidden;}
-  canvas{display:block;margin:0 auto;max-width:100%;height:auto;touch-action:manipulation}
-  #hint{text-align:center;font-size:11px;color:#9E7A3E;padding:14px 0 10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;}
+  html,body{margin:0;padding:0;height:100%;background:#F3EADB;font-family:'Montserrat',sans-serif;overflow:hidden;}
+  canvas{display:block;touch-action:manipulation}
+  #hint{
+    position:fixed;top:0;left:0;right:0;z-index:10;pointer-events:none;
+    text-align:center;font-size:11px;color:#9E7A3E;padding:12px 0 10px;
+    font-weight:600;letter-spacing:2px;text-transform:uppercase;
+    background:linear-gradient(180deg, rgba(249,243,231,0.95) 0%, rgba(249,243,231,0) 100%);
+  }
 </style>
 </head>
 <body>
 <div id="hint">Tap / Spasi untuk melompat</div>
-<canvas id="c" width="800" height="300"></canvas>
+<canvas id="c"></canvas>
 <script src="dino.js"></script>
 </body>
 </html>
