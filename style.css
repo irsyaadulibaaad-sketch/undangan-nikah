@@ -811,3 +811,36 @@ footer small { font-family: var(--font-sans); font-size: 0.7rem; text-transform:
   .fountain { transform: translateX(-50%) scale(0.8); transform-origin: bottom center; }
   .prayer-card { padding: 38px 26px 32px; }
 }
+/* ============================================================
+   SEGEL LILIN KREM (model referensi) — tanpa tetesan bola
+   ============================================================ */
+
+/* hilangkan bola-bola tetesan di segel */
+.seal-drips { display: none !important; }
+
+/* segel krem/putih lembut */
+.wax-seal {
+  background: radial-gradient(circle at 32% 28%, #FFFFFF 0%, #F8F2E6 45%, #EAE0CB 78%, #D8C9AC 100%);
+  box-shadow:
+    0 16px 36px rgba(107, 78, 31, 0.28),
+    0 4px 10px rgba(107, 78, 31, 0.20),
+    inset 0 -5px 10px rgba(160, 135, 90, 0.28),
+    inset 0 5px 10px rgba(255, 255, 255, 0.85);
+}
+@keyframes sealBreathe {
+  0%, 100% { box-shadow: 0 16px 36px rgba(107,78,31,0.28), 0 4px 10px rgba(107,78,31,0.20), inset 0 -5px 10px rgba(160,135,90,0.28), inset 0 5px 10px rgba(255,255,255,0.85); }
+  50% { box-shadow: 0 20px 44px rgba(107,78,31,0.36), 0 6px 13px rgba(107,78,31,0.24), inset 0 -5px 10px rgba(160,135,90,0.28), inset 0 5px 10px rgba(255,255,255,0.85); }
+}
+
+/* monogram I&R tulisan tangan emas */
+.seal-initials {
+  font-family: var(--font-script);
+  font-size: 2.1rem;
+  color: var(--gold-dark);
+  text-shadow: 0 1px 1px rgba(255,255,255,0.8);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* garis tepi segel: emas tipis menggantikan garis putus-putus */
+.seal-rim { border: 1px solid rgba(158, 122, 62, 0.35); }
