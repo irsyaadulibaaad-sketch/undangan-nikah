@@ -6,99 +6,100 @@
 <title>Admin — Irsyaadul & Refalina</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  body { background-color: var(--cream); }
-  .admin-container { max-width: 900px; margin: 0 auto; padding: 30px 20px; }
-  .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-  .admin-title { font-family: var(--font-serif); font-size: 2rem; color: var(--sage); }
+  body { background-color: var(--bg-cream); }
+  .cover { display: none !important; }
+  .admin-container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; position: relative; z-index: 10; }
+  .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+  .admin-title { font-family: var(--font-serif); font-size: 2.2rem; color: var(--gold-dark); font-weight: 400; }
   
-  table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-  th, td { border: 1px solid #eee; padding: 10px; text-align: left; }
-  th { background-color: var(--sage); color: #fff; font-weight: 500; letter-spacing: 0.5px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border-radius: 8px; overflow: hidden; }
+  th, td { border-bottom: 1px solid #eee; padding: 15px; text-align: left; }
+  th { background-color: var(--bg-dark); color: var(--text-light); font-weight: 400; letter-spacing: 1px; }
   
-  .badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; color: white; }
+  .badge { padding: 4px 10px; border-radius: 4px; font-size: 11px; font-weight: 500; color: white; letter-spacing: 0.5px; }
   .bg-green { background-color: #8A9A7B; }
   .bg-red { background-color: #d9534f; }
   .bg-blue { background-color: #5bc0de; }
   
-  .btn-sm { padding: 6px 12px; font-size: 11px; border-radius: 4px; cursor: pointer; border: none; margin-right: 5px; font-family: var(--font-sans); transition: 0.2s; }
-  .btn-edit { background-color: var(--gold); color: white; }
+  .btn-sm { padding: 8px 15px; font-size: 11px; border-radius: 4px; cursor: pointer; border: none; margin-right: 5px; font-family: var(--font-sans); transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
+  .btn-edit { background-color: var(--gold-mid); color: white; }
   .btn-del { background-color: #d9534f; color: white; }
-  .btn-save { background-color: var(--sage); color: white; }
-  .btn-sm:hover { opacity: 0.8; }
+  .btn-save { background-color: #8A9A7B; color: white; }
+  .btn-sm:hover { opacity: 0.8; transform: translateY(-1px); }
   
-  input[type="text"], input[type="number"], select { width: 100%; padding: 6px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; font-family: var(--font-sans); }
+  input[type="text"], input[type="number"], select { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; font-family: var(--font-sans); background: var(--bg-cream); }
   .hidden { display: none !important; }
 </style>
 </head>
 <body>
 
-<!-- HALAMAN LOGIN PIN -->
-<div id="loginSection" class="admin-container" style="text-align:center; margin-top: 10vh; max-width: 400px;">
-  <h2 class="admin-title">Admin Panel</h2>
-  <p style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">Masukkan PIN untuk mengakses data tamu.</p>
-  <input type="password" id="pinInput" placeholder="PIN Admin" style="text-align: center; font-size: 24px; letter-spacing: 5px; padding: 10px; margin-bottom: 15px;">
-  <button onclick="login()" class="btn-primary">Masuk</button>
+<!-- LOGIN -->
+<div id="loginSection" class="admin-container" style="text-align:center; margin-top: 15vh; max-width: 400px;">
+  <h2 class="admin-title">Admin Access</h2>
+  <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 25px; font-weight: 300;">Enter PIN to manage guest list.</p>
+  <input type="password" id="pinInput" placeholder="••••" style="text-align: center; font-size: 24px; letter-spacing: 10px; padding: 15px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ddd; width: 100%;">
+  <button onclick="login()" class="btn-primary">Login</button>
   <p id="loginMsg" style="color: #d9534f; margin-top: 15px; font-size: 0.9rem;"></p>
 </div>
 
-<!-- HALAMAN DATA -->
+<!-- DASHBOARD -->
 <div id="adminSection" class="admin-container hidden">
   <div class="admin-header">
-    <h2 class="admin-title">Daftar Tamu</h2>
-    <button onclick="logout()" class="btn-outline" style="width: auto; margin: 0; padding: 8px 20px;">Logout</button>
+    <h2 class="admin-title">Guest List</h2>
+    <button onclick="logout()" class="btn-outline" style="width: auto; margin: 0; padding: 10px 25px; color: var(--gold-dark); border-color: var(--gold-dark);">Logout</button>
   </div>
 
   <!-- TEMA SELECTOR -->
-  <div style="margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 8px; border-left: 4px solid var(--sage); box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
-    <strong style="display:block; margin-bottom:10px;">Tema Undangan</strong>
-    <select id="themeSelect" style="padding:10px; border-radius:6px; border:1px solid #ddd; width:100%; font-family:var(--font-sans);">
-      <option value="sage">Sage & Cream (Natural)</option>
-      <option value="midnight">Midnight & Gold (Mewah)</option>
-      <option value="rose">Dusty Rose & Champagne (Lembut)</option>
+  <div style="margin-bottom: 25px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee;">
+    <strong style="display:block; margin-bottom:15px; font-family: var(--font-serif); font-size: 1.2rem; color: var(--gold-dark);">Website Theme</strong>
+    <select id="themeSelect" style="padding:15px; border-radius:6px; border:1px solid #ddd; width:100%; font-family:var(--font-sans); background: var(--bg-cream);">
+      <option value="luxury">Luxury Gold (Default)</option>
+      <option value="midnight">Midnight Sage (Dark Mode)</option>
+      <option value="rose">Dusty Rose (Light Mode)</option>
     </select>
-    <p style="font-size:0.75rem; color:#888; margin-top:8px;">Tema berlaku untuk semua tamu yang membuka undangan.</p>
+    <p style="font-size:0.75rem; color:#888; margin-top:10px; font-weight:300;">Note: Guests need to refresh the invitation page to see theme changes.</p>
   </div>
 
-  <div style="margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 8px; border-left: 4px solid var(--sage); box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
-    <strong>Sisa Kuota: <span id="adminSisaKuota" style="color: var(--sage); font-size: 20px;">--</span> / 100 pax</strong>
+  <div style="margin-bottom: 25px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee;">
+    <strong style="font-family: var(--font-serif); font-size: 1.2rem; color: var(--gold-dark);">Remaining Seats: <span id="adminSisaKuota" style="font-size: 1.5rem;">--</span> / 100</strong>
   </div>
 
-  <div style="overflow-x: auto;">
+  <div style="overflow-x: auto; background: #fff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee;">
     <table>
       <thead>
         <tr>
-          <th>Nama</th>
+          <th>Name</th>
           <th>Status</th>
           <th>Pax</th>
-          <th>Kategori</th>
+          <th>Category</th>
           <th>Check-in?</th>
-          <th>Aksi</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody id="tamuTbody">
-        <tr><td colspan="6" style="text-align:center;">Memuat data...</td></tr>
+        <tr><td colspan="6" style="text-align:center;">Loading data...</td></tr>
       </tbody>
     </table>
   </div>
 
-  <div style="margin-top: 40px;">
-    <h3 class="admin-title" style="font-size: 1.5rem; margin-bottom: 15px;">Daftar Doa (Taman Doa)</h3>
-    <div style="overflow-x: auto;">
+  <div style="margin-top: 50px;">
+    <h3 class="admin-title" style="font-size: 1.5rem; margin-bottom: 15px;">Garden of Prayers</h3>
+    <div style="overflow-x: auto; background: #fff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee;">
       <table>
         <thead>
           <tr>
-            <th>Nama</th>
-            <th>Doa/Ucapan</th>
-            <th>Sumber</th>
-            <th>Aksi</th>
+            <th>Name</th>
+            <th>Prayer / Wishes</th>
+            <th>Source</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody id="doaTbody">
-          <tr><td colspan="4" style="text-align:center;">Memuat data...</td></tr>
+          <tr><td colspan="4" style="text-align:center;">Loading data...</td></tr>
         </tbody>
       </table>
     </div>
@@ -109,14 +110,13 @@
 <script>
   const ADMIN_PIN = "123456"; 
 
-  // Logika Tema
   const themeSelect = document.getElementById('themeSelect');
-  const currentTheme = localStorage.getItem('wedding_theme') || 'sage';
+  const currentTheme = localStorage.getItem('wedding_theme') || 'luxury';
   if(themeSelect) {
     themeSelect.value = currentTheme;
     themeSelect.addEventListener('change', (e) => {
       localStorage.setItem('wedding_theme', e.target.value);
-      alert('Tema disimpan! Tamu perlu refresh halaman undangan untuk melihat perubahan.');
+      alert('Theme saved! Guests need to refresh to see changes.');
     });
   }
 
@@ -127,13 +127,11 @@
       document.getElementById("adminSection").classList.remove("hidden");
       loadAdminData();
     } else {
-      document.getElementById("loginMsg").textContent = "PIN salah!";
+      document.getElementById("loginMsg").textContent = "Invalid PIN!";
     }
   }
 
-  function logout() {
-    location.reload();
-  }
+  function logout() { location.reload(); }
 
   async function loadAdminData() {
     const { data: kuotaData } = await supabaseClient.from("total_pax").select("terpakai").single();
@@ -144,24 +142,24 @@
     const tbody = document.getElementById("tamuTbody");
     tbody.innerHTML = "";
     if (!rsvpData || rsvpData.length === 0) {
-      tbody.innerHTML = "<tr><td colspan='6' style='text-align:center;'>Belum ada data.</td></tr>";
+      tbody.innerHTML = "<tr><td colspan='6' style='text-align:center;'>No data yet.</td></tr>";
     } else {
       rsvpData.forEach(t => {
         const isHadir = t.hadir;
-        const badgeStatus = isHadir ? '<span class="badge bg-green">Hadir</span>' : '<span class="badge bg-red">Tidak</span>';
-        const badgeCheckin = t.checked_in ? '<span class="badge bg-blue">Ya</span>' : '-';
+        const badgeStatus = isHadir ? '<span class="badge bg-green">Attending</span>' : '<span class="badge bg-red">Not Attending</span>';
+        const badgeCheckin = t.checked_in ? '<span class="badge bg-blue">Yes</span>' : '-';
         
         const tr = document.createElement("tr");
         tr.id = `row-${t.id}`;
         tr.innerHTML = `
-          <td>${t.nama}</td>
+          <td style="font-weight:500;">${t.nama}</td>
           <td>${badgeStatus}</td>
           <td>${isHadir ? t.jumlah_pax : '-'}</td>
-          <td>${isHadir ? t.kategori : '-'}</td>
+          <td style="text-transform:capitalize;">${isHadir ? t.kategori : '-'}</td>
           <td>${badgeCheckin}</td>
           <td>
             <button class="btn-sm btn-edit" onclick="editRow('${t.id}', '${t.nama}', ${t.jumlah_pax}, '${t.kategori}')">Edit</button>
-            <button class="btn-sm btn-del" onclick="deleteRsvp('${t.id}')">Hapus</button>
+            <button class="btn-sm btn-del" onclick="deleteRsvp('${t.id}')">Delete</button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -172,15 +170,15 @@
     const dtbody = document.getElementById("doaTbody");
     dtbody.innerHTML = "";
     if (!doaData || doaData.length === 0) {
-      dtbody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Belum ada doa.</td></tr>";
+      dtbody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>No prayers yet.</td></tr>";
     } else {
       doaData.forEach(d => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${d.nama}</td>
-          <td style="font-size:12px;">"${d.pesan}"</td>
-          <td><span class="badge ${d.sumber === 'checkin' ? 'bg-blue' : 'bg-green'}">${d.sumber}</span></td>
-          <td><button class="btn-sm btn-del" onclick="deleteDoa('${d.id}')">Hapus</button></td>
+          <td style="font-weight:500;">${d.nama}</td>
+          <td style="font-size:13px; color:#555; font-style:italic;">"${d.pesan}"</td>
+          <td><span class="badge ${d.sumber === 'checkin' ? 'bg-blue' : 'bg-green'}" style="text-transform:capitalize;">${d.sumber}</span></td>
+          <td><button class="btn-sm btn-del" onclick="deleteDoa('${d.id}')">Delete</button></td>
         `;
         dtbody.appendChild(tr);
       });
@@ -194,15 +192,15 @@
       <td colspan="2"><input type="number" id="edit-pax-${id}" value="${pax}" min="1"></td>
       <td>
         <select id="edit-kat-${id}">
-          <option value="sendiri" ${kategori==='sendiri'?'selected':''}>Sendiri</option>
-          <option value="pasangan" ${kategori==='pasangan'?'selected':''}>Pasangan</option>
-          <option value="keluarga" ${kategori==='keluarga'?'selected':''}>Keluarga</option>
+          <option value="sendiri" ${kategori==='sendiri'?'selected':''}>Alone</option>
+          <option value="pasangan" ${kategori==='pasangan'?'selected':''}>Partner</option>
+          <option value="keluarga" ${kategori==='keluarga'?'selected':''}>Family</option>
         </select>
       </td>
       <td>-</td>
       <td>
-        <button class="btn-sm btn-save" onclick="saveRow('${id}')">Simpan</button>
-        <button class="btn-sm" style="background:#ccc; color:#333;" onclick="loadAdminData()">Batal</button>
+        <button class="btn-sm btn-save" onclick="saveRow('${id}')">Save</button>
+        <button class="btn-sm" style="background:#ccc; color:#333;" onclick="loadAdminData()">Cancel</button>
       </td>
     `;
   }
@@ -213,21 +211,21 @@
     const kategori = document.getElementById(`edit-kat-${id}`).value;
 
     const { error } = await supabaseClient.from("rsvp").update({ nama, jumlah_pax: pax, kategori }).eq("id", id);
-    if (error) alert("Gagal update: " + error.message);
+    if (error) alert("Failed to update: " + error.message);
     else loadAdminData(); 
   }
 
   async function deleteRsvp(id) {
-    if (!confirm("Yakin ingin menghapus data RSVP ini?")) return;
+    if (!confirm("Are you sure you want to delete this RSVP?")) return;
     const { error } = await supabaseClient.from("rsvp").delete().eq("id", id);
-    if (error) alert("Gagal hapus: " + error.message);
+    if (error) alert("Failed to delete: " + error.message);
     else loadAdminData();
   }
 
   async function deleteDoa(id) {
-    if (!confirm("Yakin ingin menghapus doa ini dari taman?")) return;
+    if (!confirm("Are you sure you want to delete this prayer?")) return;
     const { error } = await supabaseClient.from("doa").delete().eq("id", id);
-    if (error) alert("Gagal hapus: " + error.message);
+    if (error) alert("Failed to delete: " + error.message);
     else loadAdminData();
   }
 </script>

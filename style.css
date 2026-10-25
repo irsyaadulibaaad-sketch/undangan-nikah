@@ -25,7 +25,7 @@ body { font-family: var(--font-sans); background: var(--bg-cream); color: var(--
 .hidden { display: none !important; }
 
 /* =========================================
-   TEKSTUR NOISE OVERLAY (Mewah)
+   TEKSTUR NOISE OVERLAY
    ========================================= */
 .noise-overlay {
   position: fixed; inset: 0; z-index: 9998; pointer-events: none; opacity: 0.4;
@@ -64,18 +64,15 @@ body { font-family: var(--font-sans); background: var(--bg-cream); color: var(--
 section { position: relative; padding: 120px 25px 80px; width: 100%; overflow: hidden; }
 .container { max-width: 650px; margin: 0 auto; text-align: center; position: relative; z-index: 2; }
 
-/* Variasi Warna Section */
 .bg-cream { background-color: var(--bg-cream); }
 .bg-light { background-color: var(--bg-light); }
 .bg-dark { background-color: var(--bg-dark); }
 
-/* Teks untuk Section Gelap */
 .light { color: var(--text-light) !important; }
 .light-text { color: var(--text-light-muted) !important; }
 .section-title { font-family: var(--font-serif); font-size: 2.2rem; color: var(--text-main); margin-bottom: 10px; font-weight: 400; letter-spacing: 1px; }
 .sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 35px; font-weight: 300; letter-spacing: 0.5px; }
 
-/* SVG Dividers */
 .wave-divider, .curve-divider { position: absolute; bottom: -1px; left: 0; width: 100%; line-height: 0; z-index: 1; }
 .wave-divider svg, .curve-divider svg { width: 100%; height: 80px; display: block; }
 
@@ -97,11 +94,12 @@ section { position: relative; padding: 120px 25px 80px; width: 100%; overflow: h
    VENUE SECTION (DARK)
    ========================================= */
 .venue-section { padding-bottom: 140px; }
-.venue-name { font-family: var(--font-serif); font-size: 1.8rem; margin-bottom: 5px; font-weight: 400; }
-.venue-addr { font-size: 0.85rem; margin-bottom: 30px; font-weight: 300; line-height: 1.6; }
-.map-wrap { border-radius: 12px; overflow: hidden; margin-bottom: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); }
-.map-wrap iframe { width: 100%; height: 280px; border: 0; display: block; filter: grayscale(100%) invert(90%) contrast(1.2); transition: filter 0.5s; }
-.map-wrap:hover iframe { filter: grayscale(0%) invert(0%) contrast(1); }
+.venue-name { font-family: var(--font-serif); font-size: 1.6rem; margin-bottom: 10px; font-weight: 400; line-height: 1.3; }
+.venue-addr { font-size: 0.85rem; margin-bottom: 30px; font-weight: 300; line-height: 1.6; opacity: 0.8; }
+
+/* Map Fix: Hapus filter gelap, beri bayangan elegan */
+.map-wrap { border-radius: 12px; overflow: hidden; margin-bottom: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 4px solid rgba(255,255,255,0.1); }
+.map-wrap iframe { width: 100%; height: 280px; border: 0; display: block; filter: none; transition: filter 0.3s; }
 
 /* =========================================
    RSVP SECTION (LIGHT)
