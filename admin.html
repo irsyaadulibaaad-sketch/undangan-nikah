@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin - Undangan Irsyaadul & Refalina</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  /* Styling khusus halaman admin */
+  .admin-container { max-width: 800px; margin: 0 auto; padding: 20px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+  th, td { border: 1px solid #e8c8d4; padding: 8px; text-align: left; }
+  th { background-color: #fdf6f0; color: #a04a68; }
+  .badge { padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; color: white; }
+  .bg-green { background-color: #4caf50; }
+  .bg-red { background-color: #f44336; }
+  .bg-blue { background-color: #2196f3; }
+  .btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 4px; cursor: pointer; border: none; margin-right: 5px; }
+  .btn-edit { background-color: #ff9800; color: white; }
+  .btn-del { background-color: #f44336; color: white; }
+  .btn-save { background-color: #4caf50; color: white; }
+  input[type="text"], input[type="number"] { width: 100%; padding: 4px; box-sizing: border-box; }
+  .hidden { display: none; }
+</style>
+</head>
+<body style="background: #fff;">
+
+<!-- HALAMAN LOGIN PIN -->
+<div id="loginSection" class="admin-container" style="text-align:center; margin-top: 50px;">
+  <h2>Admin Panel</h2>
+  <p>Masukkan PIN untuk mengakses data tamu.</p>
+  <input type="password" id="pinInput" placeholder="PIN Admin" style="max-width: 200px; text-align: center; font-size: 20px;">
+  <button onclick="login()" class="btn-primary" style="margin-top: 10px;">Masuk</button>
+  <p id="loginMsg" style="color: red; margin-top: 10px;"></p>
+</div>
+
+<!-- HALAMAN DATA (Tersembunyi awalnya) -->
+<div id="adminSection" class="admin-container hidden">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>Daftar Tamu</h2>
+    <button onclick="logout()" class="btn-outline" style="padding: 8px 15px; margin: 0;">Logout</button>
+  </div>
+
+  <div style="margin-bottom: 15px;">
+    <strong>Sisa Kuota: <span id="adminSisaKuota" style="color: #a04a68; font-size: 18px;">--</span> / 100 pax</strong>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nama</th>
+        <th>Status</th>
+        <th>Pax</th>
+        <th>Kategori</th>
+        <th>Check-in?</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody id="tamuTbody">
+      <tr><td colspan="6" style="text-align:center;">Memuat data...</td></tr>
+    </tbody>
+  </table>
+
+  <div style="margin-top: 30px;">
+    <h3>Daftar Doa (Taman Doa)</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Doa/Ucapan</th>
+          <th>Sumber</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="doaTbody">
+        <tr><td colspan="4" style="text-align:center;">Memuat data...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script src="supabase.js"></script>
+<script>
+  // GANTI PIN RAHASIA DI SINI
+  const ADMIN_PIN = "123456"; 
+
+  function login() {
+    const pin = document.getElementById("pinInput").value;
+    if (pin === ADMIN_PIN) {
+      document.getElementById("loginSection").classList.add("hidden");
+      document.getElementById("adminSection").classList.remove("hidden");
+      loadAdminData();
+    } else {
+      document.getElementById("loginMsg").textContent = "PIN salah!";
+    }
+  }
+
+  function logout() {
+    location.reload();
+  }
+
+  async function loadAdminData() {
+    // 1. Load Kuota
+    const { data: kuotaData } = await supabaseClient.from("total_pax").select("terpakai").single();
+    const sisa = 100 - (kuotaData?.terpakai || 0);
+    document.getElementById("adminSisaKuota").textContent = sisa;
+
+    // 2. Load RSVP
+    const { data: rsvpData } = await supabaseClient.from("rsvp").select("*").order("created_at", { ascending: false });
+    const tbody = document.getElementById("tamuTbody");
+    tbody.innerHTML = "";
+    if (!rsvpData || rsvpData.length === 0) {
+      tbody.innerHTML = "<tr><td colspan='6' style='text-align:center;'>Belum ada data.</td></tr>";
+    } else {
+      rsvpData.forEach(t => {
+        const isHadir = t.hadir;
+        const badgeStatus = isHadir ? '<span class="badge bg-green">Hadir</span>' : '<span class="badge bg-red">Tidak</span>';
+        const badgeCheckin = t.checked_in ? '<span class="badge bg-blue">Ya</span>' : '-';
+        
+        // Baris tampilan
+        const tr = document.createElement("tr");
+        tr.id = `row-${t.id}`;
+        tr.innerHTML = `
+          <td>${t.nama}</td>
+          <td>${badgeStatus}</td>
+          <td>${isHadir ? t.jumlah_pax : '-'}</td>
+          <td>${isHadir ? t.kategori : '-'}</td>
+          <td>${badgeCheckin}</td>
+          <td>
+            <button class="btn-sm btn-edit" onclick="editRow('${t.id}', '${t.nama}', ${t.jumlah_pax}, '${t.kategori}')">Edit</button>
+            <button class="btn-sm btn-del" onclick="deleteRsvp('${t.id}')">Hapus</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 3. Load Doa
+    const { data: doaData } = await supabaseClient.from("doa").select("*").order("created_at", { ascending: false });
+    const dtbody = document.getElementById("doaTbody");
+    dtbody.innerHTML = "";
+    if (!doaData || doaData.length === 0) {
+      dtbody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>Belum ada doa.</td></tr>";
+    } else {
+      doaData.forEach(d => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${d.nama}</td>
+          <td style="font-size:12px;">"${d.pesan}"</td>
+          <td><span class="badge ${d.sumber === 'checkin' ? 'bg-blue' : 'bg-green'}">${d.sumber}</span></td>
+          <td><button class="btn-sm btn-del" onclick="deleteDoa('${d.id}')">Hapus</button></td>
+        `;
+        dtbody.appendChild(tr);
+      });
+    }
+  }
+
+  // Fungsi Edit (Mengubah baris menjadi input form)
+  function editRow(id, nama, pax, kategori) {
+    const tr = document.getElementById(`row-${id}`);
+    tr.innerHTML = `
+      <td><input type="text" id="edit-nama-${id}" value="${nama}"></td>
+      <td colspan="2"><input type="number" id="edit-pax-${id}" value="${pax}" min="1"></td>
+      <td>
+        <select id="edit-kat-${id}" style="width:100%; padding:4px;">
+          <option value="sendiri" ${kategori==='sendiri'?'selected':''}>Sendiri</option>
+          <option value="pasangan" ${kategori==='pasangan'?'selected':''}>Pasangan</option>
+          <option value="keluarga" ${kategori==='keluarga'?'selected':''}>Keluarga</option>
+        </select>
+      </td>
+      <td>-</td>
+      <td>
+        <button class="btn-sm btn-save" onclick="saveRow('${id}')">Simpan</button>
+        <button class="btn-sm" style="background:#ccc;" onclick="loadAdminData()">Batal</button>
+      </td>
+    `;
+  }
+
+  async function saveRow(id) {
+    const nama = document.getElementById(`edit-nama-${id}`).value;
+    const pax = parseInt(document.getElementById(`edit-pax-${id}`).value);
+    const kategori = document.getElementById(`edit-kat-${id}`).value;
+
+    const { error } = await supabaseClient.from("rsvp").update({ nama, jumlah_pax: pax, kategori }).eq("id", id);
+    if (error) alert("Gagal update: " + error.message);
+    else loadAdminData(); // Refresh data
+  }
+
+  // Fungsi Hapus
+  async function deleteRsvp(id) {
+    if (!confirm("Yakin ingin menghapus data RSVP ini?")) return;
+    const { error } = await supabaseClient.from("rsvp").delete().eq("id", id);
+    if (error) alert("Gagal hapus: " + error.message);
+    else loadAdminData();
+  }
+
+  async function deleteDoa(id) {
+    if (!confirm("Yakin ingin menghapus doa ini dari taman?")) return;
+    const { error } = await supabaseClient.from("doa").delete().eq("id", id);
+    if (error) alert("Gagal hapus: " + error.message);
+    else loadAdminData();
+  }
+</script>
+</body>
+</html>
