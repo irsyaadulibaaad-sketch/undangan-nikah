@@ -98,9 +98,7 @@ document.getElementById("rsvpForm").addEventListener("submit", async (e) => {
   loadTaman();
 });
 
-// ====== TAMAN DOA (RENDER HTML CSS) ======
-const BUNGA_EMOJI = { mawar:"🌹", tulip:"🌷", matahari:"🌻", sakura:"🌸", lily:"🌺" };
-
+// ====== TAMAN DOA (RENDER BUNGA CSS) ======
 async function loadTaman() {
   const { data, error } = await supabaseClient
     .from("doa").select("*").order("created_at", { ascending: true });
@@ -111,17 +109,41 @@ async function loadTaman() {
 
   if (data && data.length > 0) {
     data.forEach((d, index) => {
-      const flower = document.createElement("div");
-      flower.className = "bunga";
-      flower.innerHTML = BUNGA_EMOJI[d.bunga] || "🌸";
-      flower.title = `${d.nama}: ${d.pesan}`;
+      // Buat div untuk batang
+      const stem = document.createElement("div");
+      stem.className = "flower-stem";
       
-      // Posisi acak agar natural
-      const posX = 10 + Math.random() * 80; // 10% - 90% lebar
-      const delay = (index % 10) * 0.1; // Animasi muncul bergantian
+      // Buat div untuk kelopak
+      const bloom = document.createElement("div");
+      bloom.className = "flower-bloom";
+      
+      // Bungkus dalam satu container
+      const flower = document.createElement("div");
+      flower.className = "flower-wrapper";
+      
+      // Simpan data pesan di atribut
+      flower.dataset.nama = d.nama;
+      flower.dataset.pesan = d.pesan;
+      
+      // Posisi acak
+      const posX = 10 + Math.random() * 80; 
+      const delay = (index % 10) * 0.1; 
       
       flower.style.left = `${posX}%`;
       flower.style.animationDelay = `${delay}s`;
+      
+      // Warna acak untuk kelopak
+      const colors = ["#FFB6C1", "#FF69B4", "#FFD700", "#FFA07A", "#E6E6FA"];
+      const randomColor = colors[Math.floor(Math.random() * colors.length)];
+      bloom.style.backgroundColor = randomColor;
+      
+      stem.appendChild(bloom);
+      flower.appendChild(stem);
+      
+      // Fitur Klik untuk melihat pesan
+      flower.addEventListener("click", () => {
+        showPopup(`<b>${d.nama}</b><br><br>"${d.pesan}"`);
+      });
       
       container.appendChild(flower);
     });
@@ -139,7 +161,7 @@ function showPopup(html) {
     p.onclick = () => p.remove();
     document.body.appendChild(p);
   }
-  p.innerHTML = html + "<small>(klik untuk tutup)</small>";
+  p.innerHTML = html + "<br><small>(klik untuk tutup)</small>";
 }
 // realtime taman
 supabaseClient.channel("doa-rt")

@@ -142,7 +142,7 @@ section { position: relative; padding: 160px 25px 120px; width: 100%; overflow: 
 .btn-outline:hover { background: var(--gold-mid); color: #fff; border-color: var(--gold-mid); }
 
 /* ==========================================================================
-   10. TAMAN DOA SECTION (CSS MURNI)
+   10. TAMAN DOA SECTION (CSS MURNI + BURUNG + AIR MANCUR)
    ========================================================================== */
 .taman-section { padding-bottom: 180px; }
 
@@ -156,102 +156,127 @@ section { position: relative; padding: 160px 25px 120px; width: 100%; overflow: 
   overflow: hidden;
   box-shadow: var(--shadow-medium);
   border: 4px solid rgba(255,255,255,0.5);
-  background: #87CEEB; /* Fallback sky blue */
+  background: #87CEEB; 
 }
 
-/* Langit */
-.sky {
-  position: absolute; inset: 0;
-  background: linear-gradient(to bottom, #FFDAB9 0%, #F9F7F2 60%, #E8E2D6 100%);
-}
-
-/* Matahari */
-.sun {
-  position: absolute; bottom: 30%; left: 50%; transform: translateX(-50%);
-  width: 100px; height: 100px;
-  background: radial-gradient(circle, rgba(197,160,89,0.8) 0%, rgba(197,160,89,0) 70%);
-  border-radius: 50%;
-}
+/* Langit & Matahari */
+.sky { position: absolute; inset: 0; background: linear-gradient(to bottom, #FFDAB9 0%, #F9F7F2 60%, #E8E2D6 100%); }
+.sun { position: absolute; bottom: 30%; left: 50%; transform: translateX(-50%); width: 100px; height: 100px; background: radial-gradient(circle, rgba(197,160,89,0.8) 0%, rgba(197,160,89,0) 70%); border-radius: 50%; }
 
 /* Awan */
-.cloud {
-  position: absolute;
-  background: #fff;
-  border-radius: 50%;
-  opacity: 0.6;
-  animation: floatClouds 20s linear infinite;
-}
+.cloud { position: absolute; background: #fff; border-radius: 50%; opacity: 0.6; animation: floatClouds 20s linear infinite; }
 .cloud1 { width: 80px; height: 40px; top: 20%; left: 10%; animation-duration: 25s; }
 .cloud2 { width: 120px; height: 50px; top: 10%; left: 60%; animation-duration: 35s; }
-@keyframes floatClouds {
-  from { transform: translateX(-100px); }
-  to { transform: translateX(800px); }
+@keyframes floatClouds { from { transform: translateX(-100px); } to { transform: translateX(800px); } }
+
+/* Burung */
+.bird {
+  position: absolute;
+  width: 20px; height: 10px;
+  border-top: 2px solid #555;
+  border-radius: 50% 50% 0 0;
+  animation: fly 15s linear infinite;
+  opacity: 0.6;
+}
+.bird::before {
+  content: ''; position: absolute; top: -2px; left: 50%; width: 20px; height: 10px;
+  border-top: 2px solid #555; border-radius: 50% 50% 0 0;
+  transform: translateX(-50%) scaleX(-1);
+}
+.bird1 { top: 25%; left: -50px; animation-duration: 12s; }
+.bird2 { top: 35%; left: -100px; animation-duration: 18s; animation-delay: 3s; }
+@keyframes fly {
+  0% { transform: translateX(0) translateY(0); }
+  50% { transform: translateX(400px) translateY(-20px); }
+  100% { transform: translateX(900px) translateY(0); }
 }
 
 /* Rumput / Tanah */
-.grass {
-  position: absolute; bottom: 0; left: 0; width: 100%; height: 120px;
-  background: #8A9A7B;
-  border-radius: 50% 50% 0 0 / 20% 20% 0 0;
-  box-shadow: inset 0 20px 40px rgba(0,0,0,0.1);
-}
-.grass::after {
-  content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 40px;
-  background: #6B7A5D;
-}
+.grass { position: absolute; bottom: 0; left: 0; width: 100%; height: 120px; background: #8A9A7B; border-radius: 50% 50% 0 0 / 20% 20% 0 0; box-shadow: inset 0 20px 40px rgba(0,0,0,0.1); }
+.grass::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; background: #6B7A5D; }
 
-/* Air Mancur */
+/* Air Mancur Bertingkat */
 .fountain {
   position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
-  width: 200px; height: 100px;
+  width: 240px; height: 160px;
   z-index: 5;
 }
 .water-pool {
   position: absolute; bottom: 0; left: 0; width: 100%; height: 40px;
-  background: #B0C4DE;
-  border-radius: 50%;
-  border: 4px solid #D3D3D3;
+  background: #B0C4DE; border-radius: 50%; border: 4px solid #D3D3D3;
 }
 .water-spout {
   position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-  width: 20px; height: 60px;
-  background: #A9A9A9;
+  width: 20px; height: 80px; background: #A9A9A9;
 }
+/* Tingkat 2 */
+.tier-2 {
+  position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%);
+  width: 80px; height: 20px; background: #A9A9A9;
+  border-radius: 50%;
+}
+/* Tingkat 3 */
+.tier-3 {
+  position: absolute; bottom: 110px; left: 50%; transform: translateX(-50%);
+  width: 40px; height: 15px; background: #A9A9A9;
+  border-radius: 50%;
+}
+
+/* Animasi Air Sembur */
 .water-spout::before {
   content: ''; position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
-  width: 60px; height: 20px;
-  background: #A9A9A9;
-  border-radius: 50% 50% 0 0;
+  width: 100px; height: 40px;
+  background: radial-gradient(ellipse at top, rgba(173,216,230,0.8) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: spoutWater 1.5s infinite alternate;
 }
-/* Animasi Air Sembur (Pseudo-element) */
-.water-spout::after {
-  content: ''; position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
-  width: 40px; height: 40px;
-  background: radial-gradient(circle, rgba(173,216,230,0.8) 0%, transparent 70%);
+.tier-2::before, .tier-3::before {
+  content: ''; position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+  width: 60px; height: 30px;
+  background: radial-gradient(ellipse at top, rgba(173,216,230,0.6) 0%, transparent 70%);
   border-radius: 50%;
   animation: spoutWater 1s infinite alternate;
 }
 @keyframes spoutWater {
   from { transform: translateX(-50%) scaleY(1); opacity: 0.8; }
-  to { transform: translateX(-50%) scaleY(1.3); opacity: 0.4; }
+  to { transform: translateX(-50%) scaleY(1.4); opacity: 0.4; }
 }
 
-/* Container Bunga */
+/* Container & Karakter Bunga CSS */
 .flower-container {
   position: absolute; bottom: 20px; left: 0; width: 100%; height: 150px;
   z-index: 10;
 }
-.bunga {
-  position: absolute; bottom: 0;
-  font-size: 2rem;
+
+.flower-wrapper {
+  position: absolute; bottom: 0; width: 30px; height: 50px;
+  cursor: pointer;
   transform-origin: bottom center;
-  animation: growFlower 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+  animation: growFlower 1.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   opacity: 0;
 }
+
+.flower-stem {
+  position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 4px; height: 30px; background: #4A5D23; border-radius: 2px;
+}
+
+.flower-bloom {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 20px; height: 20px; border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+/* Efek kelopak */
+.flower-bloom::before, .flower-bloom::after {
+  content: ''; position: absolute; width: 20px; height: 20px;
+  border-radius: 50%; background: inherit; z-index: -1;
+}
+.flower-bloom::before { top: -8px; left: 0; }
+.flower-bloom::after { top: 0; left: -8px; }
+
 @keyframes growFlower {
-  0% { transform: scale(0); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  0% { transform: scaleY(0) scaleX(0); opacity: 0; }
+  100% { transform: scaleY(1) scaleX(1); opacity: 1; }
 }
 
 /* ==========================================================================
@@ -309,4 +334,5 @@ footer small { font-family: var(--font-sans); font-size: 0.7rem; text-transform:
   .hero-names { font-size: 3rem; }
   .section-title { font-size: 2.2rem; }
   .qr-wrap { padding: 40px; }
+  .css-garden { height: 300px; }
 }
