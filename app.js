@@ -228,11 +228,8 @@ document.getElementById("shareBtn").addEventListener("click", async () => {
 });
 
 // ====== QR HARI-H ======
-const checkinUrl = location.origin + location.pathname.replace("index.html","") + "checkin.html";
-window.addEventListener("load", () => {
-  if (document.getElementById("qrCanvas")) {
-    QRCode.toCanvas(document.getElementById("qrCanvas"), checkinUrl, { width: 200 }, function (error) {
-      if (error) console.error("Gagal membuat QR:", error);
-    });
-  }
-});
+const checkinUrl = encodeURIComponent(location.origin + location.pathname.replace("index.html","") + "checkin.html");
+const qrImage = document.getElementById("qrImage");
+if (qrImage) {
+  qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${checkinUrl}`;
+}

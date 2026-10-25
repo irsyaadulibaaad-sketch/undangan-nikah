@@ -114,15 +114,16 @@
 <section class="qr-info">
   <h2>Registrasi Hari-H</h2>
   <p>Scan QR di pintu masuk untuk check-in:</p>
-  <canvas id="qrCanvas"></canvas>
+  <div id="qrContainer" style="display:flex; justify-content:center; margin-top:16px;">
+    <img id="qrImage" alt="QR Code Check-in" style="width:200px; height:200px; background:#fff; padding:10px; border-radius:12px;">
+  </div>
 </section>
 
 <footer>
   <p>Irsyaadul Ibaad & Refalina Putri Nursiami</p>
 </footer>
 
-<!-- Library QR -->
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase.js"></script>
 <script src="app.js"></script>
 </body>
