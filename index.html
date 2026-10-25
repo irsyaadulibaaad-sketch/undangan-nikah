@@ -14,7 +14,6 @@
 </head>
 <body>
 
-<!-- EFEK TEKSTUR KERTAS (NOISE) -->
 <div class="noise-overlay"></div>
 
 <!-- COVER PEMBUKA (LUXURY) -->
@@ -23,7 +22,6 @@
   
   <div class="luxury-envelope" id="luxuryEnvelope">
     <div class="paper-back">
-      <!-- SVG Ornamen Botanical -->
       <svg class="botanical-top" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
         <path d="M100,60 Q100,30 80,10 M100,60 Q100,30 120,10 M100,60 L100,10" fill="none" stroke="currentColor" stroke-width="0.5"/>
         <circle cx="80" cy="10" r="2" fill="currentColor"/>
@@ -56,12 +54,21 @@
 <!-- KONTEN UTAMA -->
 <div id="mainContent" class="hidden">
   
-  <!-- SECTION 1: HERO (Warna Kontras: Cream) -->
+  <!-- SECTION 1: HERO -->
   <section class="hero-section bg-cream" data-anim="fade-up">
     <div class="container">
       <p class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</p>
       <p class="hero-sub">We Are Getting Married</p>
-      <h1 class="hero-names">Irsyaadul Ibaad<br><span class="ampersand-hero">&</span><br>Refalina Putri Nursiami</h1>
+      
+      <!-- NAMA DIPISAH AGAR LEBIH RAPI -->
+      <h1 class="hero-names">
+        <span class="name-block">Irsyaadul Ibaad</span>
+        <span class="ampersand-hero">&</span>
+        <span class="name-block">Refalina Putri<br>Nursiami</span>
+      </h1>
+      
+      <!-- TANGGAL & JAM DITAMBAHKAN DI SINI -->
+      <p class="hero-date">Sabtu, 24 Desember 2026 • 08.00 WIB</p>
       
       <div class="countdown" id="countdown">
         <div><span id="cd-days">--</span><small>Days</small></div>
@@ -70,7 +77,6 @@
         <div><span id="cd-secs">--</span><small>Secs</small></div>
       </div>
     </div>
-    <!-- SVG Wave Divider -->
     <div class="wave-divider">
       <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
         <path d="M0,50 C320,100 420,0 720,50 C1020,100 1120,0 1440,50 L1440,100 L0,100 Z" fill="var(--bg-dark)"/>
@@ -78,7 +84,7 @@
     </div>
   </section>
 
-  <!-- SECTION 2: VENUE (Warna Kontras: Dark Sage) -->
+  <!-- SECTION 2: VENUE -->
   <section class="venue-section bg-dark" data-anim="fade-up">
     <div class="container">
       <h2 class="section-title light">The Venue</h2>
@@ -90,7 +96,6 @@
       </div>
       <a id="gmapLink" class="btn-outline light" target="_blank">Open Maps</a>
     </div>
-    <!-- SVG Curve Divider -->
     <div class="curve-divider">
       <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
         <path d="M0,100 L1440,0 L1440,100 Z" fill="var(--bg-light)"/>
@@ -98,7 +103,7 @@
     </div>
   </section>
 
-  <!-- SECTION 3: RSVP (Warna Kontras: Putih Bersih) -->
+  <!-- SECTION 3: RSVP -->
   <section class="rsvp-section bg-light" data-anim="fade-up">
     <div class="container">
       <h2 class="section-title">RSVP</h2>
@@ -124,7 +129,7 @@
     </div>
   </section>
 
-  <!-- SECTION 4: TAMAN DOA (Warna Kontras: Cream) -->
+  <!-- SECTION 4: TAMAN DOA -->
   <section class="taman-section bg-cream" data-anim="fade-up">
     <div class="container">
       <h2 class="section-title">Garden of Prayers</h2>
@@ -138,20 +143,18 @@
     </div>
   </section>
 
-  <!-- SECTION 5: GAME & PHOTOBOOTH (Warna Kontras: Dark Sage) -->
+  <!-- SECTION 5: GAME & PHOTOBOOTH -->
   <section class="interactive-section bg-dark" data-anim="fade-up">
     <div class="container">
       <h2 class="section-title light">Interactive</h2>
       
       <div class="interactive-grid">
-        <!-- Game -->
         <div class="interactive-item">
           <h3 class="sub-title light">The Journey</h3>
           <p class="sub light-text">Help the prince carry his princess</p>
           <iframe src="game/dino.html" class="game-frame" loading="lazy"></iframe>
         </div>
         
-        <!-- Photobooth -->
         <div class="interactive-item">
           <h3 class="sub-title light">Photobooth</h3>
           <p class="sub light-text">Capture the moment, choose a frame</p>
@@ -176,7 +179,7 @@
     </div>
   </section>
 
-  <!-- SECTION 6: QR & FOOTER (Warna Kontras: Putih Bersih) -->
+  <!-- SECTION 6: QR & FOOTER -->
   <section class="qr-section bg-light" data-anim="fade-up">
     <div class="container">
       <h2 class="section-title">Day-of Registration</h2>
@@ -205,33 +208,24 @@
 <script src="supabase.js"></script>
 <script src="app.js"></script>
 <script>
-  // Tema
   const savedTheme = localStorage.getItem('wedding_theme') || 'luxury';
   document.documentElement.setAttribute('data-theme', savedTheme);
 
-  // GSAP Animasi Scroll Kompleks
   gsap.registerPlugin(ScrollTrigger);
-  
   document.querySelectorAll('[data-anim]').forEach(el => {
     const type = el.getAttribute('data-anim');
-    
-    // Animasi masuk
     gsap.fromTo(el, 
       type === 'zoom-in' ? { scale: 0.9, opacity: 0 } : { y: 80, opacity: 0 },
-      {
-        scale: 1, y: 0, opacity: 1, duration: 1.5, ease: "power4.out",
+      { scale: 1, y: 0, opacity: 1, duration: 1.5, ease: "power4.out",
         scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" }
       }
     );
-    
-    // Parallax Effect untuk Container
     gsap.to(el.querySelector('.container') || el, {
       y: -50, ease: "none",
       scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true }
     });
   });
 
-  // Animasi Amplop
   const tl = gsap.timeline({ paused: true });
   tl.to(".wax-seal", { scale: 1.3, opacity: 0, duration: 0.6, ease: "power2.in" })
     .to(".golden-glow", { opacity: 1, duration: 1 }, "-=0.4")
