@@ -1,8 +1,38 @@
-:root {
+/* =========================================
+   TEMA WARNA (Bisa dipilih dari Admin)
+   ========================================= */
+:root, [data-theme="sage"] {
   --sage: #8A9A7B;
   --cream: #FDFBF7;
   --dark: #3A4035;
   --gold: #C5A880;
+  --bg-cover: #f4f0ea;
+  --envelope: #8A9A7B;
+  --envelope-flap: #7A8A6B;
+  --font-serif: 'Cormorant Garamond', serif;
+  --font-sans: 'Montserrat', sans-serif;
+}
+
+[data-theme="midnight"] {
+  --sage: #1B2A4A;
+  --cream: #0F172A;
+  --dark: #E2E8F0;
+  --gold: #D4AF37;
+  --bg-cover: #0a0f1a;
+  --envelope: #1B2A4A;
+  --envelope-flap: #15223D;
+  --font-serif: 'Cormorant Garamond', serif;
+  --font-sans: 'Montserrat', sans-serif;
+}
+
+[data-theme="rose"] {
+  --sage: #C48B9F;
+  --cream: #FFF5F7;
+  --dark: #4A2C35;
+  --gold: #E8C4C4;
+  --bg-cover: #fdf2f4;
+  --envelope: #C48B9F;
+  --envelope-flap: #B07A8D;
   --font-serif: 'Cormorant Garamond', serif;
   --font-sans: 'Montserrat', sans-serif;
 }
@@ -14,153 +44,106 @@ body {
   color: var(--dark);
   line-height: 1.7;
   overflow-x: hidden;
+  transition: background-color 0.6s ease, color 0.6s ease;
 }
 
 .hidden { display: none !important; }
 
 /* =========================================
-   ANIMASI AMPLOP (COVER)
+   ANIMASI AMPLOP
    ========================================= */
 .cover {
   position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-  background-color: #f4f0ea; /* Warna latar belakang luar amplop */
+  background-color: var(--bg-cover);
   display: flex; justify-content: center; align-items: center; text-align: center;
   z-index: 9999; transition: opacity 0.5s ease;
 }
 
-.envelope-wrapper {
-  position: relative;
-  width: 320px;
-  height: 220px;
-  perspective: 1000px;
-}
-
+.envelope-wrapper { position: relative; width: 320px; height: 220px; perspective: 1000px; }
 .envelope {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  background-color: var(--sage);
-  border-radius: 4px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-  transition: transform 0.5s ease;
+  position: relative; width: 100%; height: 100%;
+  background-color: var(--envelope); border-radius: 4px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.2); transition: transform 0.5s ease;
 }
 
-/* Bagian dalam surat */
 .letter {
-  position: absolute;
-  top: 10px; left: 10px; right: 10px; bottom: 10px;
-  background: var(--cream);
-  border-radius: 2px;
-  padding: 20px;
+  position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px;
+  background: var(--cream); border-radius: 2px; padding: 20px;
   display: flex; flex-direction: column; justify-content: center; align-items: center;
-  z-index: 1;
-  transition: transform 1s ease;
-  transform: translateY(0);
+  z-index: 1; transition: transform 1s ease; transform: translateY(0);
 }
+.envelope.open .letter { transform: translateY(-120px); }
 
-.envelope.open .letter {
-  transform: translateY(-120px); /* Surat naik ke atas */
-}
-
-/* Tutup amplop (Flap) */
 .envelope-flap {
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 110px; /* Setengah tinggi amplop */
-  background-color: #7A8A6B; /* Sage lebih gelap */
+  position: absolute; top: 0; left: 0; width: 100%; height: 110px;
+  background-color: var(--envelope-flap);
   clip-path: polygon(0 0, 50% 100%, 100% 0);
-  z-index: 3;
-  transform-origin: top;
-  transition: transform 1s ease;
+  z-index: 3; transform-origin: top; transition: transform 1s ease;
   border-radius: 4px 4px 0 0;
 }
+.envelope.open .envelope-flap { transform: rotateX(180deg); z-index: 0; }
 
-.envelope.open .envelope-flap {
-  transform: rotateX(180deg);
-  z-index: 0; /* Turun ke belakang surat */
-}
-
-/* Tali Emas */
 .envelope-rope {
-  position: absolute;
-  top: 50%; left: 50%;
-  width: 80px; height: 80px;
-  transform: translate(-50%, -50%);
-  border: 3px solid var(--gold);
-  border-radius: 50%;
-  z-index: 4;
-  transition: all 0.8s ease;
+  position: absolute; top: 50%; left: 50%; width: 80px; height: 80px;
+  transform: translate(-50%, -50%); border: 3px solid var(--gold);
+  border-radius: 50%; z-index: 4; transition: all 0.8s ease;
   box-shadow: 0 0 10px rgba(197, 168, 128, 0.5);
 }
-
-/* Efek silang tali */
 .envelope-rope::before, .envelope-rope::after {
   content: ''; position: absolute; background: var(--gold); height: 3px; width: 140px; top: 50%; left: 50%;
 }
 .envelope-rope::before { transform: translate(-50%, -50%) rotate(45deg); }
 .envelope-rope::after { transform: translate(-50%, -50%) rotate(-45deg); }
+.envelope.open .envelope-rope { transform: translate(-50%, -50%) scale(2); opacity: 0; }
 
-.envelope.open .envelope-rope {
-  transform: translate(-50%, -50%) scale(2); /* Tali membesar/lepas */
-  opacity: 0;
-}
-
-/* Segel Lilin (Tombol Buka) */
 .envelope-seal {
-  position: absolute;
-  top: 50%; left: 50%;
-  width: 60px; height: 60px;
-  background: var(--gold);
-  color: #fff;
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 5;
+  position: absolute; top: 50%; left: 50%; width: 60px; height: 60px;
+  background: var(--gold); color: #fff; border-radius: 50%;
+  transform: translate(-50%, -50%); z-index: 5;
   display: flex; justify-content: center; align-items: center;
   font-family: var(--font-sans); font-size: 0.7rem; letter-spacing: 1px; text-transform: uppercase;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  border: 2px solid #bda07a;
-  transition: all 0.3s ease;
+  cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  border: 2px solid rgba(255,255,255,0.3); transition: all 0.3s ease;
 }
-.envelope-seal:hover { background: #bda07a; transform: translate(-50%, -50%) scale(1.1); }
+.envelope-seal:hover { transform: translate(-50%, -50%) scale(1.1); }
 .envelope.open .envelope-seal { opacity: 0; pointer-events: none; }
 
-/* Teks di dalam surat */
 .cover-sub { font-family: var(--font-sans); letter-spacing: 3px; text-transform: uppercase; font-size: 0.7rem; color: var(--sage); margin-bottom: 10px; }
 .cover-title { font-family: var(--font-serif); font-size: 2rem; color: var(--dark); margin-bottom: 5px; font-weight: 400; }
 .cover-date { font-family: var(--font-sans); letter-spacing: 2px; font-size: 0.9rem; color: var(--gold); }
 
 /* =========================================
-   KONTEN UTAMA (Sisa desain tetap sama)
+   KONTEN UTAMA
    ========================================= */
-section { padding: 80px 20px; max-width: 600px; margin: 0 auto; text-align: center; }
-.section-title { font-family: var(--font-serif); font-size: 2rem; color: var(--sage); margin-bottom: 20px; font-weight: 400; }
-.sub { font-size: 0.9rem; color: #888; margin-bottom: 30px; }
+section { padding: 90px 20px; max-width: 600px; margin: 0 auto; text-align: center; }
+.section-title { font-family: var(--font-serif); font-size: 2.2rem; color: var(--sage); margin-bottom: 20px; font-weight: 400; }
+.sub { font-size: 0.9rem; color: var(--dark); opacity: 0.6; margin-bottom: 30px; }
 
-.hero { padding-top: 100px; }
+.hero { padding-top: 120px; }
 .bismillah { font-family: var(--font-serif); font-size: 1.5rem; color: var(--gold); margin-bottom: 30px; }
 .hero-sub { font-family: var(--font-sans); letter-spacing: 3px; text-transform: uppercase; font-size: 0.8rem; color: var(--sage); margin-bottom: 10px; }
-.hero-names { font-family: var(--font-serif); font-size: 2.5rem; line-height: 1.2; color: var(--dark); margin-bottom: 40px; font-weight: 400; }
+.hero-names { font-family: var(--font-serif); font-size: 2.8rem; line-height: 1.2; color: var(--dark); margin-bottom: 40px; font-weight: 400; }
 .hero-names span { font-size: 1.5rem; color: var(--gold); display: block; margin: 10px 0; }
 
 .countdown { display: flex; gap: 15px; justify-content: center; }
-.countdown div { background: #fff; border: 1px solid #eee; border-radius: 50%; width: 65px; height: 65px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+.countdown div { background: var(--cream); border: 1px solid rgba(0,0,0,0.05); border-radius: 50%; width: 65px; height: 65px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
 .countdown span { font-family: var(--font-serif); font-size: 1.4rem; font-weight: 600; color: var(--sage); display: block; line-height: 1; }
-.countdown small { font-size: 0.6rem; color: #999; text-transform: uppercase; margin-top: 2px; }
+.countdown small { font-size: 0.6rem; color: var(--dark); opacity: 0.5; text-transform: uppercase; margin-top: 2px; }
 
 .venue-name { font-family: var(--font-serif); font-size: 1.5rem; margin-bottom: 5px; }
-.venue-addr { font-size: 0.9rem; color: #666; margin-bottom: 20px; }
+.venue-addr { font-size: 0.9rem; opacity: 0.7; margin-bottom: 20px; }
 .map-wrap { border-radius: 12px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
 .map-wrap iframe { width: 100%; height: 250px; border: 0; display: block; }
 
 .rsvp-form { text-align: left; max-width: 400px; margin: 0 auto; }
-.rsvp-form label { display: block; margin-bottom: 15px; font-size: 0.85rem; color: #555; }
+.rsvp-form label { display: block; margin-bottom: 15px; font-size: 0.85rem; opacity: 0.8; }
 .rsvp-form input, .rsvp-form select, .rsvp-form textarea {
-  width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd;
+  width: 100%; padding: 12px; margin-top: 5px; border: 1px solid rgba(0,0,0,0.1);
   border-radius: 6px; font-family: var(--font-sans); font-size: 0.9rem;
-  background: #fff; outline: none; transition: border 0.3s;
+  background: var(--cream); color: var(--dark); outline: none; transition: border 0.3s;
 }
 .rsvp-form input:focus, .rsvp-form select:focus, .rsvp-form textarea:focus { border-color: var(--sage); }
-.quota { font-size: 0.9rem; color: #666; margin-bottom: 20px; }
+.quota { font-size: 0.9rem; opacity: 0.7; margin-bottom: 20px; }
 .quota b { color: var(--sage); }
 
 .btn-primary, .btn-outline {
@@ -176,20 +159,20 @@ section { padding: 80px 20px; max-width: 600px; margin: 0 auto; text-align: cent
 
 .garden {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(40px,1fr));
-  gap: 5px; background: rgba(138, 154, 123, 0.1); border-radius: 12px;
+  gap: 5px; background: rgba(0,0,0,0.02); border-radius: 12px;
   padding: 20px; min-height: 150px; margin-top: 20px;
 }
 .bunga { font-size: 1.5rem; background: none; border: none; cursor: pointer; transition: transform 0.2s; }
 .bunga:hover { transform: scale(1.3); }
-.empty { grid-column: 1/-1; color: #999; font-style: italic; font-size: 0.9rem; }
+.empty { grid-column: 1/-1; opacity: 0.4; font-style: italic; font-size: 0.9rem; }
 
 .popup {
   position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-  background: #fff; padding: 20px; border-radius: 8px;
+  background: var(--cream); padding: 20px; border-radius: 8px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.15); max-width: 90%; z-index: 999;
   font-size: 0.9rem; text-align: center; border-left: 4px solid var(--sage);
 }
-.popup small { display: block; color: #aaa; margin-top: 10px; font-size: 0.7rem; }
+.popup small { display: block; opacity: 0.4; margin-top: 10px; font-size: 0.7rem; }
 
 .game-frame { width: 100%; height: 300px; border: 0; border-radius: 12px; background: #f4f4f4; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
 .file-input { margin-bottom: 15px; font-size: 0.9rem; }
@@ -197,7 +180,7 @@ section { padding: 80px 20px; max-width: 600px; margin: 0 auto; text-align: cent
 .template-picker { display: flex; gap: 15px; justify-content: center; margin: 15px 0; font-size: 0.9rem; }
 .photo-actions { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
 
-.qr-wrap { background: #fff; padding: 20px; display: inline-block; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+.qr-wrap { background: var(--cream); padding: 20px; display: inline-block; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
 .qr-img { width: 200px; height: 200px; }
 
 footer { text-align: center; padding: 40px 20px; font-family: var(--font-serif); font-size: 1.2rem; color: var(--sage); }

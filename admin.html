@@ -10,7 +10,6 @@
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  /* Styling khusus halaman admin yang diselaraskan dengan tema utama */
   body { background-color: var(--cream); }
   .admin-container { max-width: 900px; margin: 0 auto; padding: 30px 20px; }
   .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -46,11 +45,22 @@
   <p id="loginMsg" style="color: #d9534f; margin-top: 15px; font-size: 0.9rem;"></p>
 </div>
 
-<!-- HALAMAN DATA (Tersembunyi awalnya) -->
+<!-- HALAMAN DATA -->
 <div id="adminSection" class="admin-container hidden">
   <div class="admin-header">
     <h2 class="admin-title">Daftar Tamu</h2>
     <button onclick="logout()" class="btn-outline" style="width: auto; margin: 0; padding: 8px 20px;">Logout</button>
+  </div>
+
+  <!-- TEMA SELECTOR -->
+  <div style="margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 8px; border-left: 4px solid var(--sage); box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+    <strong style="display:block; margin-bottom:10px;">Tema Undangan</strong>
+    <select id="themeSelect" style="padding:10px; border-radius:6px; border:1px solid #ddd; width:100%; font-family:var(--font-sans);">
+      <option value="sage">Sage & Cream (Natural)</option>
+      <option value="midnight">Midnight & Gold (Mewah)</option>
+      <option value="rose">Dusty Rose & Champagne (Lembut)</option>
+    </select>
+    <p style="font-size:0.75rem; color:#888; margin-top:8px;">Tema berlaku untuk semua tamu yang membuka undangan.</p>
   </div>
 
   <div style="margin-bottom: 20px; background: #fff; padding: 15px; border-radius: 8px; border-left: 4px solid var(--sage); box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
@@ -98,6 +108,17 @@
 <script src="supabase.js"></script>
 <script>
   const ADMIN_PIN = "123456"; 
+
+  // Logika Tema
+  const themeSelect = document.getElementById('themeSelect');
+  const currentTheme = localStorage.getItem('wedding_theme') || 'sage';
+  if(themeSelect) {
+    themeSelect.value = currentTheme;
+    themeSelect.addEventListener('change', (e) => {
+      localStorage.setItem('wedding_theme', e.target.value);
+      alert('Tema disimpan! Tamu perlu refresh halaman undangan untuk melihat perubahan.');
+    });
+  }
 
   function login() {
     const pin = document.getElementById("pinInput").value;
