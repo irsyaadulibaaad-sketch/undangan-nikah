@@ -78,7 +78,6 @@ document.getElementById("rsvpForm").addEventListener("submit", async (e) => {
   } else {
     const pesan = document.getElementById("rsvpDoa").value.trim();
     if (!pesan) { msg.textContent = "Mohon tulis doa/ucapan."; return; }
-    // simpan doa (jenis bunga acak untuk variasi taman)
     await supabaseClient.from("doa").insert({
       nama, pesan, sumber: "rsvp",
       bunga: ["mawar","tulip","matahari","sakura","lily"][Math.floor(Math.random()*5)]
@@ -134,19 +133,18 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && !prayerModal.hidden) closePrayerModal();
 });
 
-// ====== TAMAN DOA (BUNGA CSS MURNI: BATANG + DAUN + 6 KELOPAK + PUSAT) ======
+// ====== TAMAN DOA (BUNGA CSS MURNI) ======
 const BUNGA_TYPES = ["mawar", "tulip", "matahari", "sakura", "lily"];
 
-// Posisi deterministik berdasarkan id supaya bunga tidak "lompat" saat realtime refresh
 function flowerPosition(seed) {
   let h = 0;
   const s = String(seed);
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
   return {
-    x: 4 + (h % 840) / 10,          // 4% .. 88%
-    h: 58 + (h % 30),               // tinggi batang 58..87px
-    scale: 0.8 + ((h >> 4) % 40) / 100, // 0.8 .. 1.2
-    swayDelay: (h % 40) / 10        // jeda goyang 0..4s
+    x: 4 + (h % 840) / 10,
+    h: 58 + (h % 30),
+    scale: 0.8 + ((h >> 4) % 40) / 100,
+    swayDelay: (h % 40) / 10
   };
 }
 
@@ -185,7 +183,6 @@ function buildFlower(d) {
   wrapper.appendChild(stem);
   wrapper.appendChild(head);
 
-  // Klik bunga -> popup elegan berisi nama & pesan
   wrapper.addEventListener("click", () => openPrayerModal(d.nama, d.pesan));
 
   return wrapper;
@@ -197,12 +194,11 @@ async function loadTaman() {
   if (error) return;
 
   const container = document.getElementById("flowerContainer");
-  container.innerHTML = ""; // Bersihkan taman
+  container.innerHTML = "";
 
   if (data && data.length > 0) {
     data.forEach((d, index) => {
       const flower = buildFlower(d);
-      // Bunga baru (realtime) tumbuh paling akhir dengan jeda dramatis
       flower.style.animationDelay = Math.min(index * 0.08, 2) + "s, " +
         (flowerPosition(d.id).swayDelay + Math.min(index * 0.08, 2)) + "s";
       container.appendChild(flower);
@@ -211,11 +207,22 @@ async function loadTaman() {
 }
 loadTaman();
 
-// realtime taman
 supabaseClient.channel("doa-rt")
   .on("postgres_changes", { event: "INSERT", schema: "public", table: "doa" },
     () => loadTaman())
   .subscribe();
+
+// ====== KETERANGAN TAMAN DOA ======
+(function () {
+  const g = document.getElementById("garden");
+  if (g && !document.getElementById("gardenHint")) {
+    const hint = document.createElement("p");
+    hint.id = "gardenHint";
+    hint.className = "garden-hint";
+    hint.textContent = "Ketuk bunga untuk melihat doa";
+    g.parentNode.insertBefore(hint, g.nextSibling);
+  }
+})();
 
 // ====== PHOTOBOOTH ======
 const photoInput = document.getElementById("photoInput");
@@ -253,7 +260,6 @@ function drawPhoto() {
   document.getElementById("shareBtn").hidden = false;
 }
 
-// Bunga vektor di-draw manual di canvas (tanpa emoji)
 function drawCanvasFlower(c, x, y, size, petalColor, centerColor) {
   c.save();
   c.translate(x, y);
@@ -286,7 +292,6 @@ function drawTemplate(tpl, W, H) {
   } else if (tpl === "floral") {
     ctx.strokeStyle = "#e8a0b8"; ctx.lineWidth = 18;
     ctx.strokeRect(9, 9, W - 18, H - 18);
-    // Rangkaian bunga vektor di sudut-sudut (bukan emoji)
     drawCanvasFlower(ctx, 52, 62, 26, "#F4B8C9", "#E3B94E");
     drawCanvasFlower(ctx, W - 52, 62, 26, "#E58BA6", "#FDE9EE");
     drawCanvasFlower(ctx, 52, H - 150, 26, "#CE8BD6", "#E3B94E");
@@ -331,50 +336,3 @@ const qrImage = document.getElementById("qrImage");
 if (qrImage) {
   qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(checkinUrl)}`;
 }
-
-// ====== KETERANGAN TAMAN DOA ======
-(function () {
-  const g = document.getElementById("garden");
-  if (g && !document.getElementById("gardenHint")) {
-    const hint = document.createElement("p");
-    hint.id = "gardenHint";
-    hint.className = "garden-hint";
-    hint.textContent = "Ketuk bunga untuk melihat doa";
-    g.parentNode.insertBefore(hint, g.nextSibling);
-  }
-})();
-// ====== KETERANGAN TAMAN DOA ======
-(function () {
-  const g = document.getElementById("garden");
-  if (g && !document.getElementById("gardenHint")) {
-    const hint = document.createElement("p");
-    hint.id = "gardenHint";
-    hint.className = "garden-hint";
-    hint.textContent = "Ketuk bunga untuk melihat doa";
-    g.parentNode.insertBefore(hint, g.nextSibling);
-  }
-})();
-// ====== TALI PENGIKAT COVER (simpul terurai saat di-tap) ======
-(function () {
-  const env = document.getElementById("luxuryEnvelope");
-  if (!env || document.getElementById("envTie")) return;
-
-  env.insertAdjacentHTML("beforeend", `
-    <div class="env-tie" id="envTie">
-      <div class="tie-strap tie-h"></div>
-      <div class="tie-strap tie-v"></div>
-      <div class="tie-knot">
-        <span class="knot-loop left"></span>
-        <span class="knot-loop right"></span>
-        <span class="knot-tail left"></span>
-        <span class="knot-tail right"></span>
-      </div>
-    </div>`);
-
-  function untie() {
-    const tie = document.getElementById("envTie");
-    if (tie) tie.classList.add("untied");
-  }
-  env.addEventListener("click", untie);
-  env.addEventListener("touchstart", untie, { passive: true });
-})();
