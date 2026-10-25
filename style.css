@@ -1,68 +1,320 @@
-/* =========================================
-   VARIABEL TEMA (LUXURY DEFAULT)
-   ========================================= */
+/* ==========================================================================
+   1. VARIABEL TEMA (SISTEM WARNA & TIPOGRAFI)
+   ========================================================================== */
 :root {
-  --bg-cream: #F5F1E9;
+  /* Palet Warna Utama */
+  --bg-cream: #F9F7F2;
   --bg-light: #FFFFFF;
-  --bg-dark: #2E3A2F; /* Sage gelap untuk kontras */
+  --bg-dark: #1A231B; /* Deep Forest Green */
   
+  /* Warna Teks */
   --text-main: #2C2A28;
   --text-muted: #7A7570;
-  --text-light: #F5F1E9;
+  --text-light: #F9F7F2;
   --text-light-muted: #A5B0A6;
   
+  /* Warna Emas (Multi-tone untuk Gradasi) */
+  --gold-lightest: #FDFBF7;
   --gold-light: #F4E8D1;
   --gold-mid: #C5A059;
   --gold-dark: #9E7A3E;
+  --gold-darkest: #6B4E1F;
   
+  /* Tipografi */
   --font-serif: 'Cormorant Garamond', serif;
+  --font-script: 'Great Vibes', cursive;
   --font-sans: 'Montserrat', sans-serif;
+  
+  /* Shadow & Glow */
+  --shadow-soft: 0 15px 35px rgba(0, 0, 0, 0.05);
+  --shadow-medium: 0 25px 50px rgba(0, 0, 0, 0.1);
+  --shadow-hard: 0 35px 70px rgba(0, 0, 0, 0.2);
+  --glow-gold: 0 0 20px rgba(197, 160, 89, 0.4);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body { font-family: var(--font-sans); background: var(--bg-cream); color: var(--text-main); line-height: 1.8; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
-.hidden { display: none !important; }
+/* ==========================================================================
+   2. RESET & BASE STYLES
+   ========================================================================== */
+* { 
+  box-sizing: border-box; 
+  margin: 0; 
+  padding: 0; 
+}
 
-/* =========================================
-   TEKSTUR NOISE OVERLAY
-   ========================================= */
+html { 
+  scroll-behavior: smooth; 
+  font-size: 16px; 
+}
+
+body { 
+  font-family: var(--font-sans); 
+  background-color: var(--bg-cream); 
+  color: var(--text-main); 
+  line-height: 1.8; 
+  overflow-x: hidden; 
+  -webkit-font-smoothing: antialiased; 
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.hidden { 
+  display: none !important; 
+}
+
+img, iframe { 
+  max-width: 100%; 
+  display: block; 
+}
+
+/* ==========================================================================
+   3. OVERLAY EFEK (NOISE & VIGNETTE)
+   ========================================================================== */
 .noise-overlay {
-  position: fixed; inset: 0; z-index: 9998; pointer-events: none; opacity: 0.4;
+  position: fixed; 
+  inset: 0; 
+  z-index: 9998; 
+  pointer-events: none; 
+  opacity: 0.35;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   mix-blend-mode: multiply;
 }
 
-/* =========================================
-   LUXURY ENVELOPE
-   ========================================= */
-.cover { position: fixed; inset: 0; background: linear-gradient(135deg, #F9F6F0 0%, #E8E2D6 100%); display: flex; justify-content: center; align-items: center; z-index: 9999; perspective: 2000px; overflow: hidden; }
-.golden-glow { position: absolute; width: 100%; height: 100%; background: radial-gradient(circle at center, rgba(197, 160, 89, 0.5) 0%, transparent 60%); opacity: 0; pointer-events: none; z-index: 10; mix-blend-mode: overlay; }
-.luxury-envelope { position: relative; width: 320px; height: 440px; transform-style: preserve-3d; }
-.paper-back { position: absolute; inset: 0; background: linear-gradient(180deg, #FFFFFF 0%, #F4F0EA 100%); border-radius: 4px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; box-shadow: inset 0 0 60px rgba(0,0,0,0.03), 0 30px 60px rgba(0,0,0,0.1); z-index: 1; }
-.botanical-top, .botanical-bottom { width: 140px; height: 40px; color: var(--gold-mid); margin: 15px 0; opacity: 0.8; }
-.cover-sub { font-family: var(--font-sans); font-size: 0.65rem; letter-spacing: 5px; text-transform: uppercase; color: var(--gold-dark); margin-bottom: 15px; font-weight: 400; }
-.cover-title { font-family: var(--font-serif); font-size: 2.4rem; color: var(--text-main); font-weight: 300; text-align: center; line-height: 1.1; margin-bottom: 15px; }
-.ampersand-cover { font-family: var(--font-serif); font-style: italic; font-size: 2.8rem; color: var(--gold-mid); display: block; margin: 5px 0; }
-.cover-date { font-family: var(--font-sans); font-size: 0.85rem; letter-spacing: 4px; color: var(--text-muted); font-weight: 300; }
+.vignette-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  pointer-events: none;
+  background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.05) 100%);
+}
 
-.paper-front { position: absolute; top: 0; bottom: 0; width: 50%; background: linear-gradient(90deg, #FDFCFA, #F4F0EA); box-shadow: 0 15px 40px rgba(0,0,0,0.08); z-index: 5; backface-visibility: hidden; display: flex; justify-content: center; align-items: center; overflow: hidden; }
-.paper-front.left { left: 0; transform-origin: left center; border-right: 1px solid rgba(0,0,0,0.03); }
-.paper-front.right { right: 0; transform-origin: right center; border-left: 1px solid rgba(0,0,0,0.03); }
-.emboss-pattern { width: 100%; height: 100%; background-image: radial-gradient(circle at 50% 50%, transparent 40%, rgba(197,160,89,0.05) 41%, rgba(197,160,89,0.05) 42%, transparent 43%), linear-gradient(45deg, transparent 45%, rgba(255,255,255,0.5) 50%, transparent 55%); background-size: 60px 60px, 100% 100%; opacity: 0.7; }
+/* ==========================================================================
+   4. COVER PEMBUKA (LUXURY ENVELOPE & EMBOSS 3D)
+   ========================================================================== */
+.cover { 
+  position: fixed; 
+  inset: 0; 
+  background: linear-gradient(135deg, #F9F7F2 0%, #E8E2D6 100%); 
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  z-index: 9999; 
+  perspective: 2000px; 
+  overflow: hidden; 
+}
 
-.wax-seal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 80px; height: 80px; background: radial-gradient(circle at 30% 30%, #F4E8D1, var(--gold-mid) 60%, var(--gold-dark)); border-radius: 50%; z-index: 20; display: flex; justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.2), inset 0 -3px 6px rgba(0,0,0,0.15), inset 0 3px 6px rgba(255,255,255,0.6); cursor: pointer; transition: transform 0.3s; }
-.wax-seal:active { transform: translate(-50%, -50%) scale(0.95); }
-.seal-initials { font-family: var(--font-serif); font-size: 1.6rem; color: #6B4E1F; text-shadow: 1px 1px 1px rgba(255,255,255,0.4); font-weight: 600; letter-spacing: 1px; }
-.seal-shine { position: absolute; top: 10%; left: 20%; width: 30%; height: 30%; background: rgba(255,255,255,0.5); border-radius: 50%; filter: blur(3px); }
-.tap-hint { position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%); font-family: var(--font-sans); font-size: 0.7rem; letter-spacing: 3px; color: var(--text-muted); text-transform: uppercase; white-space: nowrap; animation: pulse 2.5s infinite; }
-@keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+.golden-glow { 
+  position: absolute; 
+  width: 100%; 
+  height: 100%; 
+  background: radial-gradient(circle at center, rgba(197, 160, 89, 0.6) 0%, transparent 60%); 
+  opacity: 0; 
+  pointer-events: none; 
+  z-index: 10; 
+  mix-blend-mode: overlay; 
+}
 
-/* =========================================
-   SECTION LAYOUT & KONTRAS
-   ========================================= */
-section { position: relative; padding: 120px 25px 80px; width: 100%; overflow: hidden; }
-.container { max-width: 650px; margin: 0 auto; text-align: center; position: relative; z-index: 2; }
+.luxury-envelope { 
+  position: relative; 
+  width: 340px; 
+  height: 460px; 
+  transform-style: preserve-3d; 
+}
+
+/* Kertas Belakang (Tempat Teks) */
+.paper-back { 
+  position: absolute; 
+  inset: 0; 
+  background: linear-gradient(180deg, #FFFFFF 0%, #F4F0EA 100%); 
+  border-radius: 6px; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center; 
+  align-items: center; 
+  padding: 40px; 
+  box-shadow: inset 0 0 80px rgba(0,0,0,0.04), var(--shadow-hard); 
+  z-index: 1; 
+}
+
+.ornament-frame { 
+  position: absolute; 
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%; 
+  color: var(--gold-mid); 
+  opacity: 0.35; 
+  pointer-events: none; 
+}
+
+.cover-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.cover-sub { 
+  font-family: var(--font-sans); 
+  font-size: 0.65rem; 
+  letter-spacing: 6px; 
+  text-transform: uppercase; 
+  color: var(--gold-dark); 
+  margin-bottom: 25px; 
+  font-weight: 400; 
+}
+
+.cover-title { 
+  font-family: var(--font-script); 
+  font-size: 4rem; 
+  color: var(--text-main); 
+  font-weight: 400; 
+  line-height: 1; 
+  margin-bottom: 20px; 
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+}
+
+.ampersand-cover { 
+  font-family: var(--font-serif); 
+  font-style: italic; 
+  font-size: 2.5rem; 
+  color: var(--gold-mid); 
+  display: block; 
+  margin: 10px 0; 
+}
+
+.cover-date { 
+  font-family: var(--font-sans); 
+  font-size: 0.9rem; 
+  letter-spacing: 5px; 
+  color: var(--text-muted); 
+  font-weight: 300; 
+}
+
+/* Kertas Depan (Kiri & Kanan) */
+.paper-front { 
+  position: absolute; 
+  top: 0; 
+  bottom: 0; 
+  width: 50%; 
+  background: linear-gradient(90deg, #FDFCFA, #F4F0EA); 
+  box-shadow: 0 15px 40px rgba(0,0,0,0.08); 
+  z-index: 5; 
+  backface-visibility: hidden; 
+  overflow: hidden; 
+}
+
+.paper-front.left { 
+  left: 0; 
+  transform-origin: left center; 
+  border-right: 1px solid rgba(0,0,0,0.03); 
+}
+
+.paper-front.right { 
+  right: 0; 
+  transform-origin: right center; 
+  border-left: 1px solid rgba(0,0,0,0.03); 
+}
+
+.emboss-pattern { 
+  width: 100%; 
+  height: 100%; 
+  background-image: radial-gradient(circle at 50% 50%, transparent 40%, rgba(197,160,89,0.05) 41%, rgba(197,160,89,0.05) 42%, transparent 43%), linear-gradient(45deg, transparent 45%, rgba(255,255,255,0.5) 50%, transparent 55%); 
+  background-size: 60px 60px, 100% 100%; 
+  opacity: 0.8; 
+}
+
+.emboss-shadow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(0,0,0,0.05), transparent 20%, transparent 80%, rgba(0,0,0,0.05));
+  pointer-events: none;
+}
+
+/* Segel Lilin Emas */
+.wax-seal { 
+  position: absolute; 
+  top: 50%; 
+  left: 50%; 
+  transform: translate(-50%, -50%); 
+  width: 90px; 
+  height: 90px; 
+  background: radial-gradient(circle at 30% 30%, var(--gold-lightest), var(--gold-mid) 60%, var(--gold-darkest)); 
+  border-radius: 50%; 
+  z-index: 20; 
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  box-shadow: var(--shadow-medium), inset 0 -4px 8px rgba(0,0,0,0.2), inset 0 4px 8px rgba(255,255,255,0.7); 
+  cursor: pointer; 
+  transition: transform 0.3s, box-shadow 0.3s; 
+}
+
+.wax-seal:active { 
+  transform: translate(-50%, -50%) scale(0.95); 
+  box-shadow: var(--shadow-soft), inset 0 -2px 4px rgba(0,0,0,0.2), inset 0 2px 4px rgba(255,255,255,0.7); 
+}
+
+.seal-initials { 
+  font-family: var(--font-serif); 
+  font-size: 1.8rem; 
+  color: var(--gold-darkest); 
+  text-shadow: 1px 1px 1px rgba(255,255,255,0.4), -1px -1px 1px rgba(0,0,0,0.2); 
+  font-weight: 600; 
+  letter-spacing: 1px; 
+}
+
+.seal-shine { 
+  position: absolute; 
+  top: 15%; 
+  left: 25%; 
+  width: 30%; 
+  height: 30%; 
+  background: rgba(255,255,255,0.6); 
+  border-radius: 50%; 
+  filter: blur(4px); 
+}
+
+.seal-rim {
+  position: absolute;
+  inset: 5px;
+  border: 1px dashed rgba(0,0,0,0.1);
+  border-radius: 50%;
+}
+
+.tap-hint { 
+  position: absolute; 
+  bottom: -50px; 
+  left: 50%; 
+  transform: translateX(-50%); 
+  font-family: var(--font-sans); 
+  font-size: 0.7rem; 
+  letter-spacing: 4px; 
+  color: var(--text-muted); 
+  text-transform: uppercase; 
+  white-space: nowrap; 
+  animation: pulse 2.5s infinite; 
+}
+
+@keyframes pulse { 
+  0%, 100% { opacity: 0.3; transform: translateX(-50%) scale(1); } 
+  50% { opacity: 1; transform: translateX(-50%) scale(1.05); } 
+}
+
+/* ==========================================================================
+   5. STRUKTUR SECTION & KONTRAS
+   ========================================================================== */
+section { 
+  position: relative; 
+  padding: 160px 25px 120px; 
+  width: 100%; 
+  overflow: hidden; 
+}
+
+.container { 
+  max-width: 720px; 
+  margin: 0 auto; 
+  text-align: center; 
+  position: relative; 
+  z-index: 2; 
+}
 
 .bg-cream { background-color: var(--bg-cream); }
 .bg-light { background-color: var(--bg-light); }
@@ -70,102 +322,625 @@ section { position: relative; padding: 120px 25px 80px; width: 100%; overflow: h
 
 .light { color: var(--text-light) !important; }
 .light-text { color: var(--text-light-muted) !important; }
-.section-title { font-family: var(--font-serif); font-size: 2.2rem; color: var(--text-main); margin-bottom: 10px; font-weight: 400; letter-spacing: 1px; }
-.sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 35px; font-weight: 300; letter-spacing: 0.5px; }
 
-.wave-divider, .curve-divider { position: absolute; bottom: -1px; left: 0; width: 100%; line-height: 0; z-index: 1; }
-.wave-divider svg, .curve-divider svg { width: 100%; height: 80px; display: block; }
+.section-title { 
+  font-family: var(--font-serif); 
+  font-size: 2.6rem; 
+  color: var(--text-main); 
+  margin-bottom: 15px; 
+  font-weight: 400; 
+  letter-spacing: 3px; 
+}
 
-/* =========================================
-   HERO SECTION (Teks & Tanggal)
-   ========================================= */
-.hero-section { padding-top: 140px; }
-.bismillah { font-family: var(--font-serif); font-size: 1.4rem; color: var(--gold-dark); margin-bottom: 30px; }
-.hero-sub { font-family: var(--font-sans); letter-spacing: 4px; text-transform: uppercase; font-size: 0.7rem; color: var(--gold-mid); margin-bottom: 20px; font-weight: 400; }
+.sub { 
+  font-size: 0.85rem; 
+  color: var(--text-muted); 
+  margin-bottom: 50px; 
+  font-weight: 300; 
+  letter-spacing: 1.5px; 
+}
 
-/* Perbaikan Nama agar tidak terlalu besar */
-.hero-names { font-family: var(--font-serif); font-size: 2.2rem; line-height: 1.2; color: var(--text-main); margin-bottom: 10px; font-weight: 300; }
-.name-block { display: block; }
-.ampersand-hero { font-size: 1.8rem; color: var(--gold-mid); display: block; margin: 10px 0; font-style: italic; }
+/* Pembatas SVG */
+.wave-divider, .curve-divider { 
+  position: absolute; 
+  bottom: -1px; 
+  left: 0; 
+  width: 100%; 
+  line-height: 0; 
+  z-index: 1; 
+}
 
-/* Tanggal & Jam Baru */
-.hero-date { font-family: var(--font-sans); font-size: 0.85rem; letter-spacing: 2px; color: var(--text-muted); margin-bottom: 40px; font-weight: 300; }
+.wave-divider svg, .curve-divider svg { 
+  width: 100%; 
+  height: 120px; 
+  display: block; 
+}
 
-.countdown { display: flex; gap: 12px; justify-content: center; }
-.countdown div { background: #fff; border: 1px solid rgba(197,160,89,0.2); border-radius: 8px; width: 70px; height: 80px; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: 0 10px 20px rgba(0,0,0,0.03); }
-.countdown span { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 400; color: var(--gold-dark); display: block; line-height: 1; margin-bottom: 5px; }
-.countdown small { font-size: 0.55rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+/* ==========================================================================
+   6. HERO SECTION (EDITORIAL TYPOGRAPHY)
+   ========================================================================== */
+.hero-section { 
+  padding-top: 180px; 
+  padding-bottom: 160px;
+}
 
-/* =========================================
-   VENUE SECTION (DARK)
-   ========================================= */
-.venue-section { padding-bottom: 140px; }
-.venue-name { font-family: var(--font-serif); font-size: 1.6rem; margin-bottom: 10px; font-weight: 400; line-height: 1.3; }
-.venue-addr { font-size: 0.85rem; margin-bottom: 30px; font-weight: 300; line-height: 1.6; opacity: 0.8; }
+.bismillah-wrapper {
+  margin-bottom: 50px;
+}
 
-.map-wrap { border-radius: 12px; overflow: hidden; margin-bottom: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); border: 4px solid rgba(255,255,255,0.1); }
-.map-wrap iframe { width: 100%; height: 280px; border: 0; display: block; filter: none; transition: filter 0.3s; }
+.bismillah { 
+  font-family: var(--font-serif); 
+  font-size: 1.6rem; 
+  color: var(--gold-dark); 
+  margin-bottom: 15px; 
+}
 
-/* =========================================
-   RSVP SECTION (LIGHT)
-   ========================================= */
-.rsvp-section { padding-bottom: 140px; }
-.rsvp-form { text-align: left; max-width: 420px; margin: 0 auto; }
-.rsvp-form label { display: block; margin-bottom: 20px; font-size: 0.8rem; color: var(--text-muted); font-weight: 400; letter-spacing: 0.5px; }
-.rsvp-form input, .rsvp-form select, .rsvp-form textarea { width: 100%; padding: 16px; margin-top: 8px; border: 1px solid rgba(0,0,0,0.08); border-radius: 8px; font-family: var(--font-sans); font-size: 0.9rem; background: var(--bg-cream); color: var(--text-main); outline: none; transition: all 0.3s; }
-.rsvp-form input:focus, .rsvp-form select:focus, .rsvp-form textarea:focus { border-color: var(--gold-mid); background: #fff; box-shadow: 0 0 0 4px rgba(197,160,89,0.1); }
-.quota { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 25px; font-weight: 300; }
-.quota b { color: var(--gold-dark); font-weight: 500; }
+.bismillah-line {
+  width: 100px;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold-mid), transparent);
+  margin: 0 auto;
+}
 
-/* =========================================
-   TOMBOL (GLOBAL)
-   ========================================= */
-.btn-primary, .btn-outline { display: inline-block; padding: 16px 40px; border-radius: 4px; font-family: var(--font-sans); font-weight: 400; font-size: 0.8rem; cursor: pointer; text-decoration: none; letter-spacing: 2px; text-transform: uppercase; transition: 0.3s; text-align: center; width: 100%; margin-top: 15px; }
-.btn-primary { background: linear-gradient(135deg, var(--gold-mid), var(--gold-dark)); color: #fff; border: none; box-shadow: 0 8px 20px rgba(197,160,89,0.3); }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 25px rgba(197,160,89,0.4); }
-.btn-outline { background: transparent; color: var(--gold-mid); border: 1px solid var(--gold-mid); }
-.btn-outline.light { color: var(--gold-light); border-color: var(--gold-light); }
-.btn-outline:hover { background: var(--gold-mid); color: #fff; }
+.hero-title-wrapper { 
+  margin-bottom: 40px; 
+}
 
-/* =========================================
-   GARDEN SECTION (CREAM)
-   ========================================= */
-.taman-section { padding-bottom: 140px; }
-.garden { display: grid; grid-template-columns: repeat(auto-fill, minmax(50px,1fr)); gap: 10px; background: #fff; border-radius: 16px; padding: 30px; min-height: 200px; margin-top: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.02); }
-.bunga { font-size: 1.8rem; background: none; border: none; cursor: pointer; transition: transform 0.3s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1)); }
-.bunga:hover { transform: scale(1.3) rotate(10deg); }
-.empty { grid-column: 1/-1; color: var(--text-muted); font-style: italic; font-size: 0.85rem; font-weight: 300; }
+.hero-sub { 
+  font-family: var(--font-sans); 
+  letter-spacing: 6px; 
+  text-transform: uppercase; 
+  font-size: 0.7rem; 
+  color: var(--gold-mid); 
+  margin-bottom: 25px; 
+  font-weight: 500; 
+  display: block; 
+}
 
-/* =========================================
-   INTERACTIVE SECTION (DARK)
-   ========================================= */
-.interactive-section { padding-bottom: 140px; }
-.interactive-grid { display: flex; flex-direction: column; gap: 50px; margin-top: 40px; }
-.sub-title { font-family: var(--font-serif); font-size: 1.5rem; margin-bottom: 5px; font-weight: 400; }
-.game-frame { width: 100%; height: 320px; border: 0; border-radius: 12px; background: #1a1a1a; box-shadow: 0 20px 50px rgba(0,0,0,0.4); margin-top: 20px; }
-.file-input { margin-bottom: 15px; font-size: 0.85rem; color: var(--text-light-muted); }
-#photoCanvas { max-width: 100%; border-radius: 12px; margin-top: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-.template-picker { display: flex; gap: 20px; justify-content: center; margin: 20px 0; font-size: 0.85rem; color: var(--text-light-muted); }
-.photo-actions { display: flex; gap: 15px; justify-content: center; margin-top: 20px; }
+.hero-names { 
+  font-family: var(--font-script); 
+  font-size: 3.5rem; 
+  line-height: 1.1; 
+  color: var(--text-main); 
+  margin-bottom: 25px; 
+  font-weight: 400; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  gap: 10px; 
+}
 
-/* =========================================
-   QR & FOOTER (LIGHT)
-   ========================================= */
-.qr-section { padding-bottom: 0; }
-.qr-wrap { background: var(--bg-cream); padding: 40px; display: inline-block; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.03); }
-.qr-icon { width: 40px; height: 40px; color: var(--gold-mid); margin-bottom: 20px; display: block; margin-left: auto; margin-right: auto; opacity: 0.6; }
-.qr-img { width: 200px; height: 200px; }
+.name-script { 
+  display: block; 
+}
 
-footer { text-align: center; padding: 80px 20px 60px; font-family: var(--font-serif); color: var(--gold-dark); font-weight: 300; }
-footer p { font-size: 1.8rem; letter-spacing: 1px; margin-bottom: 10px; }
-footer small { font-family: var(--font-sans); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; color: var(--text-muted); }
-.divider { width: 150px; height: 20px; color: var(--gold-mid); margin-bottom: 20px; display: block; margin-left: auto; margin-right: auto; }
+.ampersand-hero { 
+  font-family: var(--font-serif); 
+  font-style: italic; 
+  font-size: 2.5rem; 
+  color: var(--gold-mid); 
+  display: block; 
+  margin: 5px 0; 
+}
 
-.popup { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #fff; padding: 25px 30px; border-radius: 12px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); max-width: 90%; z-index: 999; font-size: 0.9rem; text-align: center; border-top: 4px solid var(--gold-mid); color: var(--text-main); }
-.popup small { display: block; color: var(--text-muted); margin-top: 15px; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
+.hero-info { 
+  margin-bottom: 60px; 
+}
 
+.hero-date { 
+  font-family: var(--font-sans); 
+  font-size: 0.95rem; 
+  letter-spacing: 4px; 
+  color: var(--text-muted); 
+  margin-bottom: 10px; 
+  font-weight: 300; 
+  text-transform: uppercase; 
+}
+
+.hero-time { 
+  font-family: var(--font-sans); 
+  font-size: 0.9rem; 
+  letter-spacing: 3px; 
+  color: var(--gold-dark); 
+  font-weight: 400; 
+}
+
+/* Countdown */
+.countdown-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.countdown { 
+  display: flex; 
+  gap: 18px; 
+}
+
+.cd-box { 
+  background: #fff; 
+  border: 1px solid rgba(197,160,89,0.15); 
+  border-radius: 10px; 
+  width: 80px; 
+  height: 90px; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center; 
+  align-items: center; 
+  box-shadow: var(--shadow-soft); 
+}
+
+.cd-box span { 
+  font-family: var(--font-serif); 
+  font-size: 2.2rem; 
+  font-weight: 400; 
+  color: var(--gold-dark); 
+  display: block; 
+  line-height: 1; 
+  margin-bottom: 8px; 
+}
+
+.cd-box small { 
+  font-size: 0.6rem; 
+  color: var(--text-muted); 
+  text-transform: uppercase; 
+  letter-spacing: 2px; 
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   7. VENUE SECTION
+   ========================================================================== */
+.venue-section { 
+  padding-bottom: 180px; 
+}
+
+.venue-name { 
+  font-family: var(--font-serif); 
+  font-size: 1.8rem; 
+  margin-bottom: 12px; 
+  font-weight: 400; 
+  line-height: 1.3; 
+  letter-spacing: 1px; 
+}
+
+.venue-addr { 
+  font-size: 0.85rem; 
+  margin-bottom: 50px; 
+  font-weight: 300; 
+  line-height: 1.8; 
+  opacity: 0.8; 
+  letter-spacing: 0.5px; 
+}
+
+.map-wrap { 
+  border-radius: 16px; 
+  overflow: hidden; 
+  margin-bottom: 50px; 
+  box-shadow: var(--shadow-hard); 
+  border: 4px solid rgba(255,255,255,0.05); 
+}
+
+.map-wrap iframe { 
+  width: 100%; 
+  height: 320px; 
+  border: 0; 
+  display: block; 
+  filter: none; 
+}
+
+/* ==========================================================================
+   8. RSVP SECTION (FORM STYLING)
+   ========================================================================== */
+.rsvp-section { 
+  padding-bottom: 180px; 
+}
+
+.rsvp-form { 
+  text-align: left; 
+  max-width: 460px; 
+  margin: 0 auto; 
+}
+
+.input-group {
+  margin-bottom: 25px;
+}
+
+.rsvp-form label { 
+  display: block; 
+  font-size: 0.8rem; 
+  color: var(--text-muted); 
+  font-weight: 500; 
+  letter-spacing: 1.5px; 
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.rsvp-form input, 
+.rsvp-form select, 
+.rsvp-form textarea { 
+  width: 100%; 
+  padding: 18px; 
+  border: 1px solid rgba(0,0,0,0.08); 
+  border-radius: 8px; 
+  font-family: var(--font-sans); 
+  font-size: 0.95rem; 
+  background: var(--bg-cream); 
+  color: var(--text-main); 
+  outline: none; 
+  transition: all 0.3s; 
+}
+
+.rsvp-form input:focus, 
+.rsvp-form select:focus, 
+.rsvp-form textarea:focus { 
+  border-color: var(--gold-mid); 
+  background: #fff; 
+  box-shadow: 0 0 0 4px rgba(197,160,89,0.1); 
+}
+
+.hidden-fields {
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.quota { 
+  font-size: 0.85rem; 
+  color: var(--text-muted); 
+  margin-bottom: 40px; 
+  font-weight: 400; 
+  letter-spacing: 1px; 
+}
+
+.quota b { 
+  color: var(--gold-dark); 
+  font-weight: 600; 
+}
+
+/* ==========================================================================
+   9. TOMBOL GLOBAL
+   ========================================================================== */
+.btn-primary, 
+.btn-outline { 
+  display: inline-block; 
+  padding: 18px 45px; 
+  border-radius: 6px; 
+  font-family: var(--font-sans); 
+  font-weight: 500; 
+  font-size: 0.8rem; 
+  cursor: pointer; 
+  text-decoration: none; 
+  letter-spacing: 3px; 
+  text-transform: uppercase; 
+  transition: all 0.4s ease; 
+  text-align: center; 
+  width: 100%; 
+  margin-top: 20px; 
+}
+
+.btn-primary { 
+  background: linear-gradient(135deg, var(--gold-mid), var(--gold-dark)); 
+  color: #fff; 
+  border: none; 
+  box-shadow: 0 10px 25px rgba(197,160,89,0.3); 
+}
+
+.btn-primary:hover { 
+  transform: translateY(-3px); 
+  box-shadow: 0 15px 35px rgba(197,160,89,0.4); 
+}
+
+.btn-outline { 
+  background: transparent; 
+  color: var(--gold-mid); 
+  border: 1px solid var(--gold-mid); 
+}
+
+.btn-outline.light { 
+  color: var(--gold-light); 
+  border-color: var(--gold-light); 
+}
+
+.btn-outline:hover { 
+  background: var(--gold-mid); 
+  color: #fff; 
+}
+
+/* ==========================================================================
+   10. TAMAN DOA SECTION
+   ========================================================================== */
+.taman-section { 
+  padding-bottom: 180px; 
+}
+
+.garden { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fill, minmax(60px,1fr)); 
+  gap: 15px; 
+  background: #fff; 
+  border-radius: 20px; 
+  padding: 40px; 
+  min-height: 250px; 
+  margin-top: 40px; 
+  box-shadow: var(--shadow-medium); 
+  border: 1px solid rgba(0,0,0,0.02); 
+}
+
+.bunga { 
+  font-size: 2.2rem; 
+  background: none; 
+  border: none; 
+  cursor: pointer; 
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  filter: drop-shadow(0 6px 8px rgba(0,0,0,0.1)); 
+}
+
+.bunga:hover { 
+  transform: scale(1.5) rotate(15deg); 
+}
+
+.empty { 
+  grid-column: 1/-1; 
+  color: var(--text-muted); 
+  font-style: italic; 
+  font-size: 0.95rem; 
+  font-weight: 300; 
+  text-align: center;
+  margin-top: 40px;
+}
+
+/* ==========================================================================
+   11. INTERACTIVE SECTION (GAME & PHOTOBOOTH)
+   ========================================================================== */
+.interactive-section { 
+  padding-bottom: 180px; 
+}
+
+.interactive-grid { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 70px; 
+  margin-top: 60px; 
+}
+
+.sub-title { 
+  font-family: var(--font-serif); 
+  font-size: 1.8rem; 
+  margin-bottom: 10px; 
+  font-weight: 400; 
+  letter-spacing: 1.5px; 
+}
+
+.game-frame { 
+  width: 100%; 
+  height: 350px; 
+  border: 0; 
+  border-radius: 16px; 
+  background: #1a1a1a; 
+  box-shadow: var(--shadow-hard); 
+  margin-top: 30px; 
+}
+
+.file-upload-wrapper {
+  position: relative;
+  margin-bottom: 25px;
+  margin-top: 25px;
+}
+
+.file-input { 
+  width: 100%;
+  padding: 15px;
+  background: rgba(255,255,255,0.05);
+  border: 1px dashed rgba(255,255,255,0.2);
+  border-radius: 8px;
+  color: var(--text-light-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.file-input::file-selector-button {
+  display: none;
+}
+
+.file-upload-text {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: var(--text-light-muted);
+  letter-spacing: 1px;
+}
+
+#photoCanvas { 
+  max-width: 100%; 
+  border-radius: 16px; 
+  margin-top: 35px; 
+  box-shadow: var(--shadow-hard); 
+}
+
+.template-picker { 
+  display: flex; 
+  gap: 25px; 
+  justify-content: center; 
+  margin: 30px 0; 
+  font-size: 0.85rem; 
+  color: var(--text-light-muted); 
+  letter-spacing: 1.5px; 
+}
+
+.template-picker label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.photo-actions { 
+  display: flex; 
+  gap: 20px; 
+  justify-content: center; 
+  margin-top: 30px; 
+}
+
+/* ==========================================================================
+   12. QR & FOOTER SECTION
+   ========================================================================== */
+.qr-section { 
+  padding-bottom: 0; 
+}
+
+.qr-wrap { 
+  background: var(--bg-cream); 
+  padding: 60px; 
+  display: inline-block; 
+  border-radius: 24px; 
+  box-shadow: var(--shadow-medium); 
+  border: 1px solid rgba(0,0,0,0.03); 
+}
+
+.qr-icon { 
+  width: 50px; 
+  height: 50px; 
+  color: var(--gold-mid); 
+  margin-bottom: 30px; 
+  display: block; 
+  margin-left: auto; 
+  margin-right: auto; 
+  opacity: 0.8; 
+}
+
+.qr-img { 
+  width: 240px; 
+  height: 240px; 
+}
+
+footer { 
+  text-align: center; 
+  padding: 120px 20px 100px; 
+  font-family: var(--font-serif); 
+  color: var(--gold-dark); 
+  font-weight: 300; 
+}
+
+footer p { 
+  font-size: 2.5rem; 
+  letter-spacing: 2px; 
+  margin-bottom: 20px; 
+  font-family: var(--font-script); 
+}
+
+footer small { 
+  font-family: var(--font-sans); 
+  font-size: 0.7rem; 
+  text-transform: uppercase; 
+  letter-spacing: 4px; 
+  color: var(--text-muted); 
+}
+
+.divider { 
+  width: 200px; 
+  height: 26px; 
+  color: var(--gold-mid); 
+  margin-bottom: 30px; 
+  display: block; 
+  margin-left: auto; 
+  margin-right: auto; 
+}
+
+/* ==========================================================================
+   13. POPUP & NOTIFIKASI
+   ========================================================================== */
+.popup { 
+  position: fixed; 
+  bottom: 40px; 
+  left: 50%; 
+  transform: translateX(-50%); 
+  background: #fff; 
+  padding: 35px 45px; 
+  border-radius: 16px; 
+  box-shadow: var(--shadow-hard); 
+  max-width: 90%; 
+  z-index: 999; 
+  font-size: 1rem; 
+  text-align: center; 
+  border-top: 5px solid var(--gold-mid); 
+  color: var(--text-main); 
+}
+
+.popup small { 
+  display: block; 
+  color: var(--text-muted); 
+  margin-top: 25px; 
+  font-size: 0.75rem; 
+  text-transform: uppercase; 
+  letter-spacing: 2px; 
+}
+
+/* ==========================================================================
+   14. MEDIA QUERIES (RESPONSIVENESS)
+   ========================================================================== */
 @media (min-width: 768px) {
-  .interactive-grid { flex-direction: row; }
-  .interactive-item { flex: 1; }
-  .hero-names { font-size: 3.2rem; }
+  .interactive-grid { 
+    flex-direction: row; 
+  }
+  
+  .interactive-item { 
+    flex: 1; 
+  }
+  
+  .hero-names { 
+    font-size: 5rem; 
+  }
+  
+  .name-script { 
+    display: inline; 
+  }
+  
+  .ampersand-hero { 
+    display: inline; 
+    margin: 0 20px; 
+    font-size: 4rem; 
+  }
+  
+  .cover-title {
+    font-size: 5rem;
+  }
+  
+  .countdown {
+    gap: 25px;
+  }
+  
+  .cd-box {
+    width: 100px;
+    height: 110px;
+  }
+  
+  .cd-box span {
+    font-size: 2.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .luxury-envelope {
+    width: 300px;
+    height: 420px;
+  }
+  
+  .cover-title {
+    font-size: 3.5rem;
+  }
+  
+  .hero-names {
+    font-size: 3rem;
+  }
+  
+  .section-title {
+    font-size: 2.2rem;
+  }
+  
+  .qr-wrap {
+    padding: 40px;
+  }
 }

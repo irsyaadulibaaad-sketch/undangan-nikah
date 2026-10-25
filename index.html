@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Irsyaadul Ibaad & Refalina Putri Nursiami</title>
+<title>Irsyaadul & Refalina — The Wedding</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Great+Vibes&family=Montserrat:wght@200;300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -14,88 +14,131 @@
 </head>
 <body>
 
+<!-- EFEK TEKSTUR KERTAS & VIGNETTE -->
 <div class="noise-overlay"></div>
+<div class="vignette-overlay"></div>
 
-<!-- COVER PEMBUKA (LUXURY) -->
+<!-- =========================================
+     COVER PEMBUKA (LUXURY ENVELOPE)
+     ========================================= -->
 <div id="cover" class="cover">
   <div class="golden-glow"></div>
   
   <div class="luxury-envelope" id="luxuryEnvelope">
+    <!-- Kertas Belakang dengan Ornamen SVG Kompleks -->
     <div class="paper-back">
-      <svg class="botanical-top" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
-        <path d="M100,60 Q100,30 80,10 M100,60 Q100,30 120,10 M100,60 L100,10" fill="none" stroke="currentColor" stroke-width="0.5"/>
-        <circle cx="80" cy="10" r="2" fill="currentColor"/>
-        <circle cx="120" cy="10" r="2" fill="currentColor"/>
-        <circle cx="100" cy="10" r="3" fill="currentColor"/>
+      <svg class="ornament-frame" viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg">
+        <!-- Garis Bingkai Luar -->
+        <path d="M15,15 L285,15 L285,385 L15,385 Z" fill="none" stroke="currentColor" stroke-width="0.8"/>
+        <path d="M25,25 L275,25 L275,375 L25,375 Z" fill="none" stroke="currentColor" stroke-width="0.3"/>
+        
+        <!-- Sudut Kiri Atas -->
+        <path d="M15,15 C15,40 40,15 15,15" fill="none" stroke="currentColor" stroke-width="1.5"/>
+        <path d="M15,15 Q30,30 15,45" fill="none" stroke="currentColor" stroke-width="1"/>
+        <path d="M15,15 Q30,30 45,15" fill="none" stroke="currentColor" stroke-width="1"/>
+        <circle cx="15" cy="15" r="2" fill="currentColor"/>
+        
+        <!-- Sudut Kanan Atas -->
+        <path d="M285,15 Q270,30 285,45" fill="none" stroke="currentColor" stroke-width="1"/>
+        <path d="M285,15 Q270,30 255,15" fill="none" stroke="currentColor" stroke-width="1"/>
+        <circle cx="285" cy="15" r="2" fill="currentColor"/>
+        
+        <!-- Sudut Kiri Bawah -->
+        <path d="M15,385 Q30,370 15,355" fill="none" stroke="currentColor" stroke-width="1"/>
+        <path d="M15,385 Q30,370 45,385" fill="none" stroke="currentColor" stroke-width="1"/>
+        <circle cx="15" cy="385" r="2" fill="currentColor"/>
+        
+        <!-- Sudut Kanan Bawah -->
+        <path d="M285,385 Q270,370 285,355" fill="none" stroke="currentColor" stroke-width="1"/>
+        <path d="M285,385 Q270,370 255,385" fill="none" stroke="currentColor" stroke-width="1"/>
+        <circle cx="285" cy="385" r="2" fill="currentColor"/>
       </svg>
-      <p class="cover-sub">The Wedding Of</p>
-      <h1 class="cover-title">Irsyaadul<br><span class="ampersand-cover">&</span><br>Refalina</h1>
-      <p class="cover-date">24 . 12 . 2026</p>
-      <svg class="botanical-bottom" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
-        <path d="M100,0 Q100,30 80,50 M100,0 Q100,30 120,50 M100,0 L100,50" fill="none" stroke="currentColor" stroke-width="0.5"/>
-        <circle cx="80" cy="50" r="2" fill="currentColor"/>
-        <circle cx="120" cy="50" r="2" fill="currentColor"/>
-        <circle cx="100" cy="50" r="3" fill="currentColor"/>
-      </svg>
+      
+      <div class="cover-content">
+        <p class="cover-sub">The Wedding Celebration</p>
+        <h1 class="cover-title">Irsyaadul<br><span class="ampersand-cover">&</span><br>Refalina</h1>
+        <p class="cover-date">24 . 12 . 2026</p>
+      </div>
     </div>
 
-    <div class="paper-front left" id="paperLeft"><div class="emboss-pattern"></div></div>
-    <div class="paper-front right" id="paperRight"><div class="emboss-pattern"></div></div>
+    <!-- Kertas Depan (Kiri & Kanan) dengan Pola Emboss -->
+    <div class="paper-front left" id="paperLeft">
+      <div class="emboss-pattern"></div>
+      <div class="emboss-shadow"></div>
+    </div>
+    <div class="paper-front right" id="paperRight">
+      <div class="emboss-pattern"></div>
+      <div class="emboss-shadow"></div>
+    </div>
 
+    <!-- Segel Lilin Emas -->
     <div class="wax-seal" id="openBtn">
       <span class="seal-initials">I&R</span>
       <div class="seal-shine"></div>
+      <div class="seal-rim"></div>
     </div>
     
-    <div class="tap-hint">Open Invitation</div>
+    <div class="tap-hint">Tap to Open</div>
   </div>
 </div>
 
-<!-- KONTEN UTAMA -->
+<!-- =========================================
+     KONTEN UTAMA (HALAMAN UNDANGAN)
+     ========================================= -->
 <div id="mainContent" class="hidden">
   
   <!-- SECTION 1: HERO -->
-  <section class="hero-section bg-cream" data-anim="fade-up">
+  <section class="hero-section bg-cream" data-anim="hero">
     <div class="container">
-      <p class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</p>
-      <p class="hero-sub">We Are Getting Married</p>
+      <div class="bismillah-wrapper" data-anim="fade">
+        <p class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</p>
+        <div class="bismillah-line"></div>
+      </div>
       
-      <!-- NAMA DIPISAH AGAR LEBIH RAPI -->
-      <h1 class="hero-names">
-        <span class="name-block">Irsyaadul Ibaad</span>
-        <span class="ampersand-hero">&</span>
-        <span class="name-block">Refalina Putri<br>Nursiami</span>
-      </h1>
+      <div class="hero-title-wrapper" data-anim="title">
+        <span class="hero-sub">We Are Getting Married</span>
+        <h1 class="hero-names">
+          <span class="name-script">Irsyaadul Ibaad</span>
+          <span class="ampersand-hero">&</span>
+          <span class="name-script">Refalina Putri Nursiami</span>
+        </h1>
+      </div>
       
-      <!-- TANGGAL & JAM DITAMBAHKAN DI SINI -->
-      <p class="hero-date">Sabtu, 24 Desember 2026 • 08.00 WIB</p>
+      <div class="hero-info" data-anim="fade">
+        <p class="hero-date">Sabtu, 24 Desember 2026</p>
+        <p class="hero-time">08.00 WIB — 13.00 WIB</p>
+      </div>
       
-      <div class="countdown" id="countdown">
-        <div><span id="cd-days">--</span><small>Days</small></div>
-        <div><span id="cd-hours">--</span><small>Hours</small></div>
-        <div><span id="cd-mins">--</span><small>Mins</small></div>
-        <div><span id="cd-secs">--</span><small>Secs</small></div>
+      <div class="countdown-wrapper" data-anim="fade">
+        <div class="countdown" id="countdown">
+          <div class="cd-box"><span id="cd-days">--</span><small>Days</small></div>
+          <div class="cd-box"><span id="cd-hours">--</span><small>Hours</small></div>
+          <div class="cd-box"><span id="cd-mins">--</span><small>Mins</small></div>
+          <div class="cd-box"><span id="cd-secs">--</span><small>Secs</small></div>
+        </div>
       </div>
     </div>
+    <!-- Pembatas Gelombang SVG -->
     <div class="wave-divider">
-      <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
-        <path d="M0,50 C320,100 420,0 720,50 C1020,100 1120,0 1440,50 L1440,100 L0,100 Z" fill="var(--bg-dark)"/>
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+        <path d="M0,60 C320,120 420,0 720,60 C1020,120 1120,0 1440,60 L1440,120 L0,120 Z" fill="var(--bg-dark)"/>
       </svg>
     </div>
   </section>
 
   <!-- SECTION 2: VENUE -->
-  <section class="venue-section bg-dark" data-anim="fade-up">
+  <section class="venue-section bg-dark" data-anim="venue">
     <div class="container">
-      <h2 class="section-title light">The Venue</h2>
-      <p id="venueName" class="venue-name light"></p>
-      <p id="venueAddr" class="venue-addr light"></p>
+      <h2 class="section-title light" data-anim="fade">The Venue</h2>
+      <p id="venueName" class="venue-name light" data-anim="fade"></p>
+      <p id="venueAddr" class="venue-addr light" data-anim="fade"></p>
       
-      <div class="map-wrap" data-anim="zoom-in">
+      <div class="map-wrap" data-anim="zoom">
         <iframe id="gmap" loading="lazy" allowfullscreen></iframe>
       </div>
-      <a id="gmapLink" class="btn-outline light" target="_blank">Open Maps</a>
+      <a id="gmapLink" class="btn-outline light" target="_blank" data-anim="fade">Open Maps</a>
     </div>
+    <!-- Pembatas Kurva SVG -->
     <div class="curve-divider">
       <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
         <path d="M0,100 L1440,0 L1440,100 Z" fill="var(--bg-light)"/>
@@ -104,20 +147,45 @@
   </section>
 
   <!-- SECTION 3: RSVP -->
-  <section class="rsvp-section bg-light" data-anim="fade-up">
+  <section class="rsvp-section bg-light" data-anim="rsvp">
     <div class="container">
-      <h2 class="section-title">RSVP</h2>
-      <p class="sub">Kindly confirm your attendance</p>
-      <p class="quota">Remaining seats: <b id="sisaKuota">--</b> / 100</p>
+      <h2 class="section-title" data-anim="fade">RSVP</h2>
+      <p class="sub" data-anim="fade">Kindly confirm your attendance</p>
+      <p class="quota" data-anim="fade">Remaining seats: <b id="sisaKuota">--</b> / 100</p>
       
-      <form id="rsvpForm" class="rsvp-form">
-        <label>Full Name<input id="rsvpNama" type="text" required maxlength="60" placeholder="Your name"></label>
-        <label>Attendance<select id="rsvpHadir" required><option value="">-- select --</option><option value="1">Attending</option><option value="0">Not Attending</option></select></label>
-        <div id="hadirFields" hidden>
-          <label>Coming As<select id="rsvpKategori"><option value="sendiri">Alone</option><option value="pasangan">With Partner</option><option value="keluarga">With Family</option></select></label>
-          <label>Total Guests (incl. yourself)<input id="rsvpPax" type="number" min="1" value="1" max="100"></label>
+      <form id="rsvpForm" class="rsvp-form" data-anim="form">
+        <div class="input-group">
+          <label>Full Name</label>
+          <input id="rsvpNama" type="text" required maxlength="60" placeholder="Your name">
         </div>
-        <div id="doaFields" hidden><label>Prayers & Wishes<textarea id="rsvpDoa" rows="3" maxlength="200" placeholder="Write your wishes..."></textarea></label></div>
+        <div class="input-group">
+          <label>Attendance</label>
+          <select id="rsvpHadir" required>
+            <option value="">-- select --</option>
+            <option value="1">Attending</option>
+            <option value="0">Not Attending</option>
+          </select>
+        </div>
+        <div id="hadirFields" class="hidden-fields" hidden>
+          <div class="input-group">
+            <label>Coming As</label>
+            <select id="rsvpKategori">
+              <option value="sendiri">Alone</option>
+              <option value="pasangan">With Partner</option>
+              <option value="keluarga">With Family</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label>Total Guests (incl. yourself)</label>
+            <input id="rsvpPax" type="number" min="1" value="1" max="100">
+          </div>
+        </div>
+        <div id="doaFields" class="hidden-fields" hidden>
+          <div class="input-group">
+            <label>Prayers & Wishes</label>
+            <textarea id="rsvpDoa" rows="4" maxlength="200" placeholder="Write your wishes..."></textarea>
+          </div>
+        </div>
         <button type="submit" class="btn-primary">Send RSVP</button>
         <p id="rsvpMsg" class="msg"></p>
       </form>
@@ -130,11 +198,11 @@
   </section>
 
   <!-- SECTION 4: TAMAN DOA -->
-  <section class="taman-section bg-cream" data-anim="fade-up">
+  <section class="taman-section bg-cream" data-anim="taman">
     <div class="container">
-      <h2 class="section-title">Garden of Prayers</h2>
-      <p class="sub">Every prayer blooms into a flower</p>
-      <div class="garden" id="garden"></div>
+      <h2 class="section-title" data-anim="fade">Garden of Prayers</h2>
+      <p class="sub" data-anim="fade">Every prayer blooms into a flower</p>
+      <div class="garden" id="garden" data-anim="fade"></div>
     </div>
     <div class="curve-divider">
       <svg viewBox="0 0 1440 100" preserveAspectRatio="none">
@@ -143,26 +211,31 @@
     </div>
   </section>
 
-  <!-- SECTION 5: GAME & PHOTOBOOTH -->
-  <section class="interactive-section bg-dark" data-anim="fade-up">
+  <!-- SECTION 5: INTERACTIVE (GAME & PHOTOBOOTH) -->
+  <section class="interactive-section bg-dark" data-anim="interactive">
     <div class="container">
-      <h2 class="section-title light">Interactive</h2>
+      <h2 class="section-title light" data-anim="fade">Interactive</h2>
       
       <div class="interactive-grid">
-        <div class="interactive-item">
+        <!-- Game -->
+        <div class="interactive-item" data-anim="fade">
           <h3 class="sub-title light">The Journey</h3>
           <p class="sub light-text">Help the prince carry his princess</p>
           <iframe src="game/dino.html" class="game-frame" loading="lazy"></iframe>
         </div>
         
-        <div class="interactive-item">
+        <!-- Photobooth -->
+        <div class="interactive-item" data-anim="fade">
           <h3 class="sub-title light">Photobooth</h3>
           <p class="sub light-text">Capture the moment, choose a frame</p>
-          <input type="file" id="photoInput" accept="image/*" capture="user" class="file-input">
+          <div class="file-upload-wrapper">
+            <input type="file" id="photoInput" accept="image/*" capture="user" class="file-input">
+            <span class="file-upload-text">Choose Photo</span>
+          </div>
           <div class="template-picker">
-            <label><input type="radio" name="tpl" value="classic" checked> Classic</label>
-            <label><input type="radio" name="tpl" value="floral"> Floral</label>
-            <label><input type="radio" name="tpl" value="gold"> Gold</label>
+            <label><input type="radio" name="tpl" value="classic" checked> <span>Classic</span></label>
+            <label><input type="radio" name="tpl" value="floral"> <span>Floral</span></label>
+            <label><input type="radio" name="tpl" value="gold"> <span>Gold</span></label>
           </div>
           <canvas id="photoCanvas" width="600" height="800"></canvas>
           <div class="photo-actions">
@@ -180,11 +253,11 @@
   </section>
 
   <!-- SECTION 6: QR & FOOTER -->
-  <section class="qr-section bg-light" data-anim="fade-up">
+  <section class="qr-section bg-light" data-anim="qr">
     <div class="container">
-      <h2 class="section-title">Day-of Registration</h2>
-      <p class="sub">Scan at the entrance to check-in</p>
-      <div class="qr-wrap">
+      <h2 class="section-title" data-anim="fade">Day-of Registration</h2>
+      <p class="sub" data-anim="fade">Scan at the entrance to check-in</p>
+      <div class="qr-wrap" data-anim="fade">
         <svg class="qr-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
           <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/>
           <path d="M14 14h3v3h-3z M18 18h3v3h-3z M14 18h3v3h-3z M18 14h3v3h-3z"/>
@@ -208,42 +281,65 @@
 <script src="supabase.js"></script>
 <script src="app.js"></script>
 <script>
+  // =========================================
+  // ANIMASI GSAP KOMPLEKS
+  // =========================================
   const savedTheme = localStorage.getItem('wedding_theme') || 'luxury';
   document.documentElement.setAttribute('data-theme', savedTheme);
 
   gsap.registerPlugin(ScrollTrigger);
+  
+  // Animasi Masuk per Section
   document.querySelectorAll('[data-anim]').forEach(el => {
     const type = el.getAttribute('data-anim');
-    gsap.fromTo(el, 
-      type === 'zoom-in' ? { scale: 0.9, opacity: 0 } : { y: 80, opacity: 0 },
-      { scale: 1, y: 0, opacity: 1, duration: 1.5, ease: "power4.out",
-        scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" }
-      }
-    );
+    let fromVars = { opacity: 0 };
+    let toVars = { opacity: 1, duration: 1.5, ease: "power3.out" };
+
+    if (type === 'hero') {
+      fromVars = { opacity: 0, y: 50 };
+      toVars = { opacity: 1, y: 0, duration: 2, ease: "power4.out" };
+    } else if (type === 'title') {
+      fromVars = { opacity: 0, scale: 0.95, filter: "blur(10px)" };
+      toVars = { opacity: 1, scale: 1, filter: "blur(0px)", duration: 1.8, ease: "power3.out" };
+    } else if (type === 'zoom') {
+      fromVars = { opacity: 0, scale: 0.8 };
+      toVars = { opacity: 1, scale: 1, duration: 1.5, ease: "power2.out" };
+    } else if (type === 'form') {
+      fromVars = { opacity: 0, y: 30 };
+      toVars = { opacity: 1, y: 0, duration: 1.2, ease: "power2.out" };
+    }
+
+    gsap.fromTo(el, fromVars, {
+      ...toVars,
+      scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" }
+    });
+
+    // Efek Parallax
     gsap.to(el.querySelector('.container') || el, {
-      y: -50, ease: "none",
+      y: -60, ease: "none",
       scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true }
     });
   });
 
+  // Animasi Amplop Pembuka
   const tl = gsap.timeline({ paused: true });
-  tl.to(".wax-seal", { scale: 1.3, opacity: 0, duration: 0.6, ease: "power2.in" })
-    .to(".golden-glow", { opacity: 1, duration: 1 }, "-=0.4")
-    .to("#paperLeft", { rotationY: -180, duration: 1.4, ease: "power3.inOut" }, "-=0.6")
-    .to("#paperRight", { rotationY: 180, duration: 1.4, ease: "power3.inOut" }, "-=1.4")
-    .to(".tap-hint", { opacity: 0, duration: 0.3 }, "-=1")
-    .to(".luxury-envelope", { scale: 1.15, duration: 1 }, "-=0.6");
+  tl.to(".wax-seal", { scale: 1.4, opacity: 0, duration: 0.8, ease: "power2.in" })
+    .to(".golden-glow", { opacity: 1, duration: 1.2 }, "-=0.6")
+    .to("#paperLeft", { rotationY: -180, duration: 1.8, ease: "power3.inOut" }, "-=0.8")
+    .to("#paperRight", { rotationY: 180, duration: 1.8, ease: "power3.inOut" }, "-=1.8")
+    .to(".tap-hint", { opacity: 0, duration: 0.4 }, "-=1.5")
+    .to(".luxury-envelope", { scale: 1.2, duration: 1.2 }, "-=0.8");
 
   document.getElementById('openBtn').addEventListener('click', function() {
     tl.play();
     setTimeout(() => {
-      gsap.to("#cover", { opacity: 0, duration: 0.8, onComplete: () => {
+      gsap.to("#cover", { opacity: 0, duration: 1, onComplete: () => {
         document.getElementById('cover').style.display = 'none';
         document.getElementById('mainContent').classList.remove('hidden');
         window.scrollTo(0, 0);
         ScrollTrigger.refresh();
       }});
-    }, 2500);
+    }, 3200);
   });
 </script>
 </body>
