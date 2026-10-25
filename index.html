@@ -9,28 +9,45 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<!-- Framer Motion (vanilla via CDN) -->
-<script src="https://cdn.jsdelivr.net/npm/framer-motion@11/dist/framer-motion.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 </head>
 <body>
 
-<!-- COVER -->
+<!-- COVER PEMBUKA (GAYA MEWAH) -->
 <div id="cover" class="cover">
-  <div class="envelope-wrapper">
-    <div class="envelope" id="envelope">
-      <div class="letter">
-        <p class="cover-sub">The Wedding Of</p>
-        <h1 class="cover-title">Irsyaadul & Refalina</h1>
-        <p class="cover-date">24 . 12 . 2026</p>
-      </div>
-      <div class="envelope-flap"></div>
-      <div class="envelope-rope"></div>
-      <div class="envelope-seal" id="openBtn">Buka</div>
+  <!-- Efek Cahaya Emas dari Tengah -->
+  <div class="golden-glow"></div>
+  
+  <div class="luxury-envelope" id="luxuryEnvelope">
+    <!-- Kertas Belakang (Tempat teks) -->
+    <div class="paper-back">
+      <p class="cover-sub">The Wedding Of</p>
+      <h1 class="cover-title">Irsyaadul & Refalina</h1>
+      <p class="cover-date">24 . 12 . 2026</p>
     </div>
+
+    <!-- Kertas Depan Kiri (Yang akan terbuka) -->
+    <div class="paper-front left" id="paperLeft">
+      <div class="emboss-pattern"></div>
+    </div>
+
+    <!-- Kertas Depan Kanan (Yang akan terbuka) -->
+    <div class="paper-front right" id="paperRight">
+      <div class="emboss-pattern"></div>
+    </div>
+
+    <!-- Segel Lilin Emas (Tombol Buka) -->
+    <div class="wax-seal" id="openBtn">
+      <span class="seal-initials">I & R</span>
+      <div class="seal-shine"></div>
+    </div>
+    
+    <!-- Teks Petunjuk -->
+    <div class="tap-hint">Tap to open</div>
   </div>
 </div>
 
-<!-- KONTEN -->
+<!-- KONTEN UTAMA -->
 <div id="mainContent" class="hidden">
   <section class="hero" data-anim="fade-up">
     <p class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</p>
@@ -108,39 +125,44 @@
 <script src="supabase.js"></script>
 <script src="app.js"></script>
 <script>
-  // Tema dari localStorage
   const savedTheme = localStorage.getItem('wedding_theme') || 'sage';
   document.documentElement.setAttribute('data-theme', savedTheme);
 
-  // Framer Motion: scroll-triggered animations
-  const { animate, scroll, inView } = window.Motion;
-
+  // Animasi Scroll Sederhana
   document.querySelectorAll('[data-anim]').forEach(el => {
-    const type = el.getAttribute('data-anim');
-    const initial = type === 'zoom-in' ? { scale: 0.9, opacity: 0 } : { y: 60, opacity: 0 };
-    const target = type === 'zoom-in' ? { scale: 1, opacity: 1 } : { y: 0, opacity: 1 };
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(30px)';
+    el.style.transition = 'all 0.8s cubic-bezier(0.22, 1, 0.36, 1)';
     
-    inView(el, () => {
-      animate(el, target, { duration: 1.2, easing: [0.22, 1, 0.36, 1] });
-    }, { margin: "-10% 0px -10% 0px" });
-    
-    // Set initial state
-    Object.assign(el.style, type === 'zoom-in' ? { transform: 'scale(0.9)', opacity: '0' } : { transform: 'translateY(60px)', opacity: '0' });
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if(entry.isIntersecting) {
+          el.style.opacity = '1';
+          el.style.transform = 'translateY(0)';
+        }
+      });
+    }, { threshold: 0.1 });
+    observer.observe(el);
   });
 
-  // Amplop
+  // Animasi Buka Kertas Terbelah (GSAP)
+  const tl = gsap.timeline({ paused: true });
+  tl.to(".wax-seal", { scale: 1.2, opacity: 0, duration: 0.5, ease: "power2.in" })
+    .to(".golden-glow", { opacity: 1, duration: 0.8 }, "-=0.3")
+    .to("#paperLeft", { rotationY: -180, duration: 1.2, ease: "power3.inOut" }, "-=0.5")
+    .to("#paperRight", { rotationY: 180, duration: 1.2, ease: "power3.inOut" }, "-=1.2")
+    .to(".tap-hint", { opacity: 0, duration: 0.3 }, "-=1")
+    .to(".luxury-envelope", { scale: 1.1, duration: 1 }, "-=0.5");
+
   document.getElementById('openBtn').addEventListener('click', function() {
-    const envelope = document.getElementById('envelope');
-    const cover = document.getElementById('cover');
-    envelope.classList.add('open');
+    tl.play();
     setTimeout(() => {
-      cover.style.opacity = '0';
-      setTimeout(() => {
-        cover.style.display = 'none';
+      gsap.to("#cover", { opacity: 0, duration: 0.8, onComplete: () => {
+        document.getElementById('cover').style.display = 'none';
         document.getElementById('mainContent').classList.remove('hidden');
         window.scrollTo(0, 0);
-      }, 500);
-    }, 1500);
+      }});
+    }, 2200);
   });
 </script>
 </body>
