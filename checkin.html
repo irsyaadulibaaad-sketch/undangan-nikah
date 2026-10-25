@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Check-in — Irsyaadul & Refalina</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<section class="rsvp">
+  <h2>Registrasi Kehadiran</h2>
+  <p class="sub">Masukkan nama sesuai RSVP, lalu tulis doa untuk mempelai.</p>
+
+  <form id="checkinForm">
+    <label>Nama
+      <input id="ciNama" type="text" required maxlength="60">
+    </label>
+    <div id="ciInfo" class="msg"></div>
+    <label>Doa & Ucapan
+      <textarea id="ciDoa" rows="3" required maxlength="200"
+        placeholder="Tulis doa/ucapan..."></textarea>
+    </label>
+    <button type="submit" class="btn-primary">Check-in</button>
+    <p id="ciMsg" class="msg"></p>
+  </form>
+</section>
+<script src="supabase.js"></script>
+<script src="checkin.js"></script>
+</body>
+</html>

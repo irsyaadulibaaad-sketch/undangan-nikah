@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Irsyaadul Ibaad & Refalina Putri Nursiami</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</p>
+  <h1>Irsyaadul Ibaad<br><span>&</span><br>Refalina Putri Nursiami</h1>
+  <p class="tanggal" id="tanggalNikah">Segera Menikah • Tanggal Menyusul</p>
+
+  <div class="countdown" id="countdown">
+    <div><span id="cd-days">--</span><small>Hari</small></div>
+    <div><span id="cd-hours">--</span><small>Jam</small></div>
+    <div><span id="cd-mins">--</span><small>Menit</small></div>
+    <div><span id="cd-secs">--</span><small>Detik</small></div>
+  </div>
+</section>
+
+<!-- VENUE -->
+<section class="venue">
+  <h2>Lokasi Acara</h2>
+  <p id="venueName">Nama Resto / Venue</p>
+  <p id="venueAddr">Alamat lengkap, Kota</p>
+  <div class="map-wrap">
+    <iframe id="gmap" loading="lazy" allowfullscreen
+      referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+  <a id="gmapLink" class="btn-outline" target="_blank">Buka di Google Maps</a>
+</section>
+
+<!-- RSVP -->
+<section class="rsvp">
+  <h2>Konfirmasi Kehadiran</h2>
+  <p class="quota">Sisa kuota: <b id="sisaKuota">--</b> / 100 pax</p>
+
+  <form id="rsvpForm">
+    <label>Nama
+      <input id="rsvpNama" type="text" required maxlength="60">
+    </label>
+
+    <label>Kehadiran
+      <select id="rsvpHadir" required>
+        <option value="">-- pilih --</option>
+        <option value="1">Hadir</option>
+        <option value="0">Tidak Hadir</option>
+      </select>
+    </label>
+
+    <div id="hadirFields" hidden>
+      <label>Datang sebagai
+        <select id="rsvpKategori">
+          <option value="sendiri">Sendiri</option>
+          <option value="pasangan">Dengan Pasangan</option>
+          <option value="keluarga">Dengan Keluarga</option>
+        </select>
+      </label>
+      <label>Total orang (termasuk diri)
+        <input id="rsvpPax" type="number" min="1" value="1" max="100">
+      </label>
+    </div>
+
+    <div id="doaFields" hidden>
+      <label>Doa & Ucapan
+        <textarea id="rsvpDoa" rows="3" maxlength="200"
+          placeholder="Tulis doa/ucapan untuk kedua mempelai..."></textarea>
+      </label>
+    </div>
+
+    <button type="submit" class="btn-primary">Kirim</button>
+    <p id="rsvpMsg" class="msg"></p>
+  </form>
+</section>
+
+<!-- TAMAN DOA -->
+<section class="taman">
+  <h2>Taman Doa</h2>
+  <p class="sub">Setiap doa menumbuhkan bunga 🌸</p>
+  <div class="garden" id="garden"></div>
+</section>
+
+<!-- GAME DINO -->
+<section class="game-section">
+  <h2>Main Yuk! 🦖</h2>
+  <p class="sub">Bantu pangeran menggendong putri melewati rintangan</p>
+  <iframe src="game/dino.html" class="game-frame" loading="lazy"></iframe>
+</section>
+
+<!-- PHOTOBOOTH -->
+<section class="photobooth">
+  <h2>Photobooth Virtual</h2>
+  <p class="sub">Abadikan momen, pilih template, download & share!</p>
+
+  <input type="file" id="photoInput" accept="image/*" capture="user">
+  <div class="template-picker">
+    <label><input type="radio" name="tpl" value="classic" checked> Classic</label>
+    <label><input type="radio" name="tpl" value="floral"> Floral</label>
+    <label><input type="radio" name="tpl" value="gold"> Gold</label>
+  </div>
+  <canvas id="photoCanvas" width="600" height="800"></canvas>
+  <div class="photo-actions">
+    <button id="downloadBtn" class="btn-primary" hidden>Download</button>
+    <button id="shareBtn" class="btn-outline" hidden>Share</button>
+  </div>
+</section>
+
+<!-- QR CHECK-IN (info untuk panitia) -->
+<section class="qr-info">
+  <h2>Registrasi Hari-H</h2>
+  <p>Scan QR di pintu masuk untuk check-in:</p>
+  <canvas id="qrCanvas"></canvas>
+</section>
+
+<footer>
+  <p>Irsyaadul Ibaad & Refalina Putri Nursiami</p>
+</footer>
+
+<!-- Library QR -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="supabase.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
