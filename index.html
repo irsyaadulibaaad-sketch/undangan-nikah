@@ -261,63 +261,95 @@
 
 <script src="supabase.js"></script>
 <script src="app.js"></script>
+
+<!-- SCRIPT INTERAKSI: handler klik dipasang PERTAMA & tahan terhadap kegagalan CDN -->
 <script>
-  const savedTheme = localStorage.getItem('wedding_theme') || 'luxury';
-  document.documentElement.setAttribute('data-theme', savedTheme);
+(function () {
+  "use strict";
 
-  gsap.registerPlugin(ScrollTrigger);
-  document.querySelectorAll('[data-anim]').forEach(el => {
-    const type = el.getAttribute('data-anim');
-    let fromVars = { opacity: 0, y: 40 };
-    let toVars = { opacity: 1, y: 0, duration: 1.4, ease: "power3.out" };
-    if (type === 'hero') { fromVars = { opacity: 0, y: 60 }; toVars = { opacity: 1, y: 0, duration: 2.2, ease: "power4.out" }; }
-    else if (type === 'title') { fromVars = { opacity: 0, scale: 0.94, filter: "blur(12px)" }; toVars = { opacity: 1, scale: 1, filter: "blur(0px)", duration: 2, ease: "power3.out" }; }
-    else if (type === 'zoom') { fromVars = { opacity: 0, scale: 0.85 }; toVars = { opacity: 1, scale: 1, duration: 1.6, ease: "power2.out" }; }
-    else if (type === 'form') { fromVars = { opacity: 0, y: 30 }; toVars = { opacity: 1, y: 0, duration: 1.2, ease: "power2.out" }; }
+  var cover = document.getElementById("cover");
+  var mainContent = document.getElementById("mainContent");
+  var openBtn = document.getElementById("openBtn");
+  var envelope = document.getElementById("luxuryEnvelope");
+  var opened = false;
 
-    gsap.fromTo(el, fromVars, { ...toVars, scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" } });
-    gsap.to(el.querySelector('.container') || el, { y: -60, ease: "none", scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true } });
-  });
+  function revealMain() {
+    cover.style.display = "none";
+    mainContent.classList.remove("hidden");
+    window.scrollTo(0, 0);
+    if (window.gsap) {
+      gsap.fromTo(".bismillah-wrapper", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.6, ease: "power3.out", delay: 0.2 });
+      gsap.fromTo(".hero-title-wrapper", { opacity: 0, scale: 0.96, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 2, ease: "power3.out", delay: 0.5 });
+      gsap.fromTo(".hero-info", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.6, ease: "power3.out", delay: 0.9 });
+      gsap.fromTo(".countdown-wrapper", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.6, ease: "power3.out", delay: 1.2 });
+    }
+    if (window.ScrollTrigger) ScrollTrigger.refresh();
+  }
 
-  // Ambient entrance untuk konten utama (jalan sekali saat cover dibuka)
-  window.playMainEntrance = function() {
-    gsap.fromTo(".bismillah-wrapper", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.6, ease: "power3.out", delay: 0.3 });
-    gsap.fromTo(".hero-title-wrapper", { opacity: 0, scale: 0.96, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 2, ease: "power3.out", delay: 0.6 });
-    gsap.fromTo(".hero-info", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.6, ease: "power3.out", delay: 1 });
-    gsap.fromTo(".countdown-wrapper", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.6, ease: "power3.out", delay: 1.3 });
-  };
+  function openInvite() {
+    if (opened) return;
+    opened = true;
 
-  // TIMELINE BUKA AMPLOP — sinematik: segel membesar & pecah, cahaya menyilaukan,
-  // kedua kertas terbuka ke kiri-kanan, amplop maju lalu fade dengan blur.
-  const tl = gsap.timeline({ paused: true, defaults: { ease: "power3.inOut" } });
-  tl.to("#openBtn", { scale: 1.15, duration: 0.35, ease: "power2.out" })
-    .to("#openBtn", { scale: 0.9, duration: 0.2, ease: "power2.in" })
-    .to("#openBtn", { scale: 1.6, opacity: 0, filter: "blur(6px)", duration: 0.7, ease: "power2.in" })
-    .to(".golden-glow", { opacity: 1, duration: 1.4, ease: "power2.out" }, "-=0.5")
-    .to(".light-rays", { opacity: 1, duration: 1.4, ease: "power2.out" }, "<")
-    .to(".tap-hint", { opacity: 0, duration: 0.4 }, "-=1.4")
-    .to("#paperLeft", { rotationY: -178, duration: 2.2, ease: "power4.inOut" }, "-=0.9")
-    .to("#paperRight", { rotationY: 178, duration: 2.2, ease: "power4.inOut" }, "<")
-    .to("#paperLeft", { boxShadow: "30px 0 60px rgba(0,0,0,0.25)", duration: 2.2, ease: "power4.inOut" }, "<")
-    .to("#paperRight", { boxShadow: "-30px 0 60px rgba(0,0,0,0.25)", duration: 2.2, ease: "power4.inOut" }, "<")
-    .to(".luxury-envelope", { scale: 1.25, y: -10, duration: 1.4, ease: "power2.inOut" }, "-=1.4")
-    .to(".cover-content", { scale: 1.05, duration: 1.4, ease: "power2.inOut" }, "<");
+    if (!window.gsap) {
+      // Fallback: GSAP gagal dimuat -> langsung buka tanpa animasi
+      revealMain();
+      return;
+    }
 
-  document.getElementById('openBtn').addEventListener('click', function() {
-    tl.play();
-    setTimeout(() => {
-      gsap.to("#cover", {
+    var tl = gsap.timeline({ defaults: { ease: "power3.inOut" } });
+    tl.to(openBtn, { scale: 1.15, duration: 0.35, ease: "power2.out" })
+      .to(openBtn, { scale: 0.9, duration: 0.2, ease: "power2.in" })
+      .to(openBtn, { scale: 1.6, opacity: 0, filter: "blur(6px)", duration: 0.7, ease: "power2.in" })
+      .to(".golden-glow", { opacity: 1, duration: 1.4, ease: "power2.out" }, "-=0.5")
+      .to(".light-rays", { opacity: 1, duration: 1.4, ease: "power2.out" }, "<")
+      .to(".tap-hint", { opacity: 0, duration: 0.4 }, "-=1.4")
+      .to("#paperLeft", { rotationY: -178, duration: 2.2, ease: "power4.inOut" }, "-=0.9")
+      .to("#paperRight", { rotationY: 178, duration: 2.2, ease: "power4.inOut" }, "<")
+      .to("#paperLeft", { boxShadow: "30px 0 60px rgba(0,0,0,0.25)", duration: 2.2, ease: "power4.inOut" }, "<")
+      .to("#paperRight", { boxShadow: "-30px 0 60px rgba(0,0,0,0.25)", duration: 2.2, ease: "power4.inOut" }, "<")
+      .to(envelope, { scale: 1.25, y: -10, duration: 1.4, ease: "power2.inOut" }, "-=1.4")
+      .to(".cover-content", { scale: 1.05, duration: 1.4, ease: "power2.inOut" }, "<");
+
+    setTimeout(function () {
+      gsap.to(cover, {
         opacity: 0, filter: "blur(14px)", scale: 1.08, duration: 1.2, ease: "power2.inOut",
-        onComplete: () => {
-          document.getElementById('cover').style.display = 'none';
-          document.getElementById('mainContent').classList.remove('hidden');
-          window.scrollTo(0, 0);
-          if (window.playMainEntrance) window.playMainEntrance();
-          ScrollTrigger.refresh();
-        }
+        onComplete: revealMain
       });
     }, 3400);
-  });
+  }
+
+  // Pasang handler sebelum apa pun yang bisa error
+  if (openBtn) {
+    openBtn.addEventListener("click", openInvite);
+    openBtn.addEventListener("touchstart", function (e) {
+      e.preventDefault();
+      openInvite();
+    }, { passive: false });
+  }
+  if (envelope) {
+    envelope.addEventListener("click", openInvite);
+  }
+
+  // ---- Animasi scroll (opsional; jika GSAP gagal, konten tetap tampil statis) ----
+  var savedTheme = localStorage.getItem("wedding_theme") || "luxury";
+  document.documentElement.setAttribute("data-theme", savedTheme);
+
+  if (window.gsap && window.ScrollTrigger) {
+    gsap.registerPlugin(ScrollTrigger);
+    document.querySelectorAll("[data-anim]").forEach(function (el) {
+      var type = el.getAttribute("data-anim");
+      var fromVars = { opacity: 0, y: 40 };
+      var toVars = { opacity: 1, y: 0, duration: 1.4, ease: "power3.out" };
+      if (type === "hero") { fromVars = { opacity: 0, y: 60 }; toVars = { opacity: 1, y: 0, duration: 2.2, ease: "power4.out" }; }
+      else if (type === "title") { fromVars = { opacity: 0, scale: 0.94, filter: "blur(12px)" }; toVars = { opacity: 1, scale: 1, filter: "blur(0px)", duration: 2, ease: "power3.out" }; }
+      else if (type === "zoom") { fromVars = { opacity: 0, scale: 0.85 }; toVars = { opacity: 1, scale: 1, duration: 1.6, ease: "power2.out" }; }
+      else if (type === "form") { fromVars = { opacity: 0, y: 30 }; toVars = { opacity: 1, y: 0, duration: 1.2, ease: "power2.out" }; }
+
+      gsap.fromTo(el, fromVars, { ...toVars, scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" } });
+      gsap.to(el.querySelector(".container") || el, { y: -60, ease: "none", scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true } });
+    });
+  }
+})();
 </script>
 </body>
 </html>
