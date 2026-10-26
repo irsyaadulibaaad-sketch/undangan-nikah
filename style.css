@@ -901,3 +901,21 @@ footer small { font-family: var(--font-sans); font-size: 0.66rem; text-transform
   .pb-styles { grid-template-columns: repeat(3, 1fr); }
   .pb-slots { grid-template-columns: repeat(3, 1fr); }
 }
+/* ============================================================
+   TAMBAHKAN di PALING BAWAH style.css Anda
+   (blok tombol mode Kamera / Galeri untuk Virtual Photobooth)
+   ============================================================ */
+.pb-mode { display: flex; gap: 10px; margin-bottom: 12px; }
+.pb-mode button {
+  flex: 1; padding: 13px 0; background: transparent; cursor: pointer;
+  border: 1px solid rgba(158,122,62,0.45); border-radius: 4px;
+  color: var(--text-light-muted);
+  font-family: var(--font-sans); font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase;
+  transition: all 0.25s ease;
+}
+.pb-mode button:hover { border-color: var(--gold-dark); color: var(--gold-dark); }
+.pb-mode button.on {
+  background: var(--gold-dark); border-color: var(--gold-dark);
+  color: #FFFDF6; box-shadow: var(--shadow-gold);
+}
