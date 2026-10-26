@@ -854,3 +854,5 @@ footer small { font-family: var(--font-sans); font-size: 0.7rem; text-transform:
   .fountain { transform: translateX(-50%) scale(0.8); transform-origin: bottom center; }
   .prayer-card { padding: 38px 26px 32px; }
 }
+/* hapus pita vertikal, sisakan simpul saja */
+.luxury-envelope::before { display: none !important; }
