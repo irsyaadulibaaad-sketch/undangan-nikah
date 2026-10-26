@@ -71,6 +71,30 @@
     <button onclick="logout()" class="btn-outline" style="width: auto; margin: 0; padding: 10px 25px; color: var(--gold-dark); border-color: var(--gold-dark);">Logout</button>
   </div>
 
+  <!-- QR CHECK-IN (untuk diprint) -->
+  <div id="qrPrint" style="margin-bottom: 25px; background: #fff; padding: 30px 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee; text-align:center;">
+    <strong style="display:block; margin-bottom:20px; font-family: var(--font-serif); font-size: 1.4rem; color: var(--gold-dark);">Check-in QR — Irsyaad &amp; Refalina</strong>
+    <img id="adminQr" alt="QR Check-in" style="width:260px; height:260px; margin:0 auto 15px; display:block; border:6px solid var(--bg-cream); border-radius:8px;">
+    <p style="font-size:0.75rem; color:#888; margin-bottom:6px; font-weight:300;">Pindai QR ini di pintu masuk untuk check-in tamu</p>
+    <p style="font-size:0.7rem; color:#aaa; margin-bottom:20px; word-break:break-all;" id="adminQrUrl"></p>
+    <button onclick="window.print()" class="btn-primary" style="width:auto; margin:0; padding:14px 40px;">Print QR</button>
+  </div>
+  <style>
+    @media print {
+      body * { visibility: hidden; }
+      #qrPrint, #qrPrint * { visibility: visible; }
+      #qrPrint { position: absolute; inset: 0; margin: 0; border: none; box-shadow: none; }
+    }
+  </style>
+  <script>
+    (function () {
+      const checkinUrl = location.origin + location.pathname.replace("admin.html", "") + "checkin.html";
+      document.getElementById("adminQr").src =
+        "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=" + encodeURIComponent(checkinUrl);
+      document.getElementById("adminQrUrl").textContent = checkinUrl;
+    })();
+  </script>
+
   <!-- TEMA SELECTOR -->
   <div style="margin-bottom: 25px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee;">
     <strong style="display:block; margin-bottom:15px; font-family: var(--font-serif); font-size: 1.2rem; color: var(--gold-dark);">Website Theme</strong>

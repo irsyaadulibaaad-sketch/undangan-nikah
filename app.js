@@ -845,9 +845,4 @@ document.getElementById("shareBtn").addEventListener("click", () => {
   env.addEventListener("touchstart", untie, { passive: true });
 })();
 
-// ====== QR HARI-H ======
-const checkinUrl = location.origin + location.pathname.replace("index.html","") + "checkin.html";
-const qrImage = document.getElementById("qrImage");
-if (qrImage) {
-  qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(checkinUrl)}`;
-}
+// (QR check-in dipindah ke halaman admin untuk diprint)
