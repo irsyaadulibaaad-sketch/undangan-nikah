@@ -534,25 +534,8 @@ pbBuildStyles();
 pbBuildSlots();
 pbRender();
 
-// ============================================================
-// TOGGLE MINI GAME & PHOTOBOOTH
-// ============================================================
+// buka/tutup panel photobooth (hemat tempat, tetap di halaman yang sama)
 (function () {
-  // Toggle Mini Game
-  const gameBtn = document.getElementById("gameToggle");
-  const gamePanel = document.getElementById("gamePanel");
-  if (gameBtn && gamePanel) {
-    gameBtn.addEventListener("click", () => {
-      gamePanel.hidden = !gamePanel.hidden;
-      gameBtn.textContent = gamePanel.hidden ? "Buka Mini Game" : "Tutup Mini Game";
-      if (!gamePanel.hidden && window.gsap) {
-        gsap.fromTo(gamePanel, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" });
-      }
-      if (window.ScrollTrigger) ScrollTrigger.refresh();
-    });
-  }
-
-  // Toggle Photobooth
   const btn = document.getElementById("pbToggle");
   const panel = document.getElementById("pbPanel");
   if (!btn || !panel) return;
@@ -604,6 +587,8 @@ document.getElementById("shareBtn").addEventListener("click", () => {
   env.addEventListener("click", untie);
   env.addEventListener("touchstart", untie, { passive: true });
 })();
+
+// (QR check-in dipindah ke halaman admin untuk diprint)
 
 // ====== FAQ AKORDEON ======
 document.querySelectorAll(".faq-q").forEach(btn => {
