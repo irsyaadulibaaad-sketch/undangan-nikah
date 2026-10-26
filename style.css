@@ -951,3 +951,51 @@ footer small { font-family: var(--font-sans); font-size: 0.66rem; text-transform
 }
 .faq-a p b { color: var(--gold-dark); font-weight: 600; }
 .faq-item.open .faq-a { max-height: 320px; }
+/* [ ... KODE CSS ASLI 900 BARIS DARI PESAN SEBELUMNYA ... ] */
+
+/* ==========================================================================
+   TAMBAHAN: STYLING VIRTUAL PHOTOBOOTH MODAL
+   ========================================================================== */
+.pb-modal {
+  position: fixed; inset: 0; z-index: 10000;
+  display: flex; justify-content: center; align-items: center;
+  padding: 20px;
+}
+.pb-modal-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(50, 42, 26, 0.6);
+  backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+}
+.pb-modal-content {
+  position: relative; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+  background: var(--bg-cream);
+  border-radius: 8px;
+  padding: 40px 30px;
+  box-shadow: var(--shadow-hard);
+  border: 1px solid rgba(158,122,62,0.3);
+}
+.pb-modal-close {
+  position: absolute; top: 15px; right: 15px;
+  background: transparent; border: none; font-size: 28px; color: var(--gold-dark);
+  cursor: pointer; line-height: 1; padding: 5px;
+}
+.pb-modal-close:hover { color: var(--text-main); }
+
+/* Step Animasi */
+.pb-step { display: none; }
+.pb-step.active { display: block; animation: fadeIn 0.4s ease; }
+
+.pb-next-btn { width: 100%; margin-top: 25px; }
+
+/* Scrollbar agar rapi */
+.pb-modal-content::-webkit-scrollbar { width: 6px; }
+.pb-modal-content::-webkit-scrollbar-thumb { background: var(--gold-mid); border-radius: 3px; }
+
+/* Penyesuaian di dalam Modal */
+.pb-modal .pb-count button { background: #fff; }
+.pb-modal .pb-count button.on { background: var(--gold-dark); color: #fff; }
+.pb-modal .pb-slot { background-color: #fff; }
+.pb-modal .pb-slot.filled span { background: rgba(255,255,255,0.9); }
+.pb-modal #photoCanvas { max-height: 300px; width: auto; display: block; margin: 0 auto; border-radius: 4px; }
+.pb-modal .photo-actions { display: flex; gap: 15px; justify-content: center; }
+.pb-modal .photo-actions .btn-primary, .pb-modal .photo-actions .btn-outline { width: auto; margin-top: 0; }

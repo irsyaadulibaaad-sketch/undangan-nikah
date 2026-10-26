@@ -225,7 +225,7 @@ supabaseClient.channel("doa-rt")
 })();
 
 // ============================================================
-// VIRTUAL PHOTOBOOTH v3 (Fungsi tetap sama)
+// VIRTUAL PHOTOBOOTH v4 (MODAL STEP-BY-STEP)
 // ============================================================
 const photoCanvas = document.getElementById("photoCanvas");
 const pctx = photoCanvas.getContext("2d");
@@ -534,23 +534,41 @@ pbBuildStyles();
 pbBuildSlots();
 pbRender();
 
-// buka/tutup panel photobooth (hemat tempat, tetap di halaman yang sama)
-(function () {
-  const btn = document.getElementById("pbToggle");
-  const panel = document.getElementById("pbPanel");
-  if (!btn || !panel) return;
-  btn.addEventListener("click", () => {
-    panel.hidden = !panel.hidden;
-    btn.textContent = panel.hidden ? "Buka Virtual Photobooth" : "Tutup Virtual Photobooth";
-    if (!panel.hidden) {
-      if (window.gsap) {
-        gsap.fromTo(panel, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" });
-      }
-      pbRender();
-    }
-    if (window.ScrollTrigger) ScrollTrigger.refresh();
-  });
-})();
+// ============================================================
+// LOGIKA MODAL & STEP-BY-STEP (BARU)
+// ============================================================
+window.pbNextStep = function(step) {
+  document.querySelectorAll(".pb-step").forEach(el => el.classList.remove("active"));
+  document.getElementById("pbStep" + step).classList.add("active");
+  if(step === 4) pbRender(); // Render ulang saat masuk preview
+};
+
+function openPBModal() {
+  document.getElementById("pbModal").hidden = false;
+  document.body.style.overflow = "hidden";
+  window.pbNextStep(1); // Selalu mulai dari step 1
+  if (window.gsap) {
+    gsap.fromTo(".pb-modal-backdrop", { opacity: 0 }, { opacity: 1, duration: 0.4 });
+    gsap.fromTo(".pb-modal-content", { opacity: 0, y: 40, scale: 0.95 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.2)" });
+  }
+}
+
+function closePBModal() {
+  if (window.gsap) {
+    gsap.to(".pb-modal-content", { opacity: 0, y: 20, scale: 0.95, duration: 0.3, ease: "power2.in" });
+    gsap.to(".pb-modal-backdrop", { opacity: 0, duration: 0.3, onComplete: () => {
+      document.getElementById("pbModal").hidden = true;
+      document.body.style.overflow = "";
+    }});
+  } else {
+    document.getElementById("pbModal").hidden = true;
+    document.body.style.overflow = "";
+  }
+}
+
+document.getElementById("pbToggle").addEventListener("click", openPBModal);
+document.getElementById("pbClose").addEventListener("click", closePBModal);
+document.getElementById("pbBackdrop").addEventListener("click", closePBModal);
 
 // ---------- download & share ----------
 document.getElementById("downloadBtn").addEventListener("click", () => {
@@ -587,8 +605,6 @@ document.getElementById("shareBtn").addEventListener("click", () => {
   env.addEventListener("click", untie);
   env.addEventListener("touchstart", untie, { passive: true });
 })();
-
-// (QR check-in dipindah ke halaman admin untuk diprint)
 
 // ====== FAQ AKORDEON ======
 document.querySelectorAll(".faq-q").forEach(btn => {
