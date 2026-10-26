@@ -19,6 +19,15 @@
 
 <!-- COVER PEMBUKA -->
 <div id="cover" class="cover">
+  <div class="ballroom-bg"></div>
+  <div class="cover-floor"></div>
+  <div class="cover-chandelier">
+    <div class="ch-chain"></div>
+    <div class="ch-arm ch-arm1"><i></i></div>
+    <div class="ch-arm ch-arm2"><i></i></div>
+    <div class="ch-bowl"></div>
+    <div class="ch-glow"></div>
+  </div>
   <div class="golden-glow"></div>
   <div class="light-rays"><span></span><span></span><span></span></div>
   <div class="luxury-envelope" id="luxuryEnvelope">
@@ -55,7 +64,16 @@
 <div id="mainContent" class="hidden">
 
   <!-- SECTION 1: HERO -->
-  <section class="hero-section bg-cream" data-anim="hero">
+  <section class="hero-section bg-ballroom" data-anim="hero">
+    <div class="pelaminan">
+      <div class="pel-lights"></div>
+      <div class="pel-arch"></div>
+      <div class="pel-drape left"></div>
+      <div class="pel-drape right"></div>
+      <div class="pel-column left"></div>
+      <div class="pel-column right"></div>
+    </div>
+    <div class="gold-dust"><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <div class="container">
       <div class="bismillah-wrapper" data-anim="fade">
         <p class="bismillah">بِسْمِ اللّٰهِ الرَّحْمٰنِ الرَّحِيْمِ</p>
@@ -85,29 +103,43 @@
       </div>
     </div>
     <div class="wave-divider">
-      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,60 C320,120 420,0 720,60 C1020,120 1120,0 1440,60 L1440,120 L0,120 Z" fill="var(--bg-dark)"/></svg>
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,60 C320,120 420,0 720,60 C1020,120 1120,0 1440,60 L1440,120 L0,120 Z" fill="var(--bg-panel)"/></svg>
     </div>
   </section>
 
   <!-- SECTION 2: VENUE -->
-  <section class="venue-section bg-dark" data-anim="venue">
+  <section class="venue-section bg-panel" data-anim="venue">
     <div class="container">
       <h2 class="section-title light" data-anim="fade">The Venue</h2>
       <div class="gold-underline-light"></div>
       <p id="venueName" class="venue-name light bold-text" data-anim="fade"></p>
       <p id="venueAddr" class="venue-addr light" data-anim="fade"></p>
+      <div class="dining-scene" data-anim="zoom">
+        <div class="candelabra">
+          <div class="cb-arm left"><span class="cb-candle"><i class="flame"></i></span></div>
+          <div class="cb-arm right"><span class="cb-candle"><i class="flame"></i></span></div>
+          <div class="cb-stem"><span class="cb-candle main"><i class="flame"></i></span></div>
+          <div class="cb-base"></div>
+        </div>
+        <div class="dining-table">
+          <div class="plate p1"></div>
+          <div class="plate p2"></div>
+          <div class="glass g1"></div>
+          <div class="glass g2"></div>
+        </div>
+      </div>
       <div class="map-wrap" data-anim="zoom">
         <iframe id="gmap" loading="lazy" allowfullscreen></iframe>
       </div>
       <a id="gmapLink" class="btn-outline light" target="_blank" data-anim="fade">Open Maps</a>
     </div>
     <div class="curve-divider">
-      <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,100 L1440,0 L1440,100 Z" fill="var(--bg-light)"/></svg>
+      <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,100 L1440,0 L1440,100 Z" fill="var(--bg-dark)"/></svg>
     </div>
   </section>
 
   <!-- SECTION 3: RSVP -->
-  <section class="rsvp-section bg-light" data-anim="rsvp">
+  <section class="rsvp-section bg-dark" data-anim="rsvp">
     <div class="container">
       <h2 class="section-title" data-anim="fade">RSVP</h2>
       <div class="gold-underline-dark"></div>
@@ -128,20 +160,18 @@
       </form>
     </div>
     <div class="wave-divider">
-      <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,50 C320,0 420,100 720,50 C1020,0 1120,100 1440,50 L1440,100 L0,100 Z" fill="var(--bg-cream)"/></svg>
+      <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,50 C320,0 420,100 720,50 C1020,0 1120,100 1440,50 L1440,100 L0,100 Z" fill="var(--bg-panel)"/></svg>
     </div>
   </section>
 
-  <!-- SECTION 4: TAMAN DOA (VIRTUAL 2D) -->
-  <section class="taman-section bg-cream" data-anim="taman">
+  <!-- SECTION 4: TAMAN DOA -->
+  <section class="taman-section bg-panel" data-anim="taman">
     <div class="container">
       <h2 class="section-title" data-anim="fade">Garden of Prayers</h2>
       <div class="gold-underline-dark"></div>
       <p class="sub" data-anim="fade">Every prayer blooms into a flower — tap one to read it</p>
 
-      <!-- TAMAN VIRTUAL HTML/CSS -->
       <div class="css-garden" id="garden">
-        <!-- Langit & Matahari & Awan & Burung -->
         <div class="sky"></div>
         <div class="sun"><div class="sun-core"></div><div class="sun-halo"></div></div>
         <div class="cloud cloud1"></div>
@@ -149,8 +179,6 @@
         <div class="cloud cloud3"></div>
         <div class="bird bird1"><span></span></div>
         <div class="bird bird2"><span></span></div>
-
-        <!-- Air Mancur Bertingkat -->
         <div class="fountain">
           <div class="tier-3"></div>
           <div class="tier-2"></div>
@@ -160,14 +188,8 @@
           <div class="water-drop drop2"></div>
           <div class="water-drop drop3"></div>
         </div>
-
-        <!-- Tanah -->
         <div class="grass"></div>
-
-        <!-- Tempat Bunga Tumbuh (Diisi oleh JS) -->
-        <div id="flowerContainer" class="flower-container">
-          <!-- Bunga akan muncul di sini -->
-        </div>
+        <div id="flowerContainer" class="flower-container"></div>
       </div>
 
     </div>
@@ -208,12 +230,12 @@
       </div>
     </div>
     <div class="wave-divider">
-      <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,50 C320,100 420,0 720,50 C1020,100 1120,0 1440,50 L1440,100 L0,100 Z" fill="var(--bg-light)"/></svg>
+      <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,50 C320,100 420,0 720,50 C1020,100 1120,0 1440,50 L1440,100 L0,100 Z" fill="var(--bg-panel)"/></svg>
     </div>
   </section>
 
   <!-- SECTION 6: QR & FOOTER -->
-  <section class="qr-section bg-light" data-anim="qr">
+  <section class="qr-section bg-panel" data-anim="qr">
     <div class="container">
       <h2 class="section-title" data-anim="fade">Day-of Registration</h2>
       <div class="gold-underline-dark"></div>
@@ -224,6 +246,13 @@
       </div>
     </div>
     <footer>
+      <div class="footer-candelabra">
+        <span class="fc-candle"><i class="flame"></i></span>
+        <span class="fc-candle"><i class="flame"></i></span>
+        <span class="fc-candle"><i class="flame"></i></span>
+        <span class="fc-candle"><i class="flame"></i></span>
+        <span class="fc-candle"><i class="flame"></i></span>
+      </div>
       <svg class="divider" viewBox="0 0 200 20" xmlns="http://www.w3.org/2000/svg"><path d="M0,10 L80,10 M120,10 L200,10" stroke="currentColor" stroke-width="0.5"/><path d="M90,10 L95,5 L100,10 L105,15 Z" fill="currentColor"/></svg>
       <p>Irsyaadul &amp; Refalina</p>
       <small>Made with love</small>
@@ -262,7 +291,6 @@
 <script src="supabase.js"></script>
 <script src="app.js"></script>
 
-<!-- SCRIPT INTERAKSI: handler klik dipasang PERTAMA & tahan terhadap kegagalan CDN -->
 <script>
 (function () {
   "use strict";
@@ -290,11 +318,7 @@
     if (opened) return;
     opened = true;
 
-    if (!window.gsap) {
-      // Fallback: GSAP gagal dimuat -> langsung buka tanpa animasi
-      revealMain();
-      return;
-    }
+    if (!window.gsap) { revealMain(); return; }
 
     var tl = gsap.timeline({ defaults: { ease: "power3.inOut" } });
     tl.to(openBtn, { scale: 1.15, duration: 0.35, ease: "power2.out" })
@@ -318,19 +342,12 @@
     }, 3400);
   }
 
-  // Pasang handler sebelum apa pun yang bisa error
   if (openBtn) {
     openBtn.addEventListener("click", openInvite);
-    openBtn.addEventListener("touchstart", function (e) {
-      e.preventDefault();
-      openInvite();
-    }, { passive: false });
+    openBtn.addEventListener("touchstart", function (e) { e.preventDefault(); openInvite(); }, { passive: false });
   }
-  if (envelope) {
-    envelope.addEventListener("click", openInvite);
-  }
+  if (envelope) envelope.addEventListener("click", openInvite);
 
-  // ---- Animasi scroll (opsional; jika GSAP gagal, konten tetap tampil statis) ----
   var savedTheme = localStorage.getItem("wedding_theme") || "luxury";
   document.documentElement.setAttribute("data-theme", savedTheme);
 
@@ -344,7 +361,6 @@
       else if (type === "title") { fromVars = { opacity: 0, scale: 0.94, filter: "blur(12px)" }; toVars = { opacity: 1, scale: 1, filter: "blur(0px)", duration: 2, ease: "power3.out" }; }
       else if (type === "zoom") { fromVars = { opacity: 0, scale: 0.85 }; toVars = { opacity: 1, scale: 1, duration: 1.6, ease: "power2.out" }; }
       else if (type === "form") { fromVars = { opacity: 0, y: 30 }; toVars = { opacity: 1, y: 0, duration: 1.2, ease: "power2.out" }; }
-
       gsap.fromTo(el, fromVars, { ...toVars, scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" } });
       gsap.to(el.querySelector(".container") || el, { y: -60, ease: "none", scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true } });
     });
