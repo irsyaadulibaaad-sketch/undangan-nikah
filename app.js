@@ -390,23 +390,28 @@ const PB_STYLES = [
       c.lineWidth = 10; c.strokeRect(cl.x - 14, cl.y - 14, cl.w + 28, cl.h + 28);
     },
     fg(c, W, H, hy, fy) {
-      // hiasan: garis + berlian di atas
+      // TANPA papan scrim (background sudah hitam pekat, kontras alami)
+      // hiasan: dua garis + berlian di atas
       c.strokeStyle = "#C9A45C"; c.lineWidth = 2;
-      c.beginPath(); c.moveTo(W / 2 - 150, hy - 62); c.lineTo(W / 2 - 18, hy - 62); c.stroke();
-      c.beginPath(); c.moveTo(W / 2 + 18, hy - 62); c.lineTo(W / 2 + 150, hy - 62); c.stroke();
+      c.beginPath(); c.moveTo(W / 2 - 150, hy - 72); c.lineTo(W / 2 - 20, hy - 72); c.stroke();
+      c.beginPath(); c.moveTo(W / 2 + 20, hy - 72); c.lineTo(W / 2 + 150, hy - 72); c.stroke();
       c.fillStyle = "#E3C078";
-      c.save(); c.translate(W / 2, hy - 62); c.rotate(Math.PI / 4);
+      c.save(); c.translate(W / 2, hy - 72); c.rotate(Math.PI / 4);
       c.fillRect(-7, -7, 14, 14); c.restore();
-      // judul serif italic tebal (render bersih di layar HP)
-      textWithScrim(c, "The Wedding of", W / 2, hy - 12,
-        'italic 600 42px "Cormorant Garamond", serif', "#E3C078", "#141109", 0.9, 22, 0);
-      textWithScrim(c, "Irsyaadul & Refalina", W / 2, hy + 52,
-        'italic 700 62px "Cormorant Garamond", serif', "#F3DFAE", "#141109", 0.9, 22, 0);
-      // footer
+      // judul
+      c.textAlign = "center";
+      c.fillStyle = "#E3C078";
+      c.font = 'italic 600 42px "Cormorant Garamond", serif';
+      c.fillText("The Wedding of", W / 2, hy - 28);
+      c.fillStyle = "#F3DFAE";
+      c.font = 'italic 700 62px "Cormorant Garamond", serif';
+      c.fillText("Irsyaadul & Refalina", W / 2, hy + 44);
+      // footer: garis tipis jauh di atas tanggal (tidak menyentuh huruf)
       c.strokeStyle = "rgba(201,164,92,0.6)"; c.lineWidth = 1.5;
-      c.beginPath(); c.moveTo(W / 2 - 90, fy - 16); c.lineTo(W / 2 + 90, fy - 16); c.stroke();
-      textWithScrim(c, "24 . 12 . 2026", W / 2, fy + 14,
-        'italic 500 32px "Cormorant Garamond", serif', "#E3C078", "#141109", 0.9, 18, 0);
+      c.beginPath(); c.moveTo(W / 2 - 90, fy - 26); c.lineTo(W / 2 + 90, fy - 26); c.stroke();
+      c.fillStyle = "#E3C078";
+      c.font = 'italic 500 32px "Cormorant Garamond", serif';
+      c.fillText("24 . 12 . 2026", W / 2, fy + 12);
     }
   },
   {
