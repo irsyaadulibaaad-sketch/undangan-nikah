@@ -390,12 +390,23 @@ const PB_STYLES = [
       c.lineWidth = 10; c.strokeRect(cl.x - 14, cl.y - 14, cl.w + 28, cl.h + 28);
     },
     fg(c, W, H, hy, fy) {
-      textWithScrim(c, "THE WEDDING OF", W / 2, hy - 18,
-        '400 28px Montserrat, sans-serif', "#EFD9A4", "#141109", 0.9, 18, 5);
-      textWithScrim(c, "Irsyaadul & Refalina", W / 2, hy + 48,
-        'italic 700 60px "Cormorant Garamond", serif', "#F3DFAE", "#141109", 0.9, 22, 0);
-      textWithScrim(c, "24 . 12 . 2026", W / 2, fy + 8,
-        '400 26px Montserrat, sans-serif', "#E3C078", "#141109", 0.9, 16, 4);
+      // hiasan: garis + berlian di atas
+      c.strokeStyle = "#C9A45C"; c.lineWidth = 2;
+      c.beginPath(); c.moveTo(W / 2 - 150, hy - 62); c.lineTo(W / 2 - 18, hy - 62); c.stroke();
+      c.beginPath(); c.moveTo(W / 2 + 18, hy - 62); c.lineTo(W / 2 + 150, hy - 62); c.stroke();
+      c.fillStyle = "#E3C078";
+      c.save(); c.translate(W / 2, hy - 62); c.rotate(Math.PI / 4);
+      c.fillRect(-7, -7, 14, 14); c.restore();
+      // judul serif italic tebal (render bersih di layar HP)
+      textWithScrim(c, "The Wedding of", W / 2, hy - 12,
+        'italic 600 42px "Cormorant Garamond", serif', "#E3C078", "#141109", 0.9, 22, 0);
+      textWithScrim(c, "Irsyaadul & Refalina", W / 2, hy + 52,
+        'italic 700 62px "Cormorant Garamond", serif', "#F3DFAE", "#141109", 0.9, 22, 0);
+      // footer
+      c.strokeStyle = "rgba(201,164,92,0.6)"; c.lineWidth = 1.5;
+      c.beginPath(); c.moveTo(W / 2 - 90, fy - 16); c.lineTo(W / 2 + 90, fy - 16); c.stroke();
+      textWithScrim(c, "24 . 12 . 2026", W / 2, fy + 14,
+        'italic 500 32px "Cormorant Garamond", serif', "#E3C078", "#141109", 0.9, 18, 0);
     }
   },
   {
