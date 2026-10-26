@@ -354,7 +354,7 @@ const PB_STYLES = [
       c.strokeRect(cl.x + 12, cl.y + 12, cl.w - 24, cl.h - 24);
     },
     fg(c, W, H, hy, fy) {
-      textWithScrim(c, "IRSYAADUL & REFALINA", W / 2, fy + 10,
+      textWithScrim(c, "IRSYAAD & REFALINA", W / 2, fy + 10,
         '600 26px Montserrat, sans-serif', "#7A5E30", "#FFFFFF", 0.95, 20, 3);
     }
   },
@@ -405,7 +405,7 @@ const PB_STYLES = [
       c.fillText("The Wedding of", W / 2, hy - 28);
       c.fillStyle = "#F3DFAE";
       c.font = 'italic 700 62px "Cormorant Garamond", serif';
-      c.fillText("Irsyaadul & Refalina", W / 2, hy + 44);
+      c.fillText("Irsyaad & Refalina", W / 2, hy + 44);
       // footer: garis tipis jauh di atas tanggal (tidak menyentuh huruf)
       c.strokeStyle = "rgba(201,164,92,0.6)"; c.lineWidth = 1.5;
       c.beginPath(); c.moveTo(W / 2 - 90, fy - 26); c.lineTo(W / 2 + 90, fy - 26); c.stroke();
@@ -810,7 +810,7 @@ pbRender();
 // ---------- download & share ----------
 document.getElementById("downloadBtn").addEventListener("click", () => {
   const a = document.createElement("a");
-  a.download = "photobooth-irsyaadul-refalina.png";
+  a.download = "photobooth-irsyaad-refalina.png";
   a.href = photoCanvas.toDataURL("image/png");
   a.click();
 });
