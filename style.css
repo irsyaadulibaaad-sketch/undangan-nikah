@@ -934,3 +934,59 @@ footer small { font-family: var(--font-sans); font-size: 0.7rem; text-transform:
 .ribbon-off .bow-core   { transition: all 0.4s ease; transform: scale(0.3); opacity: 0; }
 .ribbon-off .bow-tail.l { transition: all 0.7s 0.1s ease-in; transform: rotate(20deg) translateY(60px); opacity: 0; }
 .ribbon-off .bow-tail.r { transition: all 0.7s 0.1s ease-in; transform: rotate(-20deg) translateY(60px); opacity: 0; }
+/* ============================================================
+   PITA PERBAIKAN — ramping, kontras, rapi di dalam amplop
+   ============================================================ */
+
+/* pita lebih ramping, tidak keluar amplop, warna kontras */
+.luxury-envelope::before {
+  top: 0; height: 100%;
+  width: 20px;
+  background: linear-gradient(90deg,
+    rgba(178, 146, 96, 0.95) 0%,
+    #DFC48E 16%,
+    #F4E4BC 42%,
+    #FBF2DA 50%,
+    #EED9AC 60%,
+    #D3B57E 86%,
+    rgba(164, 134, 88, 0.95) 100%);
+  box-shadow:
+    0 1px 3px rgba(90, 70, 40, 0.30),
+    inset 1px 0 2px rgba(255, 255, 255, 0.65),
+    inset -1px 0 2px rgba(110, 85, 45, 0.35);
+}
+
+/* bow lebih besar dan tegas */
+.bow-loop {
+  top: -18px;
+  width: 62px; height: 36px;
+  background: radial-gradient(ellipse at 38% 30%, #FDF6E4 0%, #EAD3A4 52%, #C4A468 100%);
+  box-shadow:
+    inset -5px -6px 9px rgba(110, 85, 45, 0.38),
+    inset 4px 5px 8px rgba(255, 255, 255, 0.8),
+    0 4px 8px rgba(90, 70, 40, 0.32);
+}
+.bow-loop.l { right: 4px; transform: rotate(28deg); }
+.bow-loop.r { left: 4px;  transform: rotate(-28deg); }
+
+.bow-core {
+  top: -13px; left: -15px;
+  width: 30px; height: 26px;
+  background:
+    repeating-linear-gradient(90deg, rgba(120, 92, 50, 0.30) 0 2px, transparent 2px 6px),
+    linear-gradient(180deg, #F0DFB8 0%, #C9A96E 100%);
+}
+
+/* ujung pita lebih ramping & mengalir */
+.bow-tail {
+  top: 10px;
+  width: 24px; height: 150px;
+  background: linear-gradient(90deg,
+    #C9A96E 0%,
+    #F0DFB8 32%,
+    #FBF2DA 50%,
+    #E5CE9E 74%,
+    #BE9C60 100%);
+}
+.bow-tail.l { left: -20px; transform: rotate(10deg); }
+.bow-tail.r { right: -20px; transform: rotate(-10deg); }
