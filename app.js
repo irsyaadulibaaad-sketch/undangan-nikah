@@ -225,7 +225,7 @@ supabaseClient.channel("doa-rt")
 })();
 
 // ============================================================
-// VIRTUAL PHOTOBOOTH v4 (MODAL STEP-BY-STEP)
+// VIRTUAL PHOTOBOOTH v5 (FULL SCREEN, PREVIEW LIVE, BACK BUTTON)
 // ============================================================
 const photoCanvas = document.getElementById("photoCanvas");
 const pctx = photoCanvas.getContext("2d");
@@ -445,6 +445,7 @@ function pbBuildStyles() {
       document.getElementById("pbStyleName").textContent = "— " + st.nama;
       wrap.querySelectorAll(".pb-style").forEach(b => b.classList.toggle("on", b.dataset.style === st.id));
       pbRender();
+      pbUpdateLivePreview();
     });
     wrap.appendChild(btn);
   });
@@ -493,6 +494,7 @@ function pbLoadFile(file, index) {
       PB.slots[index] = { img, url: ev.target.result };
       pbBuildSlots();
       pbRender();
+      pbUpdateLivePreview(); // Update preview di Step 3
       const next = PB.slots.findIndex((s, i) => i > index && !s);
       const firstEmpty = PB.slots.findIndex(s => !s);
       const lanjut = next !== -1 ? next : firstEmpty;
@@ -521,7 +523,7 @@ document.getElementById("pbPickMulti").addEventListener("change", (e) => {
     const reader = new FileReader();
     reader.onload = (ev) => {
       const img = new Image();
-      img.onload = () => { PB.slots[cur] = { img, url: ev.target.result }; pbBuildSlots(); pbRender(); };
+      img.onload = () => { PB.slots[cur] = { img, url: ev.target.result }; pbBuildSlots(); pbRender(); pbUpdateLivePreview(); };
       img.src = ev.target.result;
     };
     reader.readAsDataURL(f);
@@ -535,27 +537,72 @@ pbBuildSlots();
 pbRender();
 
 // ============================================================
-// LOGIKA MODAL & STEP-BY-STEP (BARU)
+// LOGIKA MODAL & STEP-BY-STEP (UPDATE)
 // ============================================================
 window.pbNextStep = function(step) {
   document.querySelectorAll(".pb-step").forEach(el => el.classList.remove("active"));
   document.getElementById("pbStep" + step).classList.add("active");
-  if(step === 4) pbRender(); // Render ulang saat masuk preview
+  
+  if(step === 2) pbUpdateLivePreview();
+  if(step === 3) pbUpdateLivePreview2();
+  if(step === 4) pbRender();
 };
+
+// Preview Live di Step 2 (Pilih Gaya)
+function pbUpdateLivePreview() {
+  const st = PB_STYLES.find(s => s.id === PB.style);
+  const canvas = document.getElementById("pbPreviewCanvas");
+  if(canvas) pbRenderPreview(st, canvas, 300, 400);
+}
+
+// Preview Live di Step 3 (Upload Foto)
+function pbUpdateLivePreview2() {
+  const canvas = document.getElementById("pbPreviewCanvas2");
+  const wrapper = document.getElementById("pbStep3Preview");
+  if(canvas && PB.slots.some(s => s)) {
+    wrapper.style.display = 'block';
+    pbRenderPreview(PB_STYLES.find(s => s.id === PB.style), canvas, 300, 400);
+    // Jika ada foto, gambar foto di preview
+    const ctx = canvas.getContext('2d');
+    const img = PB.slots[0] ? PB.slots[0].img : null;
+    if(img) {
+      const scale = Math.min(300 / canvas.width, 400 / canvas.height);
+      // Logika menggambar foto di canvas preview kecil bisa rumit, 
+      // kita gunakan pbRender saja untuk akurasi
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = canvas.width;
+      tempCanvas.height = canvas.height;
+      const tCtx = tempCanvas.getContext('2d');
+      pbRenderPreview(PB_STYLES.find(s => s.id === PB.style), tempCanvas, canvas.width, canvas.height);
+      // Gambar ulang slot foto ke preview
+      const L = pbLayout(PB.count, PB_STYLES.find(s => s.id === PB.style).padT || 0, PB_STYLES.find(s => s.id === PB.style).padB || 0);
+      const scaleFactor = canvas.width / L.W;
+      tCtx.scale(scaleFactor, scaleFactor);
+      L.cells.forEach((cl, i) => {
+        if(PB.slots[i]) {
+          drawCover(tCtx, PB.slots[i].img, cl.x, cl.y, cl.w, cl.h, PB_STYLES.find(s => s.id === PB.style).radius || 0);
+        }
+      });
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.drawImage(tempCanvas, 0, 0);
+    }
+  } else if (wrapper) {
+    wrapper.style.display = 'none';
+  }
+}
 
 function openPBModal() {
   document.getElementById("pbModal").hidden = false;
   document.body.style.overflow = "hidden";
-  window.pbNextStep(1); // Selalu mulai dari step 1
+  window.pbNextStep(1); 
   if (window.gsap) {
-    gsap.fromTo(".pb-modal-backdrop", { opacity: 0 }, { opacity: 1, duration: 0.4 });
-    gsap.fromTo(".pb-modal-content", { opacity: 0, y: 40, scale: 0.95 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.2)" });
+    gsap.fromTo(".pb-modal-content-full", { opacity: 0, y: 40, scale: 0.95 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.2)" });
   }
 }
 
 function closePBModal() {
   if (window.gsap) {
-    gsap.to(".pb-modal-content", { opacity: 0, y: 20, scale: 0.95, duration: 0.3, ease: "power2.in" });
+    gsap.to(".pb-modal-content-full", { opacity: 0, y: 20, scale: 0.95, duration: 0.3, ease: "power2.in" });
     gsap.to(".pb-modal-backdrop", { opacity: 0, duration: 0.3, onComplete: () => {
       document.getElementById("pbModal").hidden = true;
       document.body.style.overflow = "";
@@ -569,6 +616,22 @@ function closePBModal() {
 document.getElementById("pbToggle").addEventListener("click", openPBModal);
 document.getElementById("pbClose").addEventListener("click", closePBModal);
 document.getElementById("pbBackdrop").addEventListener("click", closePBModal);
+
+// Toggle Mini Game
+(function () {
+  const gameBtn = document.getElementById("gameToggle");
+  const gamePanel = document.getElementById("gamePanel");
+  if (gameBtn && gamePanel) {
+    gameBtn.addEventListener("click", () => {
+      gamePanel.hidden = !gamePanel.hidden;
+      gameBtn.textContent = gamePanel.hidden ? "Buka Mini Game" : "Tutup Mini Game";
+      if (!gamePanel.hidden && window.gsap) {
+        gsap.fromTo(gamePanel, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" });
+      }
+      if (window.ScrollTrigger) ScrollTrigger.refresh();
+    });
+  }
+})();
 
 // ---------- download & share ----------
 document.getElementById("downloadBtn").addEventListener("click", () => {

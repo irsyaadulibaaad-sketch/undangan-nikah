@@ -186,18 +186,18 @@
       
       <button type="button" id="pbToggle" class="btn-primary pb-toggle">Buka Virtual Photobooth</button>
       
-      <!-- PHOTOBOOTH MODAL -->
-      <div id="pbModal" class="pb-modal" hidden>
-        <div class="pb-modal-backdrop" id="pbBackdrop"></div>
-        <div class="pb-modal-content">
+      <!-- PHOTOBOOTH MODAL (FULL SCREEN) -->
+      <div id="pbModal" class="pb-modal-full" hidden>
+        <div class="pb-modal-content-full">
           <button class="pb-modal-close" id="pbClose">&times;</button>
           
-          <h3 class="sub-title" style="margin-top:0;">Virtual Photobooth</h3>
-          <p class="sub" style="margin-bottom: 20px;">Pilih frame, isi foto, lalu download!</p>
+          <div class="pb-header">
+            <h3 class="sub-title" style="margin-top:0;">Virtual Photobooth</h3>
+          </div>
 
           <!-- STEP 1: PILIH JUMLAH -->
           <div class="pb-step active" id="pbStep1">
-            <p class="pb-label" style="color:var(--text-muted);">1. Pilih Jumlah Frame</p>
+            <p class="pb-label">1. Pilih Jumlah Frame</p>
             <div class="pb-count" id="pbCount">
               <button type="button" data-n="1">1</button>
               <button type="button" data-n="3">3</button>
@@ -210,26 +210,49 @@
 
           <!-- STEP 2: PILIH GAYA -->
           <div class="pb-step" id="pbStep2">
-            <p class="pb-label" style="color:var(--text-muted);">2. Pilih Gaya Frame <span class="pb-style-name" id="pbStyleName"></span></p>
+            <div class="pb-step-nav">
+              <button type="button" class="btn-back" onclick="pbNextStep(1)">&larr; Kembali</button>
+            </div>
+            <p class="pb-label">2. Pilih Gaya Frame <span class="pb-style-name" id="pbStyleName"></span></p>
             <div class="pb-styles" id="pbStyles"></div>
+            
+            <!-- PREVIEW LIVE SETELAH PILIH GAYA -->
+            <div class="pb-live-preview">
+              <p class="pb-label" style="margin-top: 20px;">Preview Frame:</p>
+              <canvas id="pbPreviewCanvas" width="300" height="400"></canvas>
+            </div>
+            
             <button type="button" class="btn-primary pb-next-btn" onclick="pbNextStep(3)">Lanjut Isi Foto</button>
           </div>
 
           <!-- STEP 3: ISI FOTO -->
           <div class="pb-step" id="pbStep3">
-            <p class="pb-label" style="color:var(--text-muted);">3. Isi Foto Kamu</p>
+            <div class="pb-step-nav">
+              <button type="button" class="btn-back" onclick="pbNextStep(2)">&larr; Kembali</button>
+            </div>
+            <p class="pb-label">3. Isi Foto Kamu</p>
             <div class="pb-mode" id="pbMode">
               <button type="button" data-m="galeri" class="on">Dari Galeri</button>
               <button type="button" data-m="kamera">Ambil Foto Langsung</button>
             </div>
             <div class="pb-slots" id="pbSlots"></div>
+            
+            <!-- PREVIEW LIVE SETELAH UPLOAD FOTO -->
+            <div class="pb-live-preview" id="pbStep3Preview" style="display:none;">
+              <p class="pb-label" style="margin-top: 20px;">Preview:</p>
+              <canvas id="pbPreviewCanvas2" width="300" height="400"></canvas>
+            </div>
+            
             <button type="button" id="pbFillAll" class="btn-outline pb-fillall">Isi Semua dari Galeri</button>
-            <button type="button" class="btn-primary pb-next-btn" onclick="pbNextStep(4)">Lihat Hasil</button>
+            <button type="button" class="btn-primary pb-next-btn" onclick="pbNextStep(4)">Lihat Hasil Akhir</button>
           </div>
 
           <!-- STEP 4: PREVIEW & DOWNLOAD -->
           <div class="pb-step" id="pbStep4">
-            <p class="pb-label" style="color:var(--text-muted);">4. Hasil Akhir</p>
+            <div class="pb-step-nav">
+              <button type="button" class="btn-back" onclick="pbNextStep(3)">&larr; Kembali</button>
+            </div>
+            <p class="pb-label">4. Hasil Akhir</p>
             <canvas id="photoCanvas" width="600" height="800"></canvas>
             <div class="photo-actions" style="margin-top: 20px;">
               <button id="downloadBtn" class="btn-primary" hidden>Download</button>
