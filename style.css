@@ -810,3 +810,94 @@ footer small { font-family: var(--font-sans); font-size: 0.66rem; text-transform
   .fountain { transform: translateX(-50%) scale(0.8); transform-origin: bottom center; }
   .prayer-card { padding: 40px 26px 34px; }
 }
+
+/* ==========================================================================
+   VIRTUAL PHOTOBOOTH UI
+   ========================================================================== */
+.pb-label {
+  font-size: 0.68rem; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--text-light-muted); font-weight: 600;
+  margin: 34px 0 14px; text-align: left;
+}
+.pb-label:first-of-type { margin-top: 30px; }
+.pb-style-name { color: var(--gold-dark); font-weight: 400; letter-spacing: 1px; text-transform: none; }
+.pb-hint { font-weight: 300; opacity: 0.7; text-transform: none; letter-spacing: 0.5px; }
+
+/* pilih jumlah frame */
+.pb-count { display: flex; gap: 10px; }
+.pb-count button {
+  flex: 1; padding: 14px 0; background: transparent; cursor: pointer;
+  border: 1px solid rgba(158,122,62,0.40); border-radius: 4px;
+  color: var(--text-light-muted); font-family: var(--font-sans);
+  font-size: 1rem; font-weight: 500;
+  transition: all 0.25s ease;
+}
+.pb-count button:hover { border-color: var(--gold-dark); color: var(--gold-dark); }
+.pb-count button.on {
+  background: var(--gold-dark); border-color: var(--gold-dark);
+  color: #FFFDF6; box-shadow: var(--shadow-gold);
+}
+
+/* grid 10 gaya */
+.pb-styles {
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;
+}
+.pb-style {
+  background: transparent; border: 1px solid rgba(158,122,62,0.30);
+  border-radius: 6px; padding: 8px 6px 10px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  transition: all 0.25s ease;
+}
+.pb-style:hover { border-color: var(--gold-dark); transform: translateY(-2px); }
+.pb-style.on {
+  border-color: var(--gold-dark);
+  background: rgba(201,164,92,0.10);
+  box-shadow: var(--shadow-gold);
+}
+.pb-style-canvas {
+  width: 100%; border-radius: 3px; display: block;
+  background: #EFEAE0;
+}
+.pb-style span {
+  font-size: 0.6rem; letter-spacing: 0.8px; color: var(--text-light-muted);
+  font-weight: 500; text-transform: uppercase; text-align: center; line-height: 1.4;
+}
+.pb-style.on span { color: var(--gold-dark); }
+
+/* slot foto */
+.pb-slots {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+}
+.pb-slot {
+  position: relative; aspect-ratio: 1; border-radius: 6px; cursor: pointer;
+  border: 1.5px dashed rgba(158,122,62,0.45);
+  background-color: rgba(255,255,255,0.6);
+  background-size: cover; background-position: center;
+  color: var(--text-light-muted);
+  font-family: var(--font-sans); font-size: 0.72rem; font-weight: 500;
+  letter-spacing: 1px;
+  transition: all 0.25s ease;
+  overflow: hidden;
+}
+.pb-slot:hover { border-color: var(--gold-dark); color: var(--gold-dark); transform: translateY(-2px); }
+.pb-slot span {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  padding: 6px 4px; background: rgba(253,252,249,0.88);
+  backdrop-filter: blur(2px);
+}
+.pb-slot.filled { border-style: solid; border-color: var(--gold-mid); }
+.pb-slot.filled span { color: var(--gold-dark); font-size: 0.62rem; }
+
+.pb-fillall { margin-top: 18px; }
+
+#photoCanvas {
+  max-width: 100%; height: auto; border-radius: 8px; margin-top: 36px;
+  box-shadow: var(--shadow-medium);
+  border: 1px solid rgba(158,122,62,0.20);
+  background: #FFFFFF;
+}
+
+@media (max-width: 560px) {
+  .pb-styles { grid-template-columns: repeat(3, 1fr); }
+  .pb-slots { grid-template-columns: repeat(3, 1fr); }
+}

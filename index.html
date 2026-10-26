@@ -166,10 +166,10 @@
     </div>
   </section>
 
-  <!-- SECTION 5: MINI GAME & PHOTOBOOTH -->
+  <!-- SECTION 5: MINI GAME & VIRTUAL PHOTOBOOTH -->
   <section class="interactive-section bg-dark" data-anim="interactive">
     <div class="container">
-      <h2 class="section-title light" data-anim="fade">Mini Game</h2>
+      <h2 class="section-title light" data-anim="fade">Mini Game & Photobooth</h2>
       <div class="gold-underline-light"></div>
       <div class="interactive-grid">
         <div class="interactive-item" data-anim="fade">
@@ -178,17 +178,29 @@
           <iframe src="game/dino.html" class="game-frame" loading="lazy"></iframe>
         </div>
         <div class="interactive-item" data-anim="fade">
-          <h3 class="sub-title light">Photobooth</h3>
-          <p class="sub light-text">Capture the moment, choose a frame</p>
-          <div class="file-upload-wrapper">
-            <input type="file" id="photoInput" accept="image/*" capture="user" class="file-input">
-            <span class="file-upload-text">Choose Photo</span>
+          <h3 class="sub-title light">Virtual Photobooth</h3>
+          <p class="sub light-text">Pilih jumlah frame &amp; gaya, lalu isi tiap frame dengan fotomu</p>
+
+          <p class="pb-label">Jumlah Frame</p>
+          <div class="pb-count" id="pbCount">
+            <button type="button" data-n="1">1</button>
+            <button type="button" data-n="3">3</button>
+            <button type="button" data-n="4" class="on">4</button>
+            <button type="button" data-n="5">5</button>
+            <button type="button" data-n="6">6</button>
           </div>
-          <div class="template-picker">
-            <label><input type="radio" name="tpl" value="classic" checked> <span>Classic</span></label>
-            <label><input type="radio" name="tpl" value="floral"> <span>Floral</span></label>
-            <label><input type="radio" name="tpl" value="gold"> <span>Gold</span></label>
-          </div>
+
+          <p class="pb-label">Gaya Frame <span class="pb-style-name" id="pbStyleName"></span></p>
+          <div class="pb-styles" id="pbStyles"></div>
+
+          <p class="pb-label">Foto Kamu <span class="pb-hint">— tap slot untuk kamera/galeri</span></p>
+          <div class="pb-slots" id="pbSlots"></div>
+
+          <button type="button" id="pbFillAll" class="btn-outline light pb-fillall">Isi Semua dari Galeri</button>
+
+          <input type="file" id="pbPick" accept="image/*" hidden>
+          <input type="file" id="pbPickMulti" accept="image/*" multiple hidden>
+
           <canvas id="photoCanvas" width="600" height="800"></canvas>
           <div class="photo-actions">
             <button id="downloadBtn" class="btn-primary" hidden>Download</button>
