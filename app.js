@@ -336,3 +336,21 @@ const qrImage = document.getElementById("qrImage");
 if (qrImage) {
   qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(checkinUrl)}`;
 }
+// ====== PITA SATIN + BOW DI COVER ======
+(function () {
+  const env = document.getElementById("luxuryEnvelope");
+  if (!env || document.getElementById("ribbonBow")) return;
+
+  env.insertAdjacentHTML("beforeend", `
+    <div class="ribbon-bow" id="ribbonBow">
+      <span class="bow-loop l"></span>
+      <span class="bow-loop r"></span>
+      <span class="bow-tail l"></span>
+      <span class="bow-tail r"></span>
+      <span class="bow-core"></span>
+    </div>`);
+
+  function untie() { env.classList.add("ribbon-off"); }
+  env.addEventListener("click", untie);
+  env.addEventListener("touchstart", untie, { passive: true });
+})();

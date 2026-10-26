@@ -844,3 +844,93 @@ footer small { font-family: var(--font-sans); font-size: 0.7rem; text-transform:
 
 /* garis tepi segel: emas tipis menggantikan garis putus-putus */
 .seal-rim { border: 1px solid rgba(158, 122, 62, 0.35); }
+/* ============================================================
+   PITA SATIN + BOW (model referensi) — tanpa cap
+   ============================================================ */
+
+/* hapus cap lilin sama sekali */
+.wax-seal { display: none !important; }
+
+/* pita satin vertikal membungkus amplop */
+.luxury-envelope::before {
+  content: ''; position: absolute;
+  left: 50%; top: -8px; transform: translateX(-50%);
+  width: 36px; height: 116%;
+  background: linear-gradient(90deg,
+    #C9B795 0%,
+    #E9DCC2 18%,
+    #FBF6EA 42%,
+    #FFFDF8 50%,
+    #F3EAD6 60%,
+    #DCCBA9 84%,
+    #BFAE8C 100%);
+  box-shadow:
+    0 2px 6px rgba(90, 70, 40, 0.25),
+    inset 2px 0 3px rgba(255, 255, 255, 0.55),
+    inset -2px 0 3px rgba(120, 95, 55, 0.28);
+  z-index: 6;
+}
+
+/* dasi pita (bow) */
+.ribbon-bow {
+  position: absolute; top: 50%; left: 50%;
+  width: 0; height: 0; z-index: 7; pointer-events: none;
+}
+.bow-loop {
+  position: absolute; top: -15px;
+  width: 52px; height: 30px;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(ellipse at 38% 30%, #FFFDF8 0%, #F1E7D2 55%, #D9C9A8 100%);
+  box-shadow:
+    inset -4px -5px 8px rgba(120, 95, 55, 0.30),
+    inset 3px 4px 7px rgba(255, 255, 255, 0.75),
+    0 4px 8px rgba(90, 70, 40, 0.28);
+}
+.bow-loop::after {
+  content: ''; position: absolute; top: 50%; height: 3px; margin-top: -1.5px;
+  background: rgba(150, 120, 75, 0.35); border-radius: 2px;
+}
+.bow-loop.l { right: 6px; transform: rotate(26deg); transform-origin: right center; }
+.bow-loop.l::after { left: 14%; right: 30%; }
+.bow-loop.r { left: 6px; transform: rotate(-26deg); transform-origin: left center; }
+.bow-loop.r::after { left: 30%; right: 14%; }
+
+/* inti dasi: lipatan kain mengkerut */
+.bow-core {
+  position: absolute; top: -11px; left: -13px;
+  width: 26px; height: 22px;
+  border-radius: 8px;
+  background:
+    repeating-linear-gradient(90deg, rgba(150,120,75,0.22) 0 2px, transparent 2px 6px),
+    linear-gradient(180deg, #F5EDDC 0%, #D9C9A8 100%);
+  box-shadow:
+    inset 0 -3px 5px rgba(120, 95, 55, 0.35),
+    inset 0 3px 5px rgba(255, 255, 255, 0.7),
+    0 3px 6px rgba(90, 70, 40, 0.3);
+}
+
+/* dua ujung pita panjang menjuntai */
+.bow-tail {
+  position: absolute; top: 6px;
+  width: 30px; height: 170px;
+  background: linear-gradient(90deg,
+    #D9C9A8 0%,
+    #F5EDDC 30%,
+    #FFFDF8 50%,
+    #EDE2C8 72%,
+    #C9B795 100%);
+  clip-path: polygon(0 0, 100% 0, 100% 92%, 50% 100%, 0 92%);
+  box-shadow:
+    inset -3px 0 5px rgba(120, 95, 55, 0.25),
+    inset 3px 0 5px rgba(255, 255, 255, 0.6);
+}
+.bow-tail.l { left: -26px; transform: rotate(7deg);  transform-origin: top center; }
+.bow-tail.r { right: -26px; transform: rotate(-7deg); transform-origin: top center; }
+
+/* ===== animasi terurai saat di-tap ===== */
+.ribbon-off .luxury-envelope::before { transition: transform 0.9s 0.2s ease-in; transform: translateX(-50%) translateY(-120%); }
+.ribbon-off .bow-loop.l { transition: all 0.5s ease; transform: rotate(70deg) scale(0.4); opacity: 0; }
+.ribbon-off .bow-loop.r { transition: all 0.5s ease; transform: rotate(-70deg) scale(0.4); opacity: 0; }
+.ribbon-off .bow-core   { transition: all 0.4s ease; transform: scale(0.3); opacity: 0; }
+.ribbon-off .bow-tail.l { transition: all 0.7s 0.1s ease-in; transform: rotate(20deg) translateY(60px); opacity: 0; }
+.ribbon-off .bow-tail.r { transition: all 0.7s 0.1s ease-in; transform: rotate(-20deg) translateY(60px); opacity: 0; }
