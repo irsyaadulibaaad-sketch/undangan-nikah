@@ -494,7 +494,7 @@ function pbLoadFile(file, index) {
       PB.slots[index] = { img, url: ev.target.result };
       pbBuildSlots();
       pbRender();
-      pbUpdateLivePreview(); // Update preview di Step 3
+      pbUpdateLivePreview(); 
       const next = PB.slots.findIndex((s, i) => i > index && !s);
       const firstEmpty = PB.slots.findIndex(s => !s);
       const lanjut = next !== -1 ? next : firstEmpty;
@@ -562,19 +562,14 @@ function pbUpdateLivePreview2() {
   if(canvas && PB.slots.some(s => s)) {
     wrapper.style.display = 'block';
     pbRenderPreview(PB_STYLES.find(s => s.id === PB.style), canvas, 300, 400);
-    // Jika ada foto, gambar foto di preview
     const ctx = canvas.getContext('2d');
     const img = PB.slots[0] ? PB.slots[0].img : null;
     if(img) {
-      const scale = Math.min(300 / canvas.width, 400 / canvas.height);
-      // Logika menggambar foto di canvas preview kecil bisa rumit, 
-      // kita gunakan pbRender saja untuk akurasi
       const tempCanvas = document.createElement('canvas');
       tempCanvas.width = canvas.width;
       tempCanvas.height = canvas.height;
       const tCtx = tempCanvas.getContext('2d');
       pbRenderPreview(PB_STYLES.find(s => s.id === PB.style), tempCanvas, canvas.width, canvas.height);
-      // Gambar ulang slot foto ke preview
       const L = pbLayout(PB.count, PB_STYLES.find(s => s.id === PB.style).padT || 0, PB_STYLES.find(s => s.id === PB.style).padB || 0);
       const scaleFactor = canvas.width / L.W;
       tCtx.scale(scaleFactor, scaleFactor);
@@ -617,7 +612,7 @@ document.getElementById("pbToggle").addEventListener("click", openPBModal);
 document.getElementById("pbClose").addEventListener("click", closePBModal);
 document.getElementById("pbBackdrop").addEventListener("click", closePBModal);
 
-// Toggle Mini Game
+// ====== TOGGLE MINI GAME (DIPERBAIKI) ======
 (function () {
   const gameBtn = document.getElementById("gameToggle");
   const gamePanel = document.getElementById("gamePanel");
@@ -631,6 +626,23 @@ document.getElementById("pbBackdrop").addEventListener("click", closePBModal);
       if (window.ScrollTrigger) ScrollTrigger.refresh();
     });
   }
+})();
+
+// ====== SIMPUL PITA DI COVER (DIPERBAIKI) ======
+(function () {
+  const env = document.getElementById("luxuryEnvelope");
+  if (!env || document.getElementById("ribbonBow")) return;
+  env.insertAdjacentHTML("beforeend", `
+    <div class="ribbon-bow" id="ribbonBow">
+      <span class="bow-loop l"></span>
+      <span class="bow-loop r"></span>
+      <span class="bow-tail l"></span>
+      <span class="bow-tail r"></span>
+      <span class="bow-core"></span>
+    </div>`);
+  function untie() { env.classList.add("ribbon-off"); }
+  env.addEventListener("click", untie);
+  env.addEventListener("touchstart", untie, { passive: true });
 })();
 
 // ---------- download & share ----------
@@ -651,23 +663,6 @@ document.getElementById("shareBtn").addEventListener("click", () => {
     }
   });
 });
-
-// ====== SIMPUL PITA DI COVER (bow) ======
-(function () {
-  const env = document.getElementById("luxuryEnvelope");
-  if (!env || document.getElementById("ribbonBow")) return;
-  env.insertAdjacentHTML("beforeend", `
-    <div class="ribbon-bow" id="ribbonBow">
-      <span class="bow-loop l"></span>
-      <span class="bow-loop r"></span>
-      <span class="bow-tail l"></span>
-      <span class="bow-tail r"></span>
-      <span class="bow-core"></span>
-    </div>`);
-  function untie() { env.classList.add("ribbon-off"); }
-  env.addEventListener("click", untie);
-  env.addEventListener("touchstart", untie, { passive: true });
-})();
 
 // ====== FAQ AKORDEON ======
 document.querySelectorAll(".faq-q").forEach(btn => {
