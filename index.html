@@ -132,147 +132,8 @@
     </div>
   </section>
 
-  <!-- SECTION 4: TAMAN DOA -->
-  <section class="taman-section bg-cream" data-anim="taman">
-    <div class="container">
-      <h2 class="section-title" data-anim="fade">Garden of Prayers</h2>
-      <div class="gold-underline-dark"></div>
-      <p class="sub" data-anim="fade">Every prayer blooms into a flower — tap one to read it</p>
-
-      <div class="css-garden" id="garden">
-        <div class="sky"></div>
-        <div class="sun"><div class="sun-core"></div><div class="sun-halo"></div></div>
-        <div class="cloud cloud1"></div>
-        <div class="cloud cloud2"></div>
-        <div class="cloud cloud3"></div>
-        <div class="bird bird1"><span></span></div>
-        <div class="bird bird2"><span></span></div>
-        <div class="fountain">
-          <div class="tier-3"></div>
-          <div class="tier-2"></div>
-          <div class="water-spout"></div>
-          <div class="water-pool"></div>
-          <div class="water-drop drop1"></div>
-          <div class="water-drop drop2"></div>
-          <div class="water-drop drop3"></div>
-        </div>
-        <div class="grass"></div>
-        <div id="flowerContainer" class="flower-container"></div>
-      </div>
-    </div>
-    <div class="curve-divider">
-      <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,0 C480,100 960,100 1440,0 L1440,100 L0,100 Z" fill="var(--bg-dark)"/></svg>
-    </div>
-  </section>
-
-  <!-- SECTION 5: MINI GAME & PHOTOBOOTH -->
-  <section class="interactive-section bg-dark" data-anim="interactive">
-    <div class="container">
-      
-      <!-- MINI GAME TOGGLE -->
-      <h2 class="section-title light" data-anim="fade">Mini Game</h2>
-      <div class="gold-underline-light"></div>
-      <p class="sub light-text" data-anim="fade">Help the prince carry his princess</p>
-      
-      <button type="button" id="gameToggle" class="btn-primary pb-toggle" style="margin-bottom: 60px;">Buka Mini Game</button>
-      <div id="gamePanel" class="pb-panel" hidden>
-        <iframe src="game/dino.html" class="game-frame" loading="lazy"></iframe>
-      </div>
-
-      <!-- VIRTUAL PHOTOBOOTH TOGGLE -->
-      <h2 class="section-title light" data-anim="fade">Virtual Photobooth</h2>
-      <div class="gold-underline-light"></div>
-      <p class="sub light-text" data-anim="fade">Abadikan momen dalam frame eksklusif</p>
-      
-      <button type="button" id="pbToggle" class="btn-primary pb-toggle">Buka Virtual Photobooth</button>
-      
-      <!-- PHOTOBOOTH MODAL (FULL SCREEN) -->
-      <div id="pbModal" class="pb-modal-full" hidden>
-        <div class="pb-modal-content-full">
-          <button class="pb-modal-close" id="pbClose">&times;</button>
-          
-          <div class="pb-header">
-            <h3 class="sub-title" style="margin-top:0;">Virtual Photobooth</h3>
-          </div>
-
-          <!-- STEP 1: PILIH JUMLAH -->
-          <div class="pb-step active" id="pbStep1">
-            <p class="pb-label">1. Pilih Jumlah Frame</p>
-            <div class="pb-count" id="pbCount">
-              <button type="button" data-n="1">1</button>
-              <button type="button" data-n="3">3</button>
-              <button type="button" data-n="4" class="on">4</button>
-              <button type="button" data-n="5">5</button>
-              <button type="button" data-n="6">6</button>
-            </div>
-            <button type="button" class="btn-primary pb-next-btn" onclick="pbNextStep(2)">Lanjut Pilih Gaya</button>
-          </div>
-
-          <!-- STEP 2: PILIH GAYA -->
-          <div class="pb-step" id="pbStep2">
-            <div class="pb-step-nav">
-              <button type="button" class="btn-back" onclick="pbNextStep(1)">&larr; Kembali</button>
-            </div>
-            <p class="pb-label">2. Pilih Gaya Frame <span class="pb-style-name" id="pbStyleName"></span></p>
-            <div class="pb-styles" id="pbStyles"></div>
-            
-            <!-- PREVIEW LIVE SETELAH PILIH GAYA -->
-            <div class="pb-live-preview">
-              <p class="pb-label" style="margin-top: 20px;">Preview Frame:</p>
-              <canvas id="pbPreviewCanvas" width="300" height="400"></canvas>
-            </div>
-            
-            <button type="button" class="btn-primary pb-next-btn" onclick="pbNextStep(3)">Lanjut Isi Foto</button>
-          </div>
-
-          <!-- STEP 3: ISI FOTO -->
-          <div class="pb-step" id="pbStep3">
-            <div class="pb-step-nav">
-              <button type="button" class="btn-back" onclick="pbNextStep(2)">&larr; Kembali</button>
-            </div>
-            <p class="pb-label">3. Isi Foto Kamu</p>
-            <div class="pb-mode" id="pbMode">
-              <button type="button" data-m="galeri" class="on">Dari Galeri</button>
-              <button type="button" data-m="kamera">Ambil Foto Langsung</button>
-            </div>
-            <div class="pb-slots" id="pbSlots"></div>
-            
-            <!-- PREVIEW LIVE SETELAH UPLOAD FOTO -->
-            <div class="pb-live-preview" id="pbStep3Preview" style="display:none;">
-              <p class="pb-label" style="margin-top: 20px;">Preview:</p>
-              <canvas id="pbPreviewCanvas2" width="300" height="400"></canvas>
-            </div>
-            
-            <button type="button" id="pbFillAll" class="btn-outline pb-fillall">Isi Semua dari Galeri</button>
-            <button type="button" class="btn-primary pb-next-btn" onclick="pbNextStep(4)">Lihat Hasil Akhir</button>
-          </div>
-
-          <!-- STEP 4: PREVIEW & DOWNLOAD -->
-          <div class="pb-step" id="pbStep4">
-            <div class="pb-step-nav">
-              <button type="button" class="btn-back" onclick="pbNextStep(3)">&larr; Kembali</button>
-            </div>
-            <p class="pb-label">4. Hasil Akhir</p>
-            <canvas id="photoCanvas" width="600" height="800"></canvas>
-            <div class="photo-actions" style="margin-top: 20px;">
-              <button id="downloadBtn" class="btn-primary" hidden>Download</button>
-              <button id="shareBtn" class="btn-outline" hidden>Share</button>
-            </div>
-          </div>
-
-          <input type="file" id="pbPick" accept="image/*" hidden>
-          <input type="file" id="pbPickMulti" accept="image/*" multiple hidden>
-        </div>
-      </div>
-
-    </div>
-    <div class="wave-divider">
-      <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,50 C320,100 420,0 720,50 C1020,100 1120,0 1440,50 L1440,100 L0,100 Z" fill="var(--bg-light)"/></svg>
-    </div>
-  </section>
-
-  <!-- SECTION 6: FAQ (DI PALING BAWAH) -->
-  <section class="faq-section bg-light" data-anim="faq">
+  <!-- SECTION 4: TANYA JAWAB -->
+  <section class="faq-section bg-cream" data-anim="faq">
     <div class="container">
       <h2 class="section-title" data-anim="fade">Tanya Jawab</h2>
       <div class="gold-underline-dark"></div>
@@ -318,11 +179,99 @@
     </div>
   </section>
 
+  <!-- SECTION 5: TAMAN DOA -->
+  <section class="taman-section bg-cream" data-anim="taman">
+    <div class="container">
+      <h2 class="section-title" data-anim="fade">Garden of Prayers</h2>
+      <div class="gold-underline-dark"></div>
+      <p class="sub" data-anim="fade">Every prayer blooms into a flower — tap one to read it</p>
+
+      <div class="css-garden" id="garden">
+        <div class="sky"></div>
+        <div class="sun"><div class="sun-core"></div><div class="sun-halo"></div></div>
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+        <div class="cloud cloud3"></div>
+        <div class="bird bird1"><span></span></div>
+        <div class="bird bird2"><span></span></div>
+        <div class="fountain">
+          <div class="tier-3"></div>
+          <div class="tier-2"></div>
+          <div class="water-spout"></div>
+          <div class="water-pool"></div>
+          <div class="water-drop drop1"></div>
+          <div class="water-drop drop2"></div>
+          <div class="water-drop drop3"></div>
+        </div>
+        <div class="grass"></div>
+        <div id="flowerContainer" class="flower-container"></div>
+      </div>
+
+      <button type="button" id="pbToggle" class="btn-primary pb-toggle">Buka Virtual Photobooth</button>
+      <div id="pbPanel" class="pb-panel" hidden>
+        <h3 class="sub-title" style="margin-top:36px;">Virtual Photobooth</h3>
+        <p class="sub">Pilih jumlah frame &amp; gaya, lalu isi tiap frame dengan fotomu</p>
+
+        <p class="pb-label" style="color:var(--text-muted);">Jumlah Frame</p>
+        <div class="pb-count" id="pbCount">
+          <button type="button" data-n="1">1</button>
+          <button type="button" data-n="3">3</button>
+          <button type="button" data-n="4" class="on">4</button>
+          <button type="button" data-n="5">5</button>
+          <button type="button" data-n="6">6</button>
+        </div>
+
+        <p class="pb-label" style="color:var(--text-muted);">Gaya Frame <span class="pb-style-name" id="pbStyleName"></span></p>
+        <div class="pb-styles" id="pbStyles"></div>
+
+        <p class="pb-label" style="color:var(--text-muted);">Foto Kamu</p>
+        <div class="pb-mode" id="pbMode">
+          <button type="button" data-m="galeri" class="on">Dari Galeri</button>
+          <button type="button" data-m="kamera">Ambil Foto Langsung</button>
+        </div>
+        <div class="pb-slots" id="pbSlots"></div>
+
+        <button type="button" id="pbFillAll" class="btn-outline pb-fillall">Isi Semua dari Galeri</button>
+
+        <input type="file" id="pbPick" accept="image/*" hidden>
+        <input type="file" id="pbPickMulti" accept="image/*" multiple hidden>
+
+        <canvas id="photoCanvas" width="600" height="800"></canvas>
+        <div class="photo-actions">
+          <button id="downloadBtn" class="btn-primary" hidden>Download</button>
+          <button id="shareBtn" class="btn-outline" hidden>Share</button>
+        </div>
+      </div>
+
+    </div>
+    <div class="curve-divider">
+      <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,0 C480,100 960,100 1440,0 L1440,100 L0,100 Z" fill="var(--bg-dark)"/></svg>
+    </div>
+  </section>
+
+  <!-- SECTION 5: MINI GAME & VIRTUAL PHOTOBOOTH -->
+  <section class="interactive-section bg-dark" data-anim="interactive">
+    <div class="container">
+      <h2 class="section-title light" data-anim="fade">Mini Game</h2>
+      <div class="gold-underline-light"></div>
+      <div class="interactive-grid">
+        <div class="interactive-item" data-anim="fade">
+          <h3 class="sub-title light">The Journey</h3>
+          <p class="sub light-text">Help the prince carry his princess</p>
+          <iframe src="game/dino.html" class="game-frame" loading="lazy"></iframe>
+        </div>
+      </div>
+    </div>
+    <div class="wave-divider">
+      <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,50 C320,100 420,0 720,50 C1020,100 1120,0 1440,50 L1440,100 L0,100 Z" fill="var(--bg-light)"/></svg>
+    </div>
+  </section>
+
   <!-- FOOTER -->
-  <footer class="bg-dark">
+  <footer class="bg-light">
       <svg class="divider" viewBox="0 0 200 20" xmlns="http://www.w3.org/2000/svg"><path d="M0,10 L80,10 M120,10 L200,10" stroke="currentColor" stroke-width="0.5"/><path d="M90,10 L95,5 L100,10 L105,15 Z" fill="currentColor"/></svg>
-      <p class="light">Irsyaad &amp; Refalina</p>
-      <small class="light-text">Made with love</small>
+      <p>Irsyaad &amp; Refalina</p>
+      <small>Made with love</small>
     </footer>
 
 </div>
