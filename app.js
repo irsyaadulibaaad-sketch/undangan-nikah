@@ -789,6 +789,24 @@ pbBuildStyles();
 pbBuildSlots();
 pbRender();
 
+// buka/tutup panel photobooth (hemat tempat, tetap di halaman yang sama)
+(function () {
+  const btn = document.getElementById("pbToggle");
+  const panel = document.getElementById("pbPanel");
+  if (!btn || !panel) return;
+  btn.addEventListener("click", () => {
+    panel.hidden = !panel.hidden;
+    btn.textContent = panel.hidden ? "Buka Virtual Photobooth" : "Tutup Virtual Photobooth";
+    if (!panel.hidden) {
+      if (window.gsap) {
+        gsap.fromTo(panel, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" });
+      }
+      pbRender();
+    }
+    if (window.ScrollTrigger) ScrollTrigger.refresh();
+  });
+})();
+
 // ---------- download & share ----------
 document.getElementById("downloadBtn").addEventListener("click", () => {
   const a = document.createElement("a");

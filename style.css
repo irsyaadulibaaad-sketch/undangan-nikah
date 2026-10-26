@@ -919,3 +919,7 @@ footer small { font-family: var(--font-sans); font-size: 0.66rem; text-transform
   background: var(--gold-dark); border-color: var(--gold-dark);
   color: #FFFDF6; box-shadow: var(--shadow-gold);
 }
+/* panel photobooth (dibuka via tombol) */
+.pb-toggle { margin-top: 38px; }
+.pb-panel { margin-top: 6px; }
+.pb-panel .sub-title { text-align: center; }
