@@ -951,10 +951,9 @@ footer small { font-family: var(--font-sans); font-size: 0.66rem; text-transform
 }
 .faq-a p b { color: var(--gold-dark); font-weight: 600; }
 .faq-item.open .faq-a { max-height: 320px; }
-/* [ ... KODE CSS ASLI 900 BARIS DARI PESAN SEBELUMNYA ... ] */
 
 /* ==========================================================================
-   TAMBAHAN: STYLING VIRTUAL PHOTOBOOTH MODAL
+   TAMBAHAN: STYLING VIRTUAL PHOTOBOOTH MODAL (FIX SCROLL)
    ========================================================================== */
 .pb-modal {
   position: fixed; inset: 0; z-index: 10000;
@@ -967,7 +966,9 @@ footer small { font-family: var(--font-sans); font-size: 0.66rem; text-transform
   backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
 }
 .pb-modal-content {
-  position: relative; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;
+  position: relative; width: 100%; max-width: 500px; 
+  max-height: 85vh; /* KUNCI AGAR BISA SCROLL */
+  overflow-y: auto; /* AKTIFKAN SCROLL */
   background: var(--bg-cream);
   border-radius: 8px;
   padding: 40px 30px;
@@ -978,6 +979,7 @@ footer small { font-family: var(--font-sans); font-size: 0.66rem; text-transform
   position: absolute; top: 15px; right: 15px;
   background: transparent; border: none; font-size: 28px; color: var(--gold-dark);
   cursor: pointer; line-height: 1; padding: 5px;
+  z-index: 10;
 }
 .pb-modal-close:hover { color: var(--text-main); }
 
