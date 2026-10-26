@@ -229,14 +229,16 @@ supabaseClient.channel("doa-rt")
 // - pilih jumlah frame: 1 / 3 / 4 / 5 / 6
 // - isi tiap frame: kamera atau galeri (per-slot / sekaligus)
 // - 10 gaya frame, tiap gaya elemennya berbeda
+// PERBAIKAN: foto selalu cover-fit ke frame; polaroid foto ikut miring
+// bersama kartu; kontras elemen & teks dinaikkan + scrim di belakang tulisan
 // ============================================================
 const photoCanvas = document.getElementById("photoCanvas");
 const pctx = photoCanvas.getContext("2d");
 
-const PB = { count: 4, style: "minimal", slots: [] }; // slots[i] = {img, url} | null
+const PB = { count: 4, style: "minimal", slots: [] };
 let pbPending = -1;
 
-// ---------- utilitas gambar ----------
+// ---------- utilitas ----------
 function roundedPath(c, x, y, w, h, r) {
   c.beginPath();
   c.moveTo(x + r, y);
@@ -247,7 +249,9 @@ function roundedPath(c, x, y, w, h, r) {
   c.closePath();
 }
 
+// cover-crop: foto SELALU memenuhi frame, pusat di tengah
 function drawCover(c, img, x, y, w, h, r) {
+  if (!img || !img.width) return;
   const s = Math.max(w / img.width, h / img.height);
   const dw = img.width * s, dh = img.height * s;
   c.save();
@@ -268,12 +272,35 @@ function pbFlower(c, x, y, size, petal, core) {
   c.restore();
 }
 
-// pseudo-acak deterministik (supaya confetti/dots stabil antar-render)
 function prand(seed) { const v = Math.sin(seed * 9301 + 49297) * 233280; return v - Math.floor(v); }
 
 function spacedText(c, text, x, y, sp) {
   let cx = x;
   for (const ch of text) { c.fillText(ch, cx, y); cx += c.measureText(ch).width + sp; }
+}
+
+// papan latar di belakang teks (scrim) supaya kontras & terfokus
+function scrim(c, x, y, w, h, r, color, alpha) {
+  c.save();
+  c.globalAlpha = alpha;
+  c.fillStyle = color;
+  roundedPath(c, x, y, w, h, r);
+  c.fill();
+  c.restore();
+}
+
+// teks dengan scrim otomatis mengukur lebar
+function textWithScrim(c, text, x, y, font, color, scolor, salpha, pad, sp) {
+  c.save();
+  c.font = font;
+  const w = (sp ? c.measureText(text.split("").join(" ")).width : c.measureText(text).width) + pad * 2;
+  const h = parseInt(font.match(/(\d+)px/)[1], 10) + pad * 1.6;
+  scrim(c, x - w / 2, y - h + pad * 0.6, w, h, h / 2, scolor, salpha);
+  c.fillStyle = color;
+  c.textAlign = "center";
+  if (sp) spacedText(c, text, x - (w - pad * 2) / 2, y, sp);
+  else c.fillText(text, x, y);
+  c.restore();
 }
 
 // ---------- layout ----------
@@ -306,7 +333,7 @@ function pbLayout(count) {
 }
 
 // ---------- 10 GAYA FRAME ----------
-const GOLD = ["#8a6a34", "#c9a45c", "#e8cf9a", "#c9a45c", "#8a6a34"];
+const GOLD = ["#7a5c26", "#c9a45c", "#efd9a4", "#c9a45c", "#7a5c26"];
 function goldGrad(c, x0, x1) {
   const g = c.createLinearGradient(x0, 0, x1, 0);
   GOLD.forEach((col, i) => g.addColorStop(i / (GOLD.length - 1), col));
@@ -318,77 +345,83 @@ const PB_STYLES = [
     id: "minimal", nama: "Minimal Gold", kat: "elegan", radius: 0,
     bg(c, W, H) { c.fillStyle = "#FFFFFF"; c.fillRect(0, 0, W, H); },
     cell(c, cl) {
-      c.strokeStyle = "rgba(158,122,62,0.75)"; c.lineWidth = 3;
+      c.strokeStyle = "rgba(122,94,48,0.9)"; c.lineWidth = 4;
       c.strokeRect(cl.x, cl.y, cl.w, cl.h);
-      c.strokeStyle = "rgba(158,122,62,0.3)"; c.lineWidth = 1;
-      c.strokeRect(cl.x + 10, cl.y + 10, cl.w - 20, cl.h - 20);
+      c.strokeStyle = "rgba(122,94,48,0.35)"; c.lineWidth = 1.5;
+      c.strokeRect(cl.x + 12, cl.y + 12, cl.w - 24, cl.h - 24);
     },
     fg(c, W, H) {
-      c.fillStyle = "#9E7A3E"; c.textAlign = "center";
-      c.font = '500 26px Montserrat, sans-serif';
-      spacedText(c, "I R S Y A A D U L   &   R E F A L I N A", W / 2, H - 14, 2);
+      textWithScrim(c, "IRSYAADUL & REFALINA", W / 2, H - 16,
+        '600 27px Montserrat, sans-serif', "#7A5E30", "#FFFFFF", 0.92, 18, 3);
     }
   },
   {
     id: "floral", nama: "Floral Rose", kat: "pernikahan", radius: 26,
-    bg(c, W, H) { c.fillStyle = "#FDF4F4"; c.fillRect(0, 0, W, H); },
+    bg(c, W, H) { c.fillStyle = "#FDF2F3"; c.fillRect(0, 0, W, H); },
     cell(c, cl) {
       roundedPath(c, cl.x - 14, cl.y - 14, cl.w + 28, cl.h + 28, 34);
-      c.strokeStyle = "#D98CA0"; c.lineWidth = 5; c.stroke();
+      c.strokeStyle = "#C05E78"; c.lineWidth = 6; c.stroke();
       roundedPath(c, cl.x - 4, cl.y - 4, cl.w + 8, cl.h + 8, 26);
-      c.strokeStyle = "rgba(217,140,160,0.45)"; c.lineWidth = 2; c.stroke();
-      pbFlower(c, cl.x + 4, cl.y + 6, 20, "#F4B8C9", "#E3B94E");
-      pbFlower(c, cl.x + cl.w - 4, cl.y + cl.h - 6, 20, "#E58BA6", "#FDE9EE");
+      c.strokeStyle = "rgba(192,94,120,0.55)"; c.lineWidth = 2.5; c.stroke();
+      pbFlower(c, cl.x + 6, cl.y + 8, 22, "#E58BA6", "#B8862E");
+      pbFlower(c, cl.x + cl.w - 6, cl.y + cl.h - 8, 22, "#D46A8A", "#F5D7E0");
+      pbFlower(c, cl.x + cl.w - 6, cl.y + 8, 16, "#F4B8C9", "#B8862E");
+      pbFlower(c, cl.x + 6, cl.y + cl.h - 8, 16, "#F4B8C9", "#B8862E");
     },
     fg(c, W, H) {
-      c.fillStyle = "#B56576"; c.textAlign = "center";
-      c.font = 'italic 600 40px "Cormorant Garamond", serif';
-      c.fillText("with love", W / 2, H - 20);
+      textWithScrim(c, "with love", W / 2, H - 18,
+        'italic 700 44px "Cormorant Garamond", serif', "#963C54", "#FFFDFB", 0.92, 26, 0);
     }
   },
   {
     id: "goldfoil", nama: "Luxury Gold Foil", kat: "pernikahan", radius: 0,
     bg(c, W, H) {
-      c.fillStyle = "#181510"; c.fillRect(0, 0, W, H);
-      const g = goldGrad(c, 0, W);
-      c.strokeStyle = g; c.lineWidth = 6; c.strokeRect(18, 18, W - 36, H - 36);
-      c.strokeStyle = "rgba(201,164,92,0.4)"; c.lineWidth = 1;
-      c.strokeRect(34, 34, W - 68, H - 68);
+      c.fillStyle = "#141109"; c.fillRect(0, 0, W, H);
+      c.strokeStyle = goldGrad(c, 0, W); c.lineWidth = 7;
+      c.strokeRect(18, 18, W - 36, H - 36);
+      c.strokeStyle = "rgba(201,164,92,0.5)"; c.lineWidth = 1.5;
+      c.strokeRect(36, 36, W - 72, H - 72);
     },
     cell(c, cl) {
-      const g = goldGrad(c, cl.x, cl.x + cl.w);
-      c.strokeStyle = g; c.lineWidth = 8; c.strokeRect(cl.x - 12, cl.y - 12, cl.w + 24, cl.h + 24);
+      c.strokeStyle = goldGrad(c, cl.x, cl.x + cl.w);
+      c.lineWidth = 10; c.strokeRect(cl.x - 14, cl.y - 14, cl.w + 28, cl.h + 28);
     },
     fg(c, W, H) {
-      c.textAlign = "center"; c.fillStyle = "#E8CF9A";
-      c.font = '300 30px Montserrat, sans-serif';
-      spacedText(c, "T H E   W E D D I N G   O F", W / 2, 66, 3);
-      c.font = 'italic 600 64px "Cormorant Garamond", serif';
-      c.fillText("Irsyaadul & Refalina", W / 2, 128);
-      c.fillStyle = "#C9A45C"; c.font = '300 26px Montserrat, sans-serif';
-      spacedText(c, "2 4 . 1 2 . 2 0 2 6", W / 2, H - 34, 4);
+      c.textAlign = "center";
+      textWithScrim(c, "THE WEDDING OF", W / 2, 64,
+        '400 30px Montserrat, sans-serif', "#F3DFAE", "#141109", 0.85, 16, 4);
+      textWithScrim(c, "Irsyaadul & Refalina", W / 2, 128,
+        'italic 700 62px "Cormorant Garamond", serif', "#F3DFAE", "#141109", 0.85, 20, 0);
+      textWithScrim(c, "24 . 12 . 2026", W / 2, H - 30,
+        '400 26px Montserrat, sans-serif', "#E3C078", "#141109", 0.85, 14, 4);
     }
   },
   {
-    id: "polaroid", nama: "Polaroid", kat: "kekinian", radius: 0, card: true,
-    bg(c, W, H) { c.fillStyle = "#EAE5DB"; c.fillRect(0, 0, W, H); },
-    cell(c, cl, i) {
-      const rot = (prand(i + 7) - 0.5) * 0.07;
-      const bw = 26, bb = 110;
+    id: "polaroid", nama: "Polaroid", kat: "kekinian", radius: 0, full: true,
+    bg(c, W, H) { c.fillStyle = "#E8E3D8"; c.fillRect(0, 0, W, H); },
+    full(c, cl, i, slot) {
+      const rot = (prand(i + 7) - 0.5) * 0.08;
+      const bw = 26, bb = 116;
       c.save();
       c.translate(cl.x + cl.w / 2, cl.y + cl.h / 2);
       c.rotate(rot);
-      c.fillStyle = "rgba(60,50,30,0.18)";
-      c.fillRect(-cl.w / 2 - bw + 8, -cl.h / 2 - bw + 12, cl.w + bw * 2, cl.h + bw + bb);
+      // bayangan kartu
+      c.fillStyle = "rgba(60,50,30,0.22)";
+      c.fillRect(-cl.w / 2 - bw + 10, -cl.h / 2 - bw + 14, cl.w + bw * 2, cl.h + bw + bb);
+      // kartu putih
       c.fillStyle = "#FFFFFF";
       c.fillRect(-cl.w / 2 - bw, -cl.h / 2 - bw, cl.w + bw * 2, cl.h + bw + bb);
-      c.restore();
-      c.save();
-      c.translate(cl.x + cl.w / 2, cl.y + cl.h / 2);
-      c.rotate(rot);
-      c.fillStyle = "#5B5648"; c.textAlign = "center";
-      c.font = 'italic 44px "Cormorant Garamond", serif';
-      c.fillText("24 . 12 . 2026", 0, cl.h / 2 + bb - 42);
+      // FOTO ikut miring bersama kartu (auto-fit cover)
+      if (slot) drawCover(c, slot.img, -cl.w / 2, -cl.h / 2, cl.w, cl.h, 0);
+      else {
+        c.fillStyle = "#EDE8DD";
+        c.fillRect(-cl.w / 2, -cl.h / 2, cl.w, cl.h);
+      }
+      // caption tulisan tangan
+      c.fillStyle = "#3F3B33";
+      c.textAlign = "center";
+      c.font = 'italic 700 46px "Cormorant Garamond", serif';
+      c.fillText("24 . 12 . 2026", 0, cl.h / 2 + bb - 44);
       c.restore();
     },
     fg() {}
@@ -396,134 +429,126 @@ const PB_STYLES = [
   {
     id: "film", nama: "Vintage Film", kat: "kekinian", radius: 0,
     bg(c, W, H) {
-      c.fillStyle = "#101010"; c.fillRect(0, 0, W, H);
-      // lubang film atas & bawah
-      for (const yy of [12, H - 42]) {
+      c.fillStyle = "#0D0D0D"; c.fillRect(0, 0, W, H);
+      for (const yy of [12, H - 44]) {
         for (let x = 26; x < W - 26; x += 64) {
           c.fillStyle = "#F2EDDF";
-          roundedPath(c, x, yy, 36, 26, 7); c.fill();
-          c.fillStyle = "#101010";
-          roundedPath(c, x + 6, yy + 6, 24, 14, 4); c.fill();
+          roundedPath(c, x, yy, 38, 28, 7); c.fill();
+          c.fillStyle = "#0D0D0D";
+          roundedPath(c, x + 7, yy + 7, 24, 14, 4); c.fill();
         }
       }
     },
     cell(c, cl) {
-      c.strokeStyle = "#2A2A2A"; c.lineWidth = 2; c.strokeRect(cl.x, cl.y, cl.w, cl.h);
-      c.fillStyle = "rgba(242,130,40,0.9)";
-      c.font = '24px "Courier New", monospace'; c.textAlign = "left";
-      c.fillText("24 12 '26", cl.x + 18, cl.y + cl.h - 18);
+      c.strokeStyle = "#333333"; c.lineWidth = 2; c.strokeRect(cl.x, cl.y, cl.w, cl.h);
+      scrim(c, cl.x + 10, cl.y + cl.h - 52, 190, 40, 6, "#000000", 0.55);
+      c.fillStyle = "#FFB066";
+      c.font = 'bold 26px "Courier New", monospace'; c.textAlign = "left";
+      c.fillText("24 12 '26", cl.x + 20, cl.y + cl.h - 24);
     },
     fg(c, W) {
-      c.fillStyle = "#8A857D"; c.textAlign = "center";
-      c.font = '18px "Courier New", monospace';
-      c.fillText("KODAK 400 — WEDDING DAY", W / 2, 66);
+      textWithScrim(c, "KODAK 400 — WEDDING DAY", W / 2, 68,
+        'bold 22px "Courier New", monospace', "#F2E7C4", "#0D0D0D", 0.85, 16, 0);
     }
   },
   {
     id: "magazine", nama: "Magazine Cover", kat: "kekinian", radius: 0,
     bg(c, W, H) { c.fillStyle = "#FDFCF9"; c.fillRect(0, 0, W, H); },
     cell(c, cl) {
-      c.strokeStyle = "#1E1C19"; c.lineWidth = 3; c.strokeRect(cl.x, cl.y, cl.w, cl.h);
+      c.strokeStyle = "#1E1C19"; c.lineWidth = 4; c.strokeRect(cl.x, cl.y, cl.w, cl.h);
     },
     fg(c, W, H) {
-      c.textAlign = "left"; c.fillStyle = "#1E1C19";
-      c.font = '700 92px "Cormorant Garamond", serif';
-      c.fillText("IR & FA", 44, 108);
-      c.font = '500 24px Montserrat, sans-serif'; c.fillStyle = "#9E7A3E";
-      c.fillText("WEDDING  EDITION — VOL. 01", 46, 144);
-      // barcode
+      c.textAlign = "left"; c.fillStyle = "#16140F";
+      c.font = '700 96px "Cormorant Garamond", serif';
+      c.fillText("IR & FA", 42, 110);
+      c.font = '600 25px Montserrat, sans-serif'; c.fillStyle = "#7A5E30";
+      c.fillText("WEDDING  EDITION — VOL. 01", 46, 148);
       let bx = 44;
-      c.fillStyle = "#1E1C19";
+      c.fillStyle = "#16140F";
       while (bx < 250) {
         const w = 2 + prand(bx) * 7;
-        c.fillRect(bx, H - 52, w, 34); bx += w + 2 + prand(bx + 1) * 5;
+        c.fillRect(bx, H - 54, w, 36); bx += w + 2 + prand(bx + 1) * 5;
       }
-      c.font = '300 20px Montserrat, sans-serif';
-      c.fillText("24.12.2026", 260, H - 26);
+      c.font = '500 22px Montserrat, sans-serif';
+      c.fillText("24.12.2026", 264, H - 26);
     }
   },
   {
     id: "arch", nama: "Wedding Arch", kat: "pernikahan", radius: 20,
-    bg(c, W, H) { c.fillStyle = "#FBF7EE"; c.fillRect(0, 0, W, H); },
+    bg(c, W, H) { c.fillStyle = "#FBF7EC"; c.fillRect(0, 0, W, H); },
     cell(c, cl) {
-      c.strokeStyle = "rgba(158,122,62,0.6)"; c.lineWidth = 2;
+      c.strokeStyle = "rgba(122,94,48,0.75)"; c.lineWidth = 3;
       roundedPath(c, cl.x, cl.y, cl.w, cl.h, 20); c.stroke();
     },
     fg(c, W) {
-      const cx = W / 2, top = 58;
-      // lengkung pelaminan
-      c.strokeStyle = "#C9A45C"; c.lineWidth = 5;
+      const cx = W / 2, top = 56;
+      c.strokeStyle = "#B08D4F"; c.lineWidth = 6;
       c.beginPath(); c.arc(cx, top + 120, 96, Math.PI, 0); c.stroke();
-      c.strokeStyle = "rgba(201,164,92,0.4)"; c.lineWidth = 2;
-      c.beginPath(); c.arc(cx, top + 120, 108, Math.PI, 0); c.stroke();
-      // dua cincin
-      c.lineWidth = 4;
-      c.beginPath(); c.arc(cx - 18, top + 128, 16, 0, Math.PI * 2); c.stroke();
-      c.beginPath(); c.arc(cx + 18, top + 128, 16, 0, Math.PI * 2); c.stroke();
-      // bunga di ujung lengkung
-      pbFlower(c, cx - 96, top + 118, 14, "#F4B8C9", "#E3B94E");
-      pbFlower(c, cx + 96, top + 118, 14, "#E58BA6", "#FDE9EE");
-      c.fillStyle = "#9E7A3E"; c.textAlign = "center";
-      c.font = 'italic 600 42px "Cormorant Garamond", serif';
-      c.fillText("Happily Ever After", cx, top + 190);
+      c.strokeStyle = "rgba(176,141,79,0.45)"; c.lineWidth = 2.5;
+      c.beginPath(); c.arc(cx, top + 120, 110, Math.PI, 0); c.stroke();
+      c.lineWidth = 5; c.strokeStyle = "#8A6A34";
+      c.beginPath(); c.arc(cx - 19, top + 128, 17, 0, Math.PI * 2); c.stroke();
+      c.beginPath(); c.arc(cx + 19, top + 128, 17, 0, Math.PI * 2); c.stroke();
+      pbFlower(c, cx - 96, top + 118, 16, "#E58BA6", "#B8862E");
+      pbFlower(c, cx + 96, top + 118, 16, "#D46A8A", "#F5D7E0");
+      pbFlower(c, cx, top + 24, 14, "#F4B8C9", "#B8862E");
+      textWithScrim(c, "Happily Ever After", cx, top + 196,
+        'italic 700 46px "Cormorant Garamond", serif', "#7A5320", "#FBF7EC", 0.9, 22, 0);
     }
   },
   {
     id: "korean", nama: "Korean Studio", kat: "kekinian", radius: 30,
     bg(c, W, H) {
-      c.fillStyle = "#F6F1E8"; c.fillRect(0, 0, W, H);
-      c.fillStyle = "rgba(158,122,62,0.25)";
+      c.fillStyle = "#F6F1E6"; c.fillRect(0, 0, W, H);
+      c.fillStyle = "rgba(122,94,48,0.16)";
       for (let i = 0; i < 70; i++) {
         c.beginPath();
-        c.arc(prand(i) * W, prand(i + 99) * H, 3, 0, Math.PI * 2);
+        c.arc(prand(i) * W, prand(i + 99) * H, 3.5, 0, Math.PI * 2);
         c.fill();
       }
     },
     cell(c, cl, i) {
-      c.strokeStyle = "#FFFFFF"; c.lineWidth = 10;
-      roundedPath(c, cl.x - 6, cl.y - 6, cl.w + 12, cl.h + 12, 34); c.stroke();
-      // stempel kecil
-      c.strokeStyle = "#B56576"; c.lineWidth = 3;
-      c.beginPath(); c.arc(cl.x + 56, cl.y + 56, 30, 0, Math.PI * 2); c.stroke();
-      c.fillStyle = "#B56576"; c.textAlign = "center";
-      c.font = '700 22px Montserrat, sans-serif';
-      c.fillText(i % 2 ? "REC" : "♡", cl.x + 56, cl.y + 64);
+      c.strokeStyle = "#FFFFFF"; c.lineWidth = 12;
+      roundedPath(c, cl.x - 7, cl.y - 7, cl.w + 14, cl.h + 14, 34); c.stroke();
+      c.strokeStyle = "#A34D63"; c.lineWidth = 4;
+      c.beginPath(); c.arc(cl.x + 58, cl.y + 58, 32, 0, Math.PI * 2); c.stroke();
+      c.fillStyle = "#A34D63"; c.textAlign = "center";
+      c.font = '700 24px Montserrat, sans-serif';
+      c.fillText(i % 2 ? "REC" : "♡", cl.x + 58, cl.y + 67);
     },
     fg(c, W, H) {
-      c.fillStyle = "#7A756C"; c.textAlign = "center";
-      c.font = '300 30px Montserrat, sans-serif';
-      c.fillText("our best days", W / 2, H - 22);
+      textWithScrim(c, "our best days", W / 2, H - 22,
+        '400 32px Montserrat, sans-serif', "#5B5148", "#F6F1E6", 0.92, 24, 0);
     }
   },
   {
     id: "neon", nama: "Neon Party", kat: "gaya-gayaan", radius: 14,
     bg(c, W, H) {
-      c.fillStyle = "#14101E"; c.fillRect(0, 0, W, H);
-      // confetti
+      c.fillStyle = "#100C1C"; c.fillRect(0, 0, W, H);
       const cols = ["#FF6EC7", "#4EF0E0", "#FFD166", "#9D7BFF"];
-      for (let i = 0; i < 90; i++) {
+      for (let i = 0; i < 100; i++) {
         c.fillStyle = cols[i % 4];
-        c.globalAlpha = 0.5 + prand(i) * 0.5;
+        c.globalAlpha = 0.55 + prand(i) * 0.45;
         c.beginPath();
-        c.arc(prand(i * 3) * W, prand(i * 7) * H, 3 + prand(i) * 4, 0, Math.PI * 2);
+        c.arc(prand(i * 3) * W, prand(i * 7) * H, 3 + prand(i) * 4.5, 0, Math.PI * 2);
         c.fill();
       }
       c.globalAlpha = 1;
     },
     cell(c, cl, i) {
       c.strokeStyle = i % 2 ? "#FF6EC7" : "#4EF0E0";
-      c.lineWidth = 6; c.shadowColor = c.strokeStyle; c.shadowBlur = 24;
-      roundedPath(c, cl.x - 8, cl.y - 8, cl.w + 16, cl.h + 16, 18); c.stroke();
+      c.lineWidth = 7; c.shadowColor = c.strokeStyle; c.shadowBlur = 26;
+      roundedPath(c, cl.x - 9, cl.y - 9, cl.w + 18, cl.h + 18, 18); c.stroke();
       c.shadowBlur = 0;
     },
     fg(c, W, H) {
       c.textAlign = "center";
-      c.shadowColor = "#FF6EC7"; c.shadowBlur = 30;
-      c.fillStyle = "#FFD6EE"; c.font = '700 64px Montserrat, sans-serif';
-      c.fillText("PARTY MODE", W / 2, 92);
+      c.shadowColor = "#FF6EC7"; c.shadowBlur = 34;
+      c.fillStyle = "#FFE3F2"; c.font = '800 66px Montserrat, sans-serif';
+      c.fillText("PARTY MODE", W / 2, 94);
       c.shadowColor = "#4EF0E0";
-      c.fillStyle = "#D8FFFB"; c.font = '300 34px Montserrat, sans-serif';
-      c.fillText("ON : 24.12.26", W / 2, H - 40);
+      c.fillStyle = "#DAFFFB"; c.font = '400 36px Montserrat, sans-serif';
+      c.fillText("ON : 24.12.26", W / 2, H - 38);
       c.shadowBlur = 0;
     }
   },
@@ -531,37 +556,35 @@ const PB_STYLES = [
     id: "retro", nama: "Retro 90s", kat: "gaya-gayaan", radius: 0,
     bg(c, W, H) {
       const g = c.createLinearGradient(0, 0, W, H);
-      g.addColorStop(0, "#F7C6D3"); g.addColorStop(0.5, "#F9D9B8"); g.addColorStop(1, "#C6E5D8");
+      g.addColorStop(0, "#F5BFCF"); g.addColorStop(0.5, "#F9D9B4"); g.addColorStop(1, "#BFE3D2");
       c.fillStyle = g; c.fillRect(0, 0, W, H);
-      // bunga & bintang funky
       for (let i = 0; i < 8; i++) {
         const x = prand(i * 11) * W, y = prand(i * 17) * H;
-        c.fillStyle = ["#E58BA6", "#E3B94E", "#7FBFA3"][i % 3];
+        c.fillStyle = ["#D46584", "#D9A62E", "#5FA383"][i % 3];
         for (let p = 0; p < 5; p++) {
           c.beginPath();
-          c.ellipse(x + 18 * Math.cos(p * 1.256), y + 18 * Math.sin(p * 1.256), 10, 10, 0, 0, Math.PI * 2);
+          c.ellipse(x + 20 * Math.cos(p * 1.256), y + 20 * Math.sin(p * 1.256), 11, 11, 0, 0, Math.PI * 2);
           c.fill();
         }
         c.fillStyle = "#FFFDF8";
-        c.beginPath(); c.arc(x, y, 8, 0, Math.PI * 2); c.fill();
+        c.beginPath(); c.arc(x, y, 9, 0, Math.PI * 2); c.fill();
       }
     },
     cell(c, cl) {
-      c.fillStyle = "rgba(255,253,248,0.9)";
+      c.fillStyle = "rgba(255,253,248,0.95)";
       c.fillRect(cl.x - 12, cl.y - 12, cl.w + 24, cl.h + 24);
-      c.strokeStyle = "#E58BA6"; c.lineWidth = 4; c.strokeRect(cl.x - 12, cl.y - 12, cl.w + 24, cl.h + 24);
+      c.strokeStyle = "#C05E78"; c.lineWidth = 5; c.strokeRect(cl.x - 12, cl.y - 12, cl.w + 24, cl.h + 24);
     },
     fg(c, W, H) {
-      c.textAlign = "center"; c.fillStyle = "#B56576";
-      c.font = '700 60px "Courier New", monospace';
-      c.fillText("X O   X O", W / 2, 84);
-      c.font = 'italic 40px "Courier New", monospace';
-      c.fillText("~ so in love ~", W / 2, H - 30);
+      textWithScrim(c, "X O   X O", W / 2, 86,
+        '700 62px "Courier New", monospace', "#8E3E54", "#FFF6EC", 0.92, 24, 0);
+      textWithScrim(c, "~ so in love ~", W / 2, H - 26,
+        'italic 700 40px "Courier New", monospace', "#8E3E54", "#FFF6EC", 0.92, 20, 0);
     }
   }
 ];
 
-// ---------- render utama ----------
+// ---------- render ----------
 function pbRender() {
   const st = PB_STYLES.find(s => s.id === PB.style);
   const L = pbLayout(PB.count);
@@ -570,13 +593,19 @@ function pbRender() {
 
   st.bg(pctx, L.W, L.H);
   L.cells.forEach((cl, i) => {
-    if (st.card) {
-      // polaroid: kartu dulu, lalu foto, lalu tulisan
-      st.cell(pctx, cl, i);
-      if (PB.slots[i]) drawCover(pctx, PB.slots[i].img, cl.x, cl.y, cl.w, cl.h, 0);
+    if (st.full) {
+      st.full(pctx, cl, i, PB.slots[i]);
     } else {
       st.cell(pctx, cl, i);
       if (PB.slots[i]) drawCover(pctx, PB.slots[i].img, cl.x, cl.y, cl.w, cl.h, st.radius || 0);
+      else {
+        pctx.fillStyle = "rgba(122,94,48,0.06)";
+        pctx.fillRect(cl.x, cl.y, cl.w, cl.h);
+        pctx.fillStyle = "rgba(122,94,48,0.35)";
+        pctx.font = '200 120px Montserrat, sans-serif';
+        pctx.textAlign = "center";
+        pctx.fillText("+", cl.x + cl.w / 2, cl.y + cl.h / 2 + 42);
+      }
     }
   });
   st.fg(pctx, L.W, L.H);
@@ -586,7 +615,6 @@ function pbRender() {
   document.getElementById("shareBtn").hidden = !ada;
 }
 
-// pratinjau kecil tiap gaya
 function pbRenderPreview(st, mini, mw, mh) {
   const L = pbLayout(1);
   const scale = Math.min(mw / L.W, mh / L.H);
@@ -595,12 +623,15 @@ function pbRenderPreview(st, mini, mw, mh) {
   c.scale(scale, scale);
   st.bg(c, L.W, L.H);
   const cl = L.cells[0];
-  st.cell(c, cl, 0);
-  c.fillStyle = "#E8E2D5";
-  c.fillRect(cl.x, cl.y, cl.w, cl.h);
-  c.fillStyle = "rgba(120,100,60,0.5)";
-  c.font = '200 120px Montserrat, sans-serif'; c.textAlign = "center";
-  c.fillText("+", cl.x + cl.w / 2, cl.y + cl.h / 2 + 40);
+  if (st.full) st.full(c, cl, 0, null);
+  else {
+    st.cell(c, cl, 0);
+    c.fillStyle = "#E4DECF";
+    c.fillRect(cl.x, cl.y, cl.w, cl.h);
+    c.fillStyle = "rgba(122,94,48,0.4)";
+    c.font = '200 120px Montserrat, sans-serif'; c.textAlign = "center";
+    c.fillText("+", cl.x + cl.w / 2, cl.y + cl.h / 2 + 40);
+  }
   st.fg(c, L.W, L.H);
 }
 
@@ -677,7 +708,6 @@ function pbLoadFile(file, index) {
       PB.slots[index] = { img, url: ev.target.result };
       pbBuildSlots();
       pbRender();
-      // lanjut otomatis ke slot kosong berikutnya
       const next = PB.slots.findIndex((s, i) => i > index && !s);
       const firstEmpty = PB.slots.findIndex(s => !s);
       const lanjut = next !== -1 ? next : firstEmpty;
@@ -721,7 +751,6 @@ document.getElementById("pbPickMulti").addEventListener("change", (e) => {
   }
 });
 
-// init
 while (PB.slots.length < PB.count) PB.slots.push(null);
 pbBuildStyles();
 pbBuildSlots();
