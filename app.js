@@ -450,14 +450,15 @@ const PB_STYLES = [
     id: "magazine", nama: "Magazine Cover", kat: "kekinian", radius: 0, padT: 180, padB: 100,
     bg(c, W, H) { c.fillStyle = "#FDFCF9"; c.fillRect(0, 0, W, H); },
     cell(c, cl) {
-      c.strokeStyle = "#1E1C19"; c.lineWidth = 4; c.strokeRect(cl.x, cl.y, cl.w, cl.h);
+      c.strokeStyle = "rgba(30,28,25,0.22)"; c.lineWidth = 2;
+      c.strokeRect(cl.x, cl.y, cl.w, cl.h);
     },
     fg(c, W, H, hy, fy) {
       c.textAlign = "left"; c.fillStyle = "#16140F";
-      c.font = '700 84px "Cormorant Garamond", serif';
-      c.fillText("IR & FA", 48, hy + 8);
-      c.font = '600 24px Montserrat, sans-serif'; c.fillStyle = "#7A5E30";
-      c.fillText("WEDDING  EDITION — VOL. 01", 50, hy + 48);
+      c.font = '700 56px "Cormorant Garamond", serif';
+      c.fillText("Irsyaadul & Refalina", 48, hy + 4);
+      c.font = '600 22px Montserrat, sans-serif'; c.fillStyle = "#7A5E30";
+      c.fillText("THE WEDDING EDITION — VOL. 01", 50, hy + 44);
       let bx = 48;
       c.fillStyle = "#16140F";
       while (bx < 240) {
