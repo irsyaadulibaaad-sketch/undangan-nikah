@@ -51,6 +51,14 @@
     background-color: #d9534f; color: #fff; transition: 0.2s;
   }
   .btn-bulk:hover { opacity: 0.85; transform: translateY(-1px); }
+
+  /* ===== LIGHTBOX ===== */
+  .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 99999; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+  .lightbox.active { display: flex; }
+  .lightbox-img { max-width: 100%; max-height: 80vh; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  .lightbox-close { position: absolute; top: 20px; right: 20px; color: #fff; font-size: 30px; cursor: pointer; background: none; border: none; }
+  .admin-gal-img { cursor: pointer; transition: opacity 0.2s; }
+  .admin-gal-img:hover { opacity: 0.8; }
 </style>
 </head>
 <body>
@@ -113,7 +121,7 @@
   <!-- DOORPRIZE GALLERY ADMIN -->
   <div style="margin-bottom: 50px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee;">
     <h3 class="admin-title" style="font-size: 1.5rem; margin-bottom: 15px;">Doorprize Winners</h3>
-    <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Pilih 1 pemenang untuk masing-masing kategori.</p>
+    <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Klik foto untuk melihat ukuran penuh. Pilih 1 pemenang untuk masing-masing kategori.</p>
     
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
       <!-- Kategori 1 -->
@@ -181,6 +189,12 @@
       </table>
     </div>
   </div>
+</div>
+
+<!-- LIGHTBOX MODAL UNTUK ADMIN -->
+<div class="lightbox" id="adminLightbox">
+  <button class="lightbox-close" onclick="closeAdminLightbox()">&times;</button>
+  <img src="" alt="Full Screen" class="lightbox-img" id="adminLightboxImg">
 </div>
 
 <script src="supabase.js"></script>
@@ -344,6 +358,16 @@
     else loadAdminData();
   }
 
+  // ===== FUNGSI LIGHTBOX ADMIN =====
+  window.openAdminLightbox = function(url) {
+    document.getElementById("adminLightboxImg").src = url;
+    document.getElementById("adminLightbox").classList.add("active");
+  }
+
+  window.closeAdminLightbox = function() {
+    document.getElementById("adminLightbox").classList.remove("active");
+  }
+
   // ===== FUNGSI ADMIN DOORPRIZE =====
   async function loadAdminGallery() {
     const { data, error } = await supabaseClient.from("gallery").select("*");
@@ -365,7 +389,7 @@
       div.style.display = "flex"; div.style.alignItems = "center"; div.style.gap = "10px"; div.style.background = "var(--bg-cream)"; div.style.padding = "8px"; div.style.borderRadius = "6px"; div.style.border = item.is_winner ? "2px solid #FFD700" : "1px solid #ddd";
       
       div.innerHTML = `
-        <img src="${item.image_url}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+        <img src="${item.image_url}" class="admin-gal-img" onclick="openAdminLightbox('${item.image_url}')" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
         <div style="flex: 1;">
           <div style="font-size: 12px; font-weight: 600;">${item.nama}</div>
           ${item.is_winner 
