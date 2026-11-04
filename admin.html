@@ -368,7 +368,11 @@
         <img src="${item.image_url}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
         <div style="flex: 1;">
           <div style="font-size: 12px; font-weight: 600;">${item.nama}</div>
-          ${item.is_winner ? '<div style="font-size: 10px; color: #B8860B; font-weight:700;">🏆 PEMENANG</div>' : `<button class="btn-sm btn-save" onclick="setWinner('${item.id}', '${item.kategori}')">Pilih Pemenang</button>`}
+          ${item.is_winner 
+            ? `<div style="font-size: 10px; color: #B8860B; font-weight:700; margin-bottom:5px;">🏆 PEMENANG</div>
+               <button class="btn-sm btn-del" onclick="cancelWinner('${item.id}')">Batal Pemenang</button>` 
+            : `<button class="btn-sm btn-save" onclick="setWinner('${item.id}', '${item.kategori}')">Pilih Pemenang</button>`
+          }
         </div>
       `;
       el.appendChild(div);
@@ -385,6 +389,12 @@
     await supabaseClient.from("gallery").update({ is_winner: false }).eq("kategori", kategori);
     await supabaseClient.from("gallery").update({ is_winner: true }).eq("id", id);
     
+    loadAdminGallery();
+  }
+
+  async function cancelWinner(id) {
+    if (!confirm("Batalkan status pemenang untuk foto ini?")) return;
+    await supabaseClient.from("gallery").update({ is_winner: false }).eq("id", id);
     loadAdminGallery();
   }
 </script>
