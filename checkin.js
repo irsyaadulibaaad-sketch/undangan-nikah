@@ -9,23 +9,20 @@ form.addEventListener("submit", async (e) => {
   
   msg.textContent = "Memproses...";
 
-  // 1. Cek Sisa Kuota sebelum mendaftar
-  const { data: kuotaData } = await supabaseClient.from("total_pax").select("terpakai").single();
-  const sisa = 150 - (kuotaData?.terpakai || 0);
+  // 1. Cek Sisa Kuota KHUSUS Registrasi Lapangan (Maksimal 150)
+  const { data: hadirData } = await supabaseClient.from("checkin").select("jumlah_pax");
+  const totalHadirAktual = hadirData ? hadirData.reduce((sum, item) => sum + item.jumlah_pax, 0) : 0;
+  const sisaKuotaCheckin = 150 - totalHadirAktual;
 
-  if (pax > sisa) {
-    msg.textContent = `Maaf, sisa kuota kursi hanya ${sisa} pax.`;
+  if (pax > sisaKuotaCheckin) {
+    msg.textContent = `Maaf, sisa kuota registrasi lapangan hanya ${sisaKuotaCheckin} pax.`;
     return;
   }
 
-  // 2. Masukkan data kehadiran AKTUAL ke database RSVP
-  // Kita isi hadir=true dan checked_in=true agar masuk hitungan
-  const { error: insertError } = await supabaseClient.from("rsvp").insert({
+  // 2. Masukkan data ke tabel CHECKIN (bukan RSVP lagi)
+  const { error: insertError } = await supabaseClient.from("checkin").insert({
     nama: nama,
-    hadir: true,
-    jumlah_pax: pax,
-    kategori: "registrasi_lokasi", // Penanda kalau ini tamu aktual
-    checked_in: true
+    jumlah_pax: pax
   });
 
   if (insertError) {
@@ -43,10 +40,9 @@ form.addEventListener("submit", async (e) => {
     });
   }
 
-  msg.style.color = "#8A9A7B"; // Warna hijau sukses
+  msg.style.color = "#8A9A7B";
   msg.innerHTML = `🎉 Berhasil! <b>${nama}</b> (${pax} pax) telah terdaftar.`;
   form.reset();
   
-  // Arahkan ke undangan setelah 2 detik
   setTimeout(() => location.href = "index.html#taman", 2000);
 });

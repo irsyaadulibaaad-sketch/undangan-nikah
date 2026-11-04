@@ -16,7 +16,7 @@
   .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
   .admin-title { font-family: var(--font-serif); font-size: 2.2rem; color: var(--gold-dark); font-weight: 400; }
 
-  table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border-radius: 8px; overflow: hidden; }
+  table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border-radius: 8px; overflow: hidden; margin-bottom: 30px;}
   th, td { border-bottom: 1px solid #eee; padding: 15px; text-align: left; }
   th { background-color: var(--bg-dark); color: var(--text-light); font-weight: 400; letter-spacing: 1px; }
 
@@ -26,7 +26,6 @@
   .bg-blue { background-color: #5bc0de; }
 
   .btn-sm { padding: 8px 15px; font-size: 11px; border-radius: 4px; cursor: pointer; border: none; margin-right: 5px; font-family: var(--font-sans); transition: 0.2s; text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
-  .btn-edit { background-color: var(--gold-mid); color: white; }
   .btn-del { background-color: #d9534f; color: white; }
   .btn-save { background-color: #8A9A7B; color: white; }
   .btn-sm:hover { opacity: 0.8; transform: translateY(-1px); }
@@ -83,7 +82,7 @@
 <!-- DASHBOARD -->
 <div id="adminSection" class="admin-container hidden">
   <div class="admin-header">
-    <h2 class="admin-title">Guest List</h2>
+    <h2 class="admin-title">Dashboard</h2>
     <button onclick="logout()" class="btn-outline" style="width: auto; margin: 0; padding: 10px 25px; color: var(--gold-dark); border-color: var(--gold-dark);">Logout</button>
   </div>
 
@@ -99,12 +98,11 @@
     </label>
   </div>
 
-  <!-- QR CHECK-IN (untuk diprint) -->
+  <!-- QR CHECK-IN -->
   <div id="qrPrint" style="margin-bottom: 25px; background: #fff; padding: 30px 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee; text-align:center;">
     <strong style="display:block; margin-bottom:20px; font-family: var(--font-serif); font-size: 1.4rem; color: var(--gold-dark);">Check-in QR — Irsyaad &amp; Refalina</strong>
     <img id="adminQr" alt="QR Check-in" style="width:260px; height:260px; margin:0 auto 15px; display:block; border:6px solid var(--bg-cream); border-radius:8px;">
-    <p style="font-size:0.75rem; color:#888; margin-bottom:6px; font-weight:300;">Pindai QR ini di pintu masuk untuk check-in tamu</p>
-    <p style="font-size:0.7rem; color:#aaa; margin-bottom:20px; word-break:break-all;" id="adminQrUrl"></p>
+    <p style="font-size:0.75rem; color:#888; margin-bottom:6px; font-weight:300;">Pindai QR ini di pintu masuk untuk registrasi tamu</p>
     <button onclick="window.print()" class="btn-primary" style="width:auto; margin:0; padding:14px 40px;">Print QR</button>
   </div>
   <style>
@@ -119,7 +117,6 @@
       const checkinUrl = location.origin + location.pathname.replace("admin.html", "") + "checkin.html";
       document.getElementById("adminQr").src =
         "https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=" + encodeURIComponent(checkinUrl);
-      document.getElementById("adminQrUrl").textContent = checkinUrl;
     })();
   </script>
 
@@ -131,58 +128,81 @@
       <option value="midnight">Midnight Sage (Dark Mode)</option>
       <option value="rose">Dusty Rose (Light Mode)</option>
     </select>
-    <p style="font-size:0.75rem; color:#888; margin-top:10px; font-weight:300;">Note: Guests need to refresh the invitation page to see theme changes.</p>
   </div>
 
-  <div style="margin-bottom: 25px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee;">
-    <strong style="font-family: var(--font-serif); font-size: 1.2rem; color: var(--gold-dark);">Remaining Seats: <span id="adminSisaKuota" style="font-size: 1.5rem;">--</span> / 150</strong>
+  <!-- STATUS KUOTA -->
+  <div style="display: flex; gap: 15px; margin-bottom: 30px;">
+    <div style="flex: 1; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee;">
+      <strong style="display:block; font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Sisa Kuota RSVP</strong>
+      <span style="font-family: var(--font-serif); font-size: 2rem; color: var(--gold-dark);"><span id="adminSisaKuotaRsvp">--</span> <span style="font-size: 1rem; color: #ccc;">/ 150</span></span>
+    </div>
+    <div style="flex: 1; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee;">
+      <strong style="display:block; font-size: 0.8rem; color: #888; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px;">Sisa Kuota Check-in</strong>
+      <span style="font-family: var(--font-serif); font-size: 2rem; color: #8A9A7B;"><span id="adminSisaKuotaCheckin">--</span> <span style="font-size: 1rem; color: #ccc;">/ 150</span></span>
+    </div>
   </div>
 
   <!-- DOORPRIZE GALLERY ADMIN -->
   <div style="margin-bottom: 50px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee;">
     <h3 class="admin-title" style="font-size: 1.5rem; margin-bottom: 15px;">Doorprize Winners</h3>
-    <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Klik foto untuk melihat ukuran penuh. Pilih 1 pemenang untuk masing-masing kategori.</p>
-    
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-      <div>
-        <h4 style="font-family: var(--font-sans); font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase;">Foto Bersama Pengantin</h4>
-        <div id="adminGal1" style="display: flex; flex-direction: column; gap: 10px;"></div>
-      </div>
-      <div>
-        <h4 style="font-family: var(--font-sans); font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase;">Momen Seru Tamu</h4>
-        <div id="adminGal2" style="display: flex; flex-direction: column; gap: 10px;"></div>
-      </div>
-      <div>
-        <h4 style="font-family: var(--font-sans); font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase;">Foto Pengantin</h4>
-        <div id="adminGal3" style="display: flex; flex-direction: column; gap: 10px;"></div>
-      </div>
+      <div><h4 style="font-family: var(--font-sans); font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase;">Bersama Pengantin</h4><div id="adminGal1"></div></div>
+      <div><h4 style="font-family: var(--font-sans); font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase;">Momen Seru</h4><div id="adminGal2"></div></div>
+      <div><h4 style="font-family: var(--font-sans); font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase;">Foto Pengantin</h4><div id="adminGal3"></div></div>
     </div>
   </div>
 
-  <!-- RSVP -->
-  <div class="bulk-bar" id="bulkBarRsvp" style="display:none;">
-    <span><b id="countRsvp">0</b> selected</span>
-    <button class="btn-bulk" onclick="deleteSelected('rsvp')">Delete Selected</button>
-  </div>
-  <div style="overflow-x: auto; background: #fff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee;">
-    <table>
-      <thead>
-        <tr>
-          <th style="width:36px; text-align:center;"><input type="checkbox" class="chk" id="chkAllRsvp" onchange="toggleAll('rsvp', this.checked)"></th>
-          <th>Name</th>
-          <th>Status</th>
-          <th>Pax</th>
-          <th>Category</th>
-          <th>Check-in?</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="tamuTbody">
-        <tr><td colspan="7" style="text-align:center;">Loading data...</td></tr>
-      </tbody>
-    </table>
+  <!-- TABEL REGISTRASI LAPANGAN (BARU) -->
+  <div style="margin-top: 50px;">
+    <h3 class="admin-title" style="font-size: 1.5rem; margin-bottom: 15px;">Registrasi Lapangan (Aktual)</h3>
+    <div class="bulk-bar" id="bulkBarCheckin" style="display:none;">
+      <span><b id="countCheckin">0</b> selected</span>
+      <button class="btn-bulk" onclick="deleteSelected('checkin')">Delete Selected</button>
+    </div>
+    <div style="overflow-x: auto; background: #fff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee;">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:36px; text-align:center;"><input type="checkbox" class="chk" id="chkAllCheckin" onchange="toggleAll('checkin', this.checked)"></th>
+            <th>Nama Tamu</th>
+            <th>Jumlah Pax</th>
+            <th>Waktu Daftar</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="checkinTbody">
+          <tr><td colspan="5" style="text-align:center;">Loading data...</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
+  <!-- TABEL RSVP -->
+  <div style="margin-top: 50px;">
+    <h3 class="admin-title" style="font-size: 1.5rem; margin-bottom: 15px;">Data RSVP (Estimasi)</h3>
+    <div class="bulk-bar" id="bulkBarRsvp" style="display:none;">
+      <span><b id="countRsvp">0</b> selected</span>
+      <button class="btn-bulk" onclick="deleteSelected('rsvp')">Delete Selected</button>
+    </div>
+    <div style="overflow-x: auto; background: #fff; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee;">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:36px; text-align:center;"><input type="checkbox" class="chk" id="chkAllRsvp" onchange="toggleAll('rsvp', this.checked)"></th>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Pax</th>
+            <th>Category</th>
+          </tr>
+        </thead>
+        <tbody id="tamuTbody">
+          <tr><td colspan="5" style="text-align:center;">Loading data...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TABEL DOA -->
   <div style="margin-top: 50px;">
     <h3 class="admin-title" style="font-size: 1.5rem; margin-bottom: 15px;">Garden of Prayers</h3>
     <div class="bulk-bar" id="bulkBarDoa" style="display:none;">
@@ -208,7 +228,7 @@
   </div>
 </div>
 
-<!-- LIGHTBOX MODAL UNTUK ADMIN -->
+<!-- LIGHTBOX MODAL -->
 <div class="lightbox" id="adminLightbox">
   <button class="lightbox-close" onclick="closeAdminLightbox()">&times;</button>
   <img src="" alt="Full Screen" class="lightbox-img" id="adminLightboxImg">
@@ -218,6 +238,7 @@
 <script>
   const ADMIN_PIN = "123456";
 
+  // --- Tema ---
   const themeSelect = document.getElementById('themeSelect');
   const currentTheme = localStorage.getItem('wedding_theme') || 'luxury';
   if(themeSelect) {
@@ -240,94 +261,95 @@
       document.getElementById("loginMsg").textContent = "Invalid PIN!";
     }
   }
-
   function logout() { location.reload(); }
 
-  // ===== PHOTOBOOTH TOGGLE =====
+  // --- Photobooth Toggle ---
   async function loadPhotoboothStatus() {
     const { data, error } = await supabaseClient.from("pengaturan").select("photobooth_active").single();
-    if (!error && data) {
-      document.getElementById("togglePhotobooth").checked = data.photobooth_active;
-    }
+    if (!error && data) document.getElementById("togglePhotobooth").checked = data.photobooth_active;
   }
-
   async function updatePhotoboothStatus(isActive) {
-    const { error } = await supabaseClient.from("pengaturan").update({ photobooth_active: isActive }).eq("id", 1);
-    if (error) {
-      alert("Gagal mengubah status: " + error.message);
-      document.getElementById("togglePhotobooth").checked = !isActive; // revert if failed
-    } else {
-      alert(`Tombol Photobooth berhasil di-${isActive ? 'TAMPILKAN' : 'SEMBUNYIKAN'}! Tamu tidak perlu refresh halaman.`);
-    }
+    await supabaseClient.from("pengaturan").update({ photobooth_active: isActive }).eq("id", 1);
   }
 
-  // ===== MULTI-SELECT HELPERS =====
-  function getChecked(table) {
-    return Array.from(document.querySelectorAll(`.chk-row[data-table="${table}"]:checked`))
-                .map(cb => cb.value);
-  }
-
+  // --- Multi Select Helpers ---
+  function getChecked(table) { return Array.from(document.querySelectorAll(`.chk-row[data-table="${table}"]:checked`)).map(cb => cb.value); }
   function updateBulkBar(table) {
     const ids = getChecked(table);
-    const bar = document.getElementById(table === 'rsvp' ? 'bulkBarRsvp' : 'bulkBarDoa');
-    const count = document.getElementById(table === 'rsvp' ? 'countRsvp' : 'countDoa');
-    const chkAll = document.getElementById(table === 'rsvp' ? 'chkAllRsvp' : 'chkAllDoa');
-    count.textContent = ids.length;
-    bar.style.display = ids.length > 0 ? 'flex' : 'none';
+    const bar = document.getElementById(`bulkBar${table.charAt(0).toUpperCase() + table.slice(1)}`);
+    const count = document.getElementById(`count${table.charAt(0).toUpperCase() + table.slice(1)}`);
+    const chkAll = document.getElementById(`chkAll${table.charAt(0).toUpperCase() + table.slice(1)}`);
+    if(bar) bar.style.display = ids.length > 0 ? 'flex' : 'none';
+    if(count) count.textContent = ids.length;
     const boxes = document.querySelectorAll(`.chk-row[data-table="${table}"]`);
-    chkAll.checked = boxes.length > 0 && ids.length === boxes.length;
+    if(chkAll) chkAll.checked = boxes.length > 0 && ids.length === boxes.length;
   }
-
   function toggleAll(table, checked) {
     document.querySelectorAll(`.chk-row[data-table="${table}"]`).forEach(cb => cb.checked = checked);
     updateBulkBar(table);
   }
-
   async function deleteSelected(table) {
     const ids = getChecked(table);
-    if (ids.length === 0) return;
-    const label = table === 'rsvp' ? 'RSVP' : 'prayer';
-    if (!confirm(`Delete ${ids.length} selected ${label}(s)?`)) return;
-    const { error } = await supabaseClient.from(table).delete().in("id", ids);
-    if (error) alert("Failed to delete: " + error.message);
-    else loadAdminData();
+    if (ids.length === 0 || !confirm(`Delete ${ids.length} selected data?`)) return;
+    await supabaseClient.from(table).delete().in("id", ids);
+    loadAdminData();
   }
 
+  // --- LOAD DATA UTAMA ---
   async function loadAdminData() {
-    const { data: kuotaData } = await supabaseClient.from("total_pax").select("terpakai").single();
-    const sisa = 150 - (kuotaData?.terpakai || 0);
-    document.getElementById("adminSisaKuota").textContent = sisa;
+    // 1. Hitung Kuota RSVP
+    const { data: rsvpKuota } = await supabaseClient.from("total_pax").select("terpakai").single();
+    document.getElementById("adminSisaKuotaRsvp").textContent = 150 - (rsvpKuota?.terpakai || 0);
 
+    // 2. Hitung Kuota Check-in
+    const { data: checkinData } = await supabaseClient.from("checkin").select("*").order("created_at", { ascending: false });
+    const totalCheckin = checkinData ? checkinData.reduce((sum, item) => sum + item.jumlah_pax, 0) : 0;
+    document.getElementById("adminSisaKuotaCheckin").textContent = 150 - totalCheckin;
+
+    // Render Tabel Check-in
+    const ctb = document.getElementById("checkinTbody");
+    ctb.innerHTML = "";
+    if (!checkinData || checkinData.length === 0) {
+      ctb.innerHTML = "<tr><td colspan='5' style='text-align:center;'>Belum ada registrasi lapangan.</td></tr>";
+    } else {
+      checkinData.forEach(t => {
+        const tgl = new Date(t.created_at).toLocaleString('id-ID');
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td style="text-align:center;"><input type="checkbox" class="chk chk-row" data-table="checkin" value="${t.id}" onchange="updateBulkBar('checkin')"></td>
+          <td style="font-weight:600;">${t.nama}</td>
+          <td><span class="badge bg-blue">${t.jumlah_pax} Pax</span></td>
+          <td style="font-size:12px; color:#888;">${tgl}</td>
+          <td><button class="btn-sm btn-del" onclick="deleteSelected('checkin')" style="display:none;"></button></td>
+        `;
+        ctb.appendChild(tr);
+      });
+    }
+    updateBulkBar('checkin');
+
+    // 3. Render Tabel RSVP
     const { data: rsvpData } = await supabaseClient.from("rsvp").select("*").order("created_at", { ascending: false });
     const tbody = document.getElementById("tamuTbody");
     tbody.innerHTML = "";
     if (!rsvpData || rsvpData.length === 0) {
-      tbody.innerHTML = "<tr><td colspan='7' style='text-align:center;'>No data yet.</td></tr>";
+      tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>No data yet.</td></tr>";
     } else {
       rsvpData.forEach(t => {
-        const isHadir = t.hadir;
-        const badgeStatus = isHadir ? '<span class="badge bg-green">Attending</span>' : '<span class="badge bg-red">Not Attending</span>';
-        const badgeCheckin = t.checked_in ? '<span class="badge bg-blue">Yes</span>' : '-';
-
+        const badgeStatus = t.hadir ? '<span class="badge bg-green">Attending</span>' : '<span class="badge bg-red">Not Attending</span>';
         const tr = document.createElement("tr");
-        tr.id = `row-${t.id}`;
         tr.innerHTML = `
           <td style="text-align:center;"><input type="checkbox" class="chk chk-row" data-table="rsvp" value="${t.id}" onchange="updateBulkBar('rsvp')"></td>
           <td style="font-weight:500;">${t.nama}</td>
           <td>${badgeStatus}</td>
-          <td>${isHadir ? t.jumlah_pax : '-'}</td>
-          <td style="text-transform:capitalize;">${isHadir ? t.kategori : '-'}</td>
-          <td>${badgeCheckin}</td>
-          <td>
-            <button class="btn-sm btn-edit" onclick="editRow('${t.id}', '${t.nama}', ${t.jumlah_pax}, '${t.kategori}')">Edit</button>
-            <button class="btn-sm btn-del" onclick="deleteRsvp('${t.id}')">Delete</button>
-          </td>
+          <td>${t.hadir ? t.jumlah_pax : '-'}</td>
+          <td style="text-transform:capitalize;">${t.hadir ? t.kategori : '-'}</td>
         `;
         tbody.appendChild(tr);
       });
     }
     updateBulkBar('rsvp');
 
+    // 4. Render Tabel Doa
     const { data: doaData } = await supabaseClient.from("doa").select("*").order("created_at", { ascending: false });
     const dtbody = document.getElementById("doaTbody");
     dtbody.innerHTML = "";
@@ -341,7 +363,7 @@
           <td style="font-weight:500;">${d.nama}</td>
           <td style="font-size:13px; color:#555; font-style:italic;">"${d.pesan}"</td>
           <td><span class="badge ${d.sumber === 'checkin' ? 'bg-blue' : 'bg-green'}" style="text-transform:capitalize;">${d.sumber}</span></td>
-          <td><button class="btn-sm btn-del" onclick="deleteDoa('${d.id}')">Delete</button></td>
+          <td><button class="btn-sm btn-del" onclick="deleteSelected('doa')" style="display:none;"></button></td>
         `;
         dtbody.appendChild(tr);
       });
@@ -349,111 +371,43 @@
     updateBulkBar('doa');
   }
 
-  function editRow(id, nama, pax, kategori) {
-    const tr = document.getElementById(`row-${id}`);
-    tr.innerHTML = `
-      <td></td>
-      <td><input type="text" id="edit-nama-${id}" value="${nama}"></td>
-      <td colspan="2"><input type="number" id="edit-pax-${id}" value="${pax}" min="1"></td>
-      <td>
-        <select id="edit-kat-${id}">
-          <option value="sendiri" ${kategori==='sendiri'?'selected':''}>Alone</option>
-          <option value="pasangan" ${kategori==='pasangan'?'selected':''}>Partner</option>
-          <option value="keluarga" ${kategori==='keluarga'?'selected':''}>Family</option>
-        </select>
-      </td>
-      <td>-</td>
-      <td>
-        <button class="btn-sm btn-save" onclick="saveRow('${id}')">Save</button>
-        <button class="btn-sm" style="background:#ccc; color:#333;" onclick="loadAdminData()">Cancel</button>
-      </td>
-    `;
-  }
-
-  async function saveRow(id) {
-    const nama = document.getElementById(`edit-nama-${id}`).value;
-    const pax = parseInt(document.getElementById(`edit-pax-${id}`).value);
-    const kategori = document.getElementById(`edit-kat-${id}`).value;
-
-    const { error } = await supabaseClient.from("rsvp").update({ nama, jumlah_pax: pax, kategori }).eq("id", id);
-    if (error) alert("Failed to update: " + error.message);
-    else loadAdminData();
-  }
-
-  async function deleteRsvp(id) {
-    if (!confirm("Are you sure you want to delete this RSVP?")) return;
-    const { error } = await supabaseClient.from("rsvp").delete().eq("id", id);
-    if (error) alert("Failed to delete: " + error.message);
-    else loadAdminData();
-  }
-
-  async function deleteDoa(id) {
-    if (!confirm("Are you sure you want to delete this prayer?")) return;
-    const { error } = await supabaseClient.from("doa").delete().eq("id", id);
-    if (error) alert("Failed to delete: " + error.message);
-    else loadAdminData();
-  }
-
-  // ===== FUNGSI LIGHTBOX ADMIN =====
+  // --- Lightbox & Galeri ---
   window.openAdminLightbox = function(url) {
     document.getElementById("adminLightboxImg").src = url;
     document.getElementById("adminLightbox").classList.add("active");
   }
-
   window.closeAdminLightbox = function() {
     document.getElementById("adminLightbox").classList.remove("active");
   }
-
-  // ===== FUNGSI ADMIN DOORPRIZE =====
   async function loadAdminGallery() {
     const { data, error } = await supabaseClient.from("gallery").select("*");
     if (error) return;
-
-    const cats = {
-      "bersama_pengantin": document.getElementById("adminGal1"),
-      "momen_seru": document.getElementById("adminGal2"),
-      "pengantin": document.getElementById("adminGal3")
-    };
-
+    const cats = { "bersama_pengantin": document.getElementById("adminGal1"), "momen_seru": document.getElementById("adminGal2"), "pengantin": document.getElementById("adminGal3") };
     Object.values(cats).forEach(el => el.innerHTML = "");
-
     data.forEach(item => {
       const el = cats[item.kategori];
       if (!el) return;
-
       const div = document.createElement("div");
-      div.style.display = "flex"; div.style.alignItems = "center"; div.style.gap = "10px"; div.style.background = "var(--bg-cream)"; div.style.padding = "8px"; div.style.borderRadius = "6px"; div.style.border = item.is_winner ? "2px solid #FFD700" : "1px solid #ddd";
-      
+      div.style.cssText = `display:flex; align-items:center; gap:10px; background:var(--bg-cream); padding:8px; border-radius:6px; margin-bottom:8px; border: ${item.is_winner ? "2px solid #FFD700" : "1px solid #ddd"};`;
       div.innerHTML = `
-        <img src="${item.image_url}" class="admin-gal-img" onclick="openAdminLightbox('${item.image_url}')" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+        <img src="${item.image_url}" class="admin-gal-img" onclick="openAdminLightbox('${item.image_url}')" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
         <div style="flex: 1;">
           <div style="font-size: 12px; font-weight: 600;">${item.nama}</div>
-          ${item.is_winner 
-            ? `<div style="font-size: 10px; color: #B8860B; font-weight:700; margin-bottom:5px;">🏆 PEMENANG</div>
-               <button class="btn-sm btn-del" onclick="cancelWinner('${item.id}')">Batal Pemenang</button>` 
-            : `<button class="btn-sm btn-save" onclick="setWinner('${item.id}', '${item.kategori}')">Pilih Pemenang</button>`
-          }
+          ${item.is_winner ? `<div style="font-size: 10px; color: #B8860B; font-weight:700;">🏆 PEMENANG</div><button class="btn-sm btn-del" onclick="cancelWinner('${item.id}')" style="padding:4px 8px; font-size:9px; margin-top:4px;">Batal</button>` : `<button class="btn-sm btn-save" onclick="setWinner('${item.id}', '${item.kategori}')" style="padding:4px 8px; font-size:9px; margin-top:4px;">Pilih</button>`}
         </div>
       `;
       el.appendChild(div);
     });
-
-    Object.keys(cats).forEach(k => {
-      if (cats[k].innerHTML === "") cats[k].innerHTML = '<p style="font-size:12px; color:#999;">Belum ada foto.</p>';
-    });
+    Object.keys(cats).forEach(k => { if (cats[k].innerHTML === "") cats[k].innerHTML = '<p style="font-size:12px; color:#999;">Belum ada.</p>'; });
   }
-
   async function setWinner(id, kategori) {
-    if (!confirm("Pilih foto ini sebagai pemenang? (Pemenang lain di kategori ini akan di-reset)")) return;
-    
+    if (!confirm("Pilih foto ini sebagai pemenang?")) return;
     await supabaseClient.from("gallery").update({ is_winner: false }).eq("kategori", kategori);
     await supabaseClient.from("gallery").update({ is_winner: true }).eq("id", id);
-    
     loadAdminGallery();
   }
-
   async function cancelWinner(id) {
-    if (!confirm("Batalkan status pemenang untuk foto ini?")) return;
+    if (!confirm("Batalkan status pemenang?")) return;
     await supabaseClient.from("gallery").update({ is_winner: false }).eq("id", id);
     loadAdminGallery();
   }
