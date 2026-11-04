@@ -14,7 +14,7 @@
 </head>
 <body>
 
-<!-- MUSIK LATAR -->
+<!-- MUSIK LATAR (Pastikan file lagu-pernikahan.mp3 ada di folder yang sama) -->
 <audio id="bg-music" loop>
   <source src="lagu-pernikahan.mp3" type="audio/mpeg">
 </audio>
@@ -300,7 +300,6 @@
 <script src="app.js"></script>
 
 <script>
-// ====== LOGIKA ANIMASI GSAP & PEMBUKA UNDANGAN ======
 (function () {
   "use strict";
   var cover = document.getElementById("cover");
@@ -433,28 +432,25 @@ document.getElementById("directDoaForm").addEventListener("submit", async (e) =>
   }
 });
 
-// ====== LOGIKA FAQ AKORDEON (DIPERBAIKI) ======
-// Menggunakan event delegation agar lebih kuat dan tidak mudah terhapus
-document.body.addEventListener('click', function(e) {
-  const btn = e.target.closest('.faq-q');
-  if (btn) {
+// --- LOGIKA FAQ AKORDEON (DITAMBAHKAN KEMBALI) ---
+document.querySelectorAll(".faq-q").forEach(btn => {
+  btn.addEventListener("click", () => {
     const item = btn.parentElement;
-    const wasOpen = item.classList.contains('open');
+    const wasOpen = item.classList.contains("open");
     
-    // Tutup semua
+    // Tutup semua FAQ yang sedang terbuka
     document.querySelectorAll(".faq-item.open").forEach(i => {
       i.classList.remove("open");
-      const answer = i.querySelector(".faq-a");
-      if (answer) answer.style.maxHeight = null;
+      i.querySelector(".faq-a").style.maxHeight = null;
     });
     
-    // Buka yang diklik
+    // Buka FAQ yang diklik (jika sebelumnya tertutup)
     if (!wasOpen) {
       item.classList.add("open");
       const answer = item.querySelector(".faq-a");
-      if (answer) answer.style.maxHeight = answer.scrollHeight + "px";
+      answer.style.maxHeight = answer.scrollHeight + "px";
     }
-  }
+  });
 });
 </script>
 </body>
