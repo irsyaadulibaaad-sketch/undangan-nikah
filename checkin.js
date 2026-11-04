@@ -3,41 +3,50 @@ const form = document.getElementById("checkinForm");
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const msg = document.getElementById("ciMsg");
-  const info = document.getElementById("ciInfo");
   const nama = document.getElementById("ciNama").value.trim();
+  const pax = parseInt(document.getElementById("ciPax").value) || 1;
   const doa = document.getElementById("ciDoa").value.trim();
+  
   msg.textContent = "Memproses...";
 
-  // cari RSVP dengan nama tsb yang hadir
-  const { data: rows, error } = await supabaseClient
-    .from("rsvp").select("*")
-    .ilike("nama", nama).eq("hadir", true);
+  // 1. Cek Sisa Kuota sebelum mendaftar
+  const { data: kuotaData } = await supabaseClient.from("total_pax").select("terpakai").single();
+  const sisa = 150 - (kuotaData?.terpakai || 0);
 
-  if (error) { msg.textContent = "Error: " + error.message; return; }
-
-  if (!rows || rows.length === 0) {
-    msg.textContent = "Nama tidak ditemukan di daftar hadir. Hubungi panitia.";
+  if (pax > sisa) {
+    msg.textContent = `Maaf, sisa kuota kursi hanya ${sisa} pax.`;
     return;
   }
 
-  const tamu = rows[0];
-
-  if (tamu.checked_in) {
-    info.innerHTML = `✅ <b>${tamu.nama}</b> sudah check-in sebelumnya (${tamu.jumlah_pax} pax).`;
-    msg.textContent = "";
-    return;
-  }
-
-  // tandai checked-in
-  await supabaseClient.from("rsvp").update({ checked_in: true }).eq("id", tamu.id);
-
-  // simpan doa → taman bunga tumbuh
-  await supabaseClient.from("doa").insert({
-    nama: tamu.nama, pesan: doa, sumber: "checkin",
-    bunga: ["mawar","tulip","matahari","sakura","lily"][Math.floor(Math.random()*5)]
+  // 2. Masukkan data kehadiran AKTUAL ke database RSVP
+  // Kita isi hadir=true dan checked_in=true agar masuk hitungan
+  const { error: insertError } = await supabaseClient.from("rsvp").insert({
+    nama: nama,
+    hadir: true,
+    jumlah_pax: pax,
+    kategori: "registrasi_lokasi", // Penanda kalau ini tamu aktual
+    checked_in: true
   });
 
-  info.innerHTML = `🎉 Selamat datang <b>${tamu.nama}</b> (${tamu.jumlah_pax} pax).<br>Doamu sudah menumbuhkan bunga di taman 🌸`;
-  msg.textContent = "Mengalihkan ke undangan...";
-  setTimeout(() => location.href = "index.html#taman", 1800);
+  if (insertError) {
+    msg.textContent = "Gagal mendaftar: " + insertError.message;
+    return;
+  }
+
+  // 3. Simpan doa jika diisi
+  if (doa) {
+    await supabaseClient.from("doa").insert({
+      nama: nama, 
+      pesan: doa, 
+      sumber: "checkin",
+      bunga: ["mawar","tulip","matahari","sakura","lily"][Math.floor(Math.random()*5)]
+    });
+  }
+
+  msg.style.color = "#8A9A7B"; // Warna hijau sukses
+  msg.innerHTML = `🎉 Berhasil! <b>${nama}</b> (${pax} pax) telah terdaftar.`;
+  form.reset();
+  
+  // Arahkan ke undangan setelah 2 detik
+  setTimeout(() => location.href = "index.html#taman", 2000);
 });

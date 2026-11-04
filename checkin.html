@@ -3,38 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Check-in — Irsyaadul & Refalina</title>
+<title>Registrasi Tamu — Irsyaadul & Refalina</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  /* Penyesuaian Check-in dengan Tema High-End */
-  .cover { display: none !important; } /* Sembunyikan amplop */
+  .cover { display: none !important; }
   body { background-color: var(--bg-cream); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
   .checkin-container { width: 100%; max-width: 420px; padding: 40px 30px; background: #fff; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.02); position: relative; z-index: 10; }
   .checkin-title { font-family: var(--font-serif); font-size: 2.2rem; color: var(--gold-dark); text-align: center; margin-bottom: 10px; font-weight: 400; }
   .checkin-sub { text-align: center; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 30px; font-weight: 300; }
-  .rsvp-form input, .rsvp-form textarea { background: var(--bg-cream); }
+  .rsvp-form input, .rsvp-form textarea, .rsvp-form select { background: var(--bg-cream); }
   .rsvp-form input:focus, .rsvp-form textarea:focus { background: #fff; }
-  .msg { text-align: center; margin-top: 15px; font-size: 0.9rem; color: var(--gold-dark); }
+  .msg { text-align: center; margin-top: 15px; font-size: 0.9rem; color: var(--gold-dark); font-weight: 500;}
 </style>
 </head>
 <body>
 <div class="checkin-container">
-  <h2 class="checkin-title">Check-in</h2>
-  <p class="checkin-sub">Masukkan nama sesuai RSVP, lalu tulis doa untuk mempelai.</p>
+  <h2 class="checkin-title">Registrasi Tamu</h2>
+  <p class="checkin-sub">Silakan isi data kehadiran aktual di lokasi acara.</p>
 
   <form id="checkinForm" class="rsvp-form">
-    <label>Full Name
-      <input id="ciNama" type="text" required maxlength="60" placeholder="Your name">
+    <label>Nama Tamu / Perwakilan
+      <input id="ciNama" type="text" required maxlength="60" placeholder="Nama yang hadir saat ini">
     </label>
-    <div id="ciInfo" class="msg" style="font-weight: 500;"></div>
-    <label>Prayers & Wishes
-      <textarea id="ciDoa" rows="3" required maxlength="200" placeholder="Write your wishes..."></textarea>
+    
+    <label>Jumlah Pax (Aktual yang Hadir)
+      <input id="ciPax" type="number" min="1" value="1" required max="20">
     </label>
-    <button type="submit" class="btn-primary">Check-in Now</button>
+    
+    <label>Doa / Ucapan (Opsional)
+      <textarea id="ciDoa" rows="2" maxlength="200" placeholder="Tulis doa untuk mempelai..."></textarea>
+    </label>
+    
+    <button type="submit" class="btn-primary">Konfirmasi Kehadiran</button>
     <p id="ciMsg" class="msg"></p>
   </form>
 </div>
