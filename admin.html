@@ -152,7 +152,7 @@
     </div>
   </div>
 
-  <!-- TABEL REGISTRASI LAPANGAN (BARU) -->
+  <!-- TABEL REGISTRASI LAPANGAN -->
   <div style="margin-top: 50px;">
     <h3 class="admin-title" style="font-size: 1.5rem; margin-bottom: 15px;">Registrasi Lapangan (Aktual)</h3>
     <div class="bulk-bar" id="bulkBarCheckin" style="display:none;">
@@ -290,7 +290,7 @@
   }
   async function deleteSelected(table) {
     const ids = getChecked(table);
-    if (ids.length === 0 || !confirm(`Delete ${ids.length} selected data?`)) return;
+    if (ids.length === 0 || !confirm(`Hapus ${ids.length} data terpilih?`)) return;
     await supabaseClient.from(table).delete().in("id", ids);
     loadAdminData();
   }
@@ -320,7 +320,7 @@
           <td style="font-weight:600;">${t.nama}</td>
           <td><span class="badge bg-blue">${t.jumlah_pax} Pax</span></td>
           <td style="font-size:12px; color:#888;">${tgl}</td>
-          <td><button class="btn-sm btn-del" onclick="deleteSelected('checkin')" style="display:none;"></button></td>
+          <td><button class="btn-sm btn-del" onclick="deleteSingle('checkin', '${t.id}')">Hapus</button></td>
         `;
         ctb.appendChild(tr);
       });
@@ -363,12 +363,19 @@
           <td style="font-weight:500;">${d.nama}</td>
           <td style="font-size:13px; color:#555; font-style:italic;">"${d.pesan}"</td>
           <td><span class="badge ${d.sumber === 'checkin' ? 'bg-blue' : 'bg-green'}" style="text-transform:capitalize;">${d.sumber}</span></td>
-          <td><button class="btn-sm btn-del" onclick="deleteSelected('doa')" style="display:none;"></button></td>
+          <td><button class="btn-sm btn-del" onclick="deleteSingle('doa', '${d.id}')">Hapus</button></td>
         `;
         dtbody.appendChild(tr);
       });
     }
     updateBulkBar('doa');
+  }
+
+  // Fungsi hapus single data
+  async function deleteSingle(table, id) {
+    if (!confirm("Hapus data ini?")) return;
+    await supabaseClient.from(table).delete().eq("id", id);
+    loadAdminData();
   }
 
   // --- Lightbox & Galeri ---
@@ -379,36 +386,55 @@
   window.closeAdminLightbox = function() {
     document.getElementById("adminLightbox").classList.remove("active");
   }
+
   async function loadAdminGallery() {
     const { data, error } = await supabaseClient.from("gallery").select("*");
     if (error) return;
     const cats = { "bersama_pengantin": document.getElementById("adminGal1"), "momen_seru": document.getElementById("adminGal2"), "pengantin": document.getElementById("adminGal3") };
     Object.values(cats).forEach(el => el.innerHTML = "");
+    
     data.forEach(item => {
       const el = cats[item.kategori];
       if (!el) return;
+      
       const div = document.createElement("div");
       div.style.cssText = `display:flex; align-items:center; gap:10px; background:var(--bg-cream); padding:8px; border-radius:6px; margin-bottom:8px; border: ${item.is_winner ? "2px solid #FFD700" : "1px solid #ddd"};`;
+      
+      // Tampilan tombol: Pilih/Batal, dan Hapus
       div.innerHTML = `
         <img src="${item.image_url}" class="admin-gal-img" onclick="openAdminLightbox('${item.image_url}')" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
         <div style="flex: 1;">
-          <div style="font-size: 12px; font-weight: 600;">${item.nama}</div>
-          ${item.is_winner ? `<div style="font-size: 10px; color: #B8860B; font-weight:700;">🏆 PEMENANG</div><button class="btn-sm btn-del" onclick="cancelWinner('${item.id}')" style="padding:4px 8px; font-size:9px; margin-top:4px;">Batal</button>` : `<button class="btn-sm btn-save" onclick="setWinner('${item.id}', '${item.kategori}')" style="padding:4px 8px; font-size:9px; margin-top:4px;">Pilih</button>`}
+          <div style="font-size: 12px; font-weight: 600; margin-bottom:4px;">${item.nama}</div>
+          <div style="display:flex; gap:5px;">
+            ${item.is_winner 
+              ? `<button class="btn-sm btn-del" onclick="cancelWinner('${item.id}')" style="padding:6px 10px; font-size:9px;">Batal</button>` 
+              : `<button class="btn-sm btn-save" onclick="setWinner('${item.id}', '${item.kategori}')" style="padding:6px 10px; font-size:9px;">Pilih</button>`
+            }
+            <button class="btn-sm btn-del" onclick="deleteGalleryPhoto('${item.id}')" style="padding:6px 10px; font-size:9px; background-color:#c9302c;">Hapus</button>
+          </div>
         </div>
       `;
       el.appendChild(div);
     });
     Object.keys(cats).forEach(k => { if (cats[k].innerHTML === "") cats[k].innerHTML = '<p style="font-size:12px; color:#999;">Belum ada.</p>'; });
   }
+
   async function setWinner(id, kategori) {
     if (!confirm("Pilih foto ini sebagai pemenang?")) return;
     await supabaseClient.from("gallery").update({ is_winner: false }).eq("kategori", kategori);
     await supabaseClient.from("gallery").update({ is_winner: true }).eq("id", id);
     loadAdminGallery();
   }
+
   async function cancelWinner(id) {
     if (!confirm("Batalkan status pemenang?")) return;
     await supabaseClient.from("gallery").update({ is_winner: false }).eq("id", id);
+    loadAdminGallery();
+  }
+
+  async function deleteGalleryPhoto(id) {
+    if (!confirm("Yakin ingin menghapus foto ini dari galeri? (Tindakan ini permanen)")) return;
+    await supabaseClient.from("gallery").delete().eq("id", id);
     loadAdminGallery();
   }
 </script>
