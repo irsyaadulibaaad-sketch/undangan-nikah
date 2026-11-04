@@ -118,7 +118,7 @@
         <div class="input-group"><label>Attendance</label><select id="rsvpHadir" required><option value="">-- select --</option><option value="1">Attending</option><option value="0">Not Attending</option></select></div>
         <div id="hadirFields" class="hidden-fields" hidden>
           <div class="input-group"><label>Coming As</label><select id="rsvpKategori"><option value="sendiri">Alone</option><option value="pasangan">With Partner</option><option value="keluarga">With Family</option></select></div>
-          <div class="input-group"><label>Total Guests (incl. yourself)</label><input id="rsvpPax" type="number" min="1" value="1" max="100"></div>
+          <div class="input-group"><label>Total Guests (incl. yourself)</label><input id="rsvpPax" type="number" min="1" value="1" max="150"></div>
         </div>
         <div id="doaFields" class="hidden-fields" hidden>
           <div class="input-group"><label>Prayers &amp; Wishes</label><textarea id="rsvpDoa" rows="4" maxlength="200" placeholder="Write your wishes..."></textarea></div>
@@ -150,7 +150,7 @@
         </div>
         <div class="faq-item">
           <button type="button" class="faq-q">Bagaimana cara konfirmasi kehadiran?<span class="faq-arrow"></span></button>
-          <div class="faq-a"><p>Isi formulir RSVP di halaman ini. Kuota tersedia <b>100 kursi</b> — konfirmasi lebih awal agar kami bisa mengatur tempat duduk dengan baik.</p></div>
+          <div class="faq-a"><p>Isi formulir RSVP di halaman ini. Kuota tersedia <b>150 kursi</b> — konfirmasi lebih awal agar kami bisa mengatur tempat duduk dengan baik.</p></div>
         </div>
         <div class="faq-item">
           <button type="button" class="faq-q">Saya tidak bisa hadir, apakah tetap bisa memberi ucapan?<span class="faq-arrow"></span></button>
@@ -207,49 +207,15 @@
         <div id="flowerContainer" class="flower-container"></div>
       </div>
 
-      <button type="button" id="pbToggle" class="btn-primary pb-toggle">Buka Virtual Photobooth</button>
-      <div id="pbPanel" class="pb-panel" hidden>
-        <h3 class="sub-title" style="margin-top:36px;">Virtual Photobooth</h3>
-        <p class="sub">Pilih jumlah frame &amp; gaya, lalu isi tiap frame dengan fotomu</p>
-
-        <p class="pb-label" style="color:var(--text-muted);">Jumlah Frame</p>
-        <div class="pb-count" id="pbCount">
-          <button type="button" data-n="1">1</button>
-          <button type="button" data-n="3">3</button>
-          <button type="button" data-n="4" class="on">4</button>
-          <button type="button" data-n="5">5</button>
-          <button type="button" data-n="6">6</button>
-        </div>
-
-        <p class="pb-label" style="color:var(--text-muted);">Gaya Frame <span class="pb-style-name" id="pbStyleName"></span></p>
-        <div class="pb-styles" id="pbStyles"></div>
-
-        <p class="pb-label" style="color:var(--text-muted);">Foto Kamu</p>
-        <div class="pb-mode" id="pbMode">
-          <button type="button" data-m="galeri" class="on">Dari Galeri</button>
-          <button type="button" data-m="kamera">Ambil Foto Langsung</button>
-        </div>
-        <div class="pb-slots" id="pbSlots"></div>
-
-        <button type="button" id="pbFillAll" class="btn-outline pb-fillall">Isi Semua dari Galeri</button>
-
-        <input type="file" id="pbPick" accept="image/*" hidden>
-        <input type="file" id="pbPickMulti" accept="image/*" multiple hidden>
-
-        <canvas id="photoCanvas" width="600" height="800"></canvas>
-        <div class="photo-actions">
-          <button id="downloadBtn" class="btn-primary" hidden>Download</button>
-          <button id="shareBtn" class="btn-outline" hidden>Share</button>
-        </div>
-      </div>
-
+      <!-- TOMBOL MENUJU PHOTOBOOTH BARU -->
+      <a href="photobooth.html" class="btn-primary pb-toggle" style="text-decoration:none; display:inline-block; text-align:center; margin-top:30px;">Buka Photobooth & Ikut Doorprize</a>
     </div>
     <div class="curve-divider">
       <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,0 C480,100 960,100 1440,0 L1440,100 L0,100 Z" fill="var(--bg-dark)"/></svg>
     </div>
   </section>
 
-  <!-- SECTION 5: MINI GAME & VIRTUAL PHOTOBOOTH -->
+  <!-- SECTION 6: MINI GAME -->
   <section class="interactive-section bg-dark" data-anim="interactive">
     <div class="container">
       <h2 class="section-title light" data-anim="fade">Mini Game</h2>
@@ -309,7 +275,6 @@
 <script>
 (function () {
   "use strict";
-
   var cover = document.getElementById("cover");
   var mainContent = document.getElementById("mainContent");
   var openBtn = document.getElementById("openBtn");
@@ -332,7 +297,6 @@
   function openInvite() {
     if (opened) return;
     opened = true;
-
     if (!window.gsap) { revealMain(); return; }
 
     var tl = gsap.timeline({ defaults: { ease: "power3.inOut" } });
@@ -350,10 +314,7 @@
       .to(".cover-content", { scale: 1.05, duration: 1.4, ease: "power2.inOut" }, "<");
 
     setTimeout(function () {
-      gsap.to(cover, {
-        opacity: 0, filter: "blur(14px)", scale: 1.08, duration: 1.2, ease: "power2.inOut",
-        onComplete: revealMain
-      });
+      gsap.to(cover, { opacity: 0, filter: "blur(14px)", scale: 1.08, duration: 1.2, ease: "power2.inOut", onComplete: revealMain });
     }, 3400);
   }
 

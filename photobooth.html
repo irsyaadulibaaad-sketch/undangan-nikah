@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photobooth & Doorprize — Irsyaad & Refalina</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  body { background-color: var(--bg-cream); }
+  .page-header { text-align: center; padding: 40px 20px 20px; }
+  .page-title { font-family: var(--font-serif); font-size: 2.5rem; color: var(--gold-dark); margin-bottom: 10px; }
+  .page-sub { font-family: var(--font-sans); color: var(--text-muted); font-size: 0.9rem; margin-bottom: 30px; }
+  .container-pb { max-width: 800px; margin: 0 auto; padding: 20px; }
+  
+  /* Form Upload Doorprize */
+  .upload-card { background: #fff; padding: 30px; border-radius: 12px; box-shadow: var(--shadow-soft); border: 1px solid #eee; margin-bottom: 40px; }
+  .upload-card h3 { font-family: var(--font-serif); color: var(--gold-dark); margin-bottom: 20px; font-size: 1.5rem; }
+  .upload-card label { display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 600; letter-spacing: 1.5px; margin-bottom: 8px; text-transform: uppercase; }
+  .upload-card input, .upload-card select { width: 100%; padding: 14px; border: 1px solid #ddd; border-radius: 6px; margin-bottom: 18px; font-family: var(--font-sans); font-size: 0.9rem; background: var(--bg-cream); }
+  .upload-card button { width: 100%; padding: 16px; background: var(--gold-dark); color: #fff; border: none; border-radius: 6px; font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 2px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+  .upload-card button:hover { background: var(--gold-mid); }
+  .upload-card button:disabled { background: #ccc; cursor: not-allowed; }
+
+  /* Galeri Bersama */
+  .gallery-section { margin-top: 50px; }
+  .gallery-title { font-family: var(--font-serif); font-size: 2rem; color: var(--text-main); text-align: center; margin-bottom: 30px; }
+  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+  .gallery-item { position: relative; border-radius: 8px; overflow: hidden; box-shadow: var(--shadow-soft); background: #fff; aspect-ratio: 1; }
+  .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .gallery-info { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: #fff; padding: 15px 10px 8px; font-size: 0.7rem; }
+  .gallery-name { font-weight: 600; display: block; margin-bottom: 2px; }
+  .gallery-cat { font-size: 0.6rem; opacity: 0.8; text-transform: capitalize; }
+  .badge-winner { position: absolute; top: 10px; right: 10px; background: #FFD700; color: #000; padding: 4px 10px; border-radius: 20px; font-size: 0.6rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 2; }
+  
+  .btn-back { display: inline-block; margin-top: 40px; padding: 14px 30px; text-decoration: none; color: var(--gold-dark); border: 1px solid var(--gold-dark); border-radius: 6px; font-size: 0.8rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; transition: 0.3s; }
+  .btn-back:hover { background: var(--gold-dark); color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1 class="page-title">Photobooth & Doorprize</h1>
+  <p class="page-sub">Abadikan momen seru Anda dan menangkan doorprize eksklusif!</p>
+</div>
+
+<div class="container-pb">
+  <!-- VIRTUAL PHOTOBOOTH -->
+  <div style="background:#fff; padding:30px; border-radius:12px; box-shadow:var(--shadow-soft); border:1px solid #eee;">
+    <h3 class="sub-title" style="margin-bottom:10px; text-align:center;">Virtual Photobooth</h3>
+    <p style="text-align:center; font-size:0.85rem; color:var(--text-muted); margin-bottom:20px;">Pilih frame, isi dengan fotomu, lalu download hasilnya.</p>
+    
+    <p class="pb-label">Jumlah Frame</p>
+    <div class="pb-count" id="pbCount">
+      <button type="button" data-n="1">1</button>
+      <button type="button" data-n="3">3</button>
+      <button type="button" data-n="4" class="on">4</button>
+      <button type="button" data-n="5">5</button>
+      <button type="button" data-n="6">6</button>
+    </div>
+
+    <p class="pb-label">Gaya Frame <span class="pb-style-name" id="pbStyleName"></span></p>
+    <div class="pb-styles" id="pbStyles"></div>
+
+    <p class="pb-label">Foto Kamu</p>
+    <div class="pb-mode" id="pbMode">
+      <button type="button" data-m="galeri" class="on">Galeri</button>
+      <button type="button" data-m="kamera">Kamera</button>
+    </div>
+    <div class="pb-slots" id="pbSlots"></div>
+    <button type="button" id="pbFillAll" class="btn-outline pb-fillall" style="width:100%; margin-top:15px;">Isi Semua dari Galeri</button>
+
+    <input type="file" id="pbPick" accept="image/*" hidden>
+    <input type="file" id="pbPickMulti" accept="image/*" multiple hidden>
+
+    <canvas id="photoCanvas" width="600" height="800" style="margin-top:20px;"></canvas>
+    <div class="photo-actions" style="display:flex; gap:15px; margin-top:20px;">
+      <button id="downloadBtn" class="btn-primary" style="flex:1;" hidden>Download</button>
+      <button id="shareBtn" class="btn-outline" style="flex:1;" hidden>Share</button>
+    </div>
+  </div>
+
+  <!-- FORM UPLOAD DOORPRIZE -->
+  <div class="upload-card">
+    <h3>Ikuti Doorprize 📸</h3>
+    <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:20px;">Upload foto terbaikmu (selfie/camera depan bebas). Foto akan tampil di Galeri Bersama. Pastikan namamu benar agar bisa dipanggil MC jika menang!</p>
+    
+    <form id="uploadForm">
+      <label>Nama Lengkap</label>
+      <input type="text" id="upNama" required placeholder="Nama sesuai undangan" maxlength="50">
+
+      <label>Kategori Foto</label>
+      <select id="upKategori" required>
+        <option value="">-- Pilih Kategori --</option>
+        <option value="bersama_pengantin">Foto Bersama Pengantin</option>
+        <option value="momen_seru">Momen Seru Tamu di Pernikahan</option>
+        <option value="pengantin">Foto Pengantin (Momen Terbaik)</option>
+      </select>
+
+      <label>Pilih Foto (Maks 5MB)</label>
+      <input type="file" id="upFile" accept="image/*" required>
+
+      <button type="submit" id="upBtn">Upload & Ikut Doorprize</button>
+      <p id="upMsg" style="text-align:center; font-size:0.8rem; margin-top:15px; font-weight:600;"></p>
+    </form>
+  </div>
+
+  <!-- GALERI BERSAMA -->
+  <div class="gallery-section">
+    <h2 class="gallery-title">Galeri Bersama</h2>
+    <div class="gallery-grid" id="galleryGrid">
+      <p style="text-align:center; grid-column: 1/-1; color:#888; font-size:0.9rem;">Memuat galeri...</p>
+    </div>
+  </div>
+
+  <div style="text-align:center;">
+    <a href="index.html" class="btn-back">Kembali ke Undangan</a>
+  </div>
+</div>
+
+<script src="supabase.js"></script>
+<script src="app.js"></script>
+<script>
+  // ==========================================
+  // LOGIKA UPLOAD DOORPRIZE & GALERI
+  // ==========================================
+  const upForm = document.getElementById("uploadForm");
+  const galleryGrid = document.getElementById("galleryGrid");
+
+  async function loadGallery() {
+    const { data, error } = await supabaseClient
+      .from("gallery").select("*").order("is_winner", { ascending: false }).order("created_at", { ascending: false });
+    
+    if (error) { console.error(error); return; }
+    
+    galleryGrid.innerHTML = "";
+    if (!data || data.length === 0) {
+      galleryGrid.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color:#888; font-size:0.9rem;">Belum ada foto yang diupload.</p>';
+      return;
+    }
+
+    data.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "gallery-item";
+      
+      let badge = item.is_winner ? `<div class="badge-winner">🏆 Pemenang</div>` : "";
+      let catLabel = item.kategori.replace(/_/g, ' ');
+
+      div.innerHTML = `
+        ${badge}
+        <img src="${item.image_url}" alt="${item.nama}" loading="lazy">
+        <div class="gallery-info">
+          <span class="gallery-name">${item.nama}</span>
+          <span class="gallery-cat">${catLabel}</span>
+        </div>
+      `;
+      galleryGrid.appendChild(div);
+    });
+  }
+
+  upForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById("upBtn");
+    const msg = document.getElementById("upMsg");
+    const nama = document.getElementById("upNama").value.trim();
+    const kategori = document.getElementById("upKategori").value;
+    const file = document.getElementById("upFile").files[0];
+
+    if (file.size > 5 * 1024 * 1024) {
+      msg.style.color = "red"; msg.textContent = "Ukuran foto maksimal 5MB!"; return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = "Mengunggah...";
+    msg.style.color = "var(--gold-dark)"; msg.textContent = "Sedang memproses foto...";
+
+    try {
+      // 1. Upload ke Supabase Storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+      
+      const { error: uploadError } = await supabaseClient.storage
+        .from("doorprize").upload(fileName, file);
+      
+      if (uploadError) throw uploadError;
+
+      // 2. Dapatkan URL Publik
+      const { data: publicUrlData } = supabaseClient.storage
+        .from("doorprize").getPublicUrl(fileName);
+      
+      // 3. Simpan ke tabel database
+      const { error: dbError } = await supabaseClient.from("gallery").insert({
+        nama: nama,
+        kategori: kategori,
+        image_url: publicUrlData.publicUrl
+      });
+
+      if (dbError) throw dbError;
+
+      msg.style.color = "green"; msg.textContent = "Berhasil! Foto kamu sudah masuk galeri.";
+      upForm.reset();
+      loadGallery(); // Refresh galeri
+    } catch (err) {
+      console.error(err);
+      msg.style.color = "red"; msg.textContent = "Gagal upload: " + err.message;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Upload & Ikut Doorprize";
+    }
+  });
+
+  loadGallery();
+
+  // Realtime untuk galeri (tamu lain upload, langsung muncul)
+  supabaseClient.channel("gallery-rt")
+    .on("postgres_changes", { event: "*", schema: "public", table: "gallery" }, () => loadGallery())
+    .subscribe();
+</script>
+</body>
+</html>

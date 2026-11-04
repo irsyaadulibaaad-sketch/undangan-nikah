@@ -110,6 +110,30 @@
     <strong style="font-family: var(--font-serif); font-size: 1.2rem; color: var(--gold-dark);">Remaining Seats: <span id="adminSisaKuota" style="font-size: 1.5rem;">--</span> / 150</strong>
   </div>
 
+  <!-- DOORPRIZE GALLERY ADMIN -->
+  <div style="margin-bottom: 50px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee;">
+    <h3 class="admin-title" style="font-size: 1.5rem; margin-bottom: 15px;">Doorprize Winners</h3>
+    <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Pilih 1 pemenang untuk masing-masing kategori.</p>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+      <!-- Kategori 1 -->
+      <div>
+        <h4 style="font-family: var(--font-sans); font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase;">Foto Bersama Pengantin</h4>
+        <div id="adminGal1" style="display: flex; flex-direction: column; gap: 10px;"></div>
+      </div>
+      <!-- Kategori 2 -->
+      <div>
+        <h4 style="font-family: var(--font-sans); font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase;">Momen Seru Tamu</h4>
+        <div id="adminGal2" style="display: flex; flex-direction: column; gap: 10px;"></div>
+      </div>
+      <!-- Kategori 3 -->
+      <div>
+        <h4 style="font-family: var(--font-sans); font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase;">Foto Pengantin</h4>
+        <div id="adminGal3" style="display: flex; flex-direction: column; gap: 10px;"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- RSVP -->
   <div class="bulk-bar" id="bulkBarRsvp" style="display:none;">
     <span><b id="countRsvp">0</b> selected</span>
@@ -179,6 +203,7 @@
       document.getElementById("loginSection").classList.add("hidden");
       document.getElementById("adminSection").classList.remove("hidden");
       loadAdminData();
+      loadAdminGallery();
     } else {
       document.getElementById("loginMsg").textContent = "Invalid PIN!";
     }
@@ -199,7 +224,6 @@
     const chkAll = document.getElementById(table === 'rsvp' ? 'chkAllRsvp' : 'chkAllDoa');
     count.textContent = ids.length;
     bar.style.display = ids.length > 0 ? 'flex' : 'none';
-    // sinkronkan "select all" kalau dicentang manual
     const boxes = document.querySelectorAll(`.chk-row[data-table="${table}"]`);
     chkAll.checked = boxes.length > 0 && ids.length === boxes.length;
   }
@@ -318,6 +342,50 @@
     const { error } = await supabaseClient.from("doa").delete().eq("id", id);
     if (error) alert("Failed to delete: " + error.message);
     else loadAdminData();
+  }
+
+  // ===== FUNGSI ADMIN DOORPRIZE =====
+  async function loadAdminGallery() {
+    const { data, error } = await supabaseClient.from("gallery").select("*");
+    if (error) return;
+
+    const cats = {
+      "bersama_pengantin": document.getElementById("adminGal1"),
+      "momen_seru": document.getElementById("adminGal2"),
+      "pengantin": document.getElementById("adminGal3")
+    };
+
+    Object.values(cats).forEach(el => el.innerHTML = "");
+
+    data.forEach(item => {
+      const el = cats[item.kategori];
+      if (!el) return;
+
+      const div = document.createElement("div");
+      div.style.display = "flex"; div.style.alignItems = "center"; div.style.gap = "10px"; div.style.background = "var(--bg-cream)"; div.style.padding = "8px"; div.style.borderRadius = "6px"; div.style.border = item.is_winner ? "2px solid #FFD700" : "1px solid #ddd";
+      
+      div.innerHTML = `
+        <img src="${item.image_url}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 4px;">
+        <div style="flex: 1;">
+          <div style="font-size: 12px; font-weight: 600;">${item.nama}</div>
+          ${item.is_winner ? '<div style="font-size: 10px; color: #B8860B; font-weight:700;">🏆 PEMENANG</div>' : `<button class="btn-sm btn-save" onclick="setWinner('${item.id}', '${item.kategori}')">Pilih Pemenang</button>`}
+        </div>
+      `;
+      el.appendChild(div);
+    });
+
+    Object.keys(cats).forEach(k => {
+      if (cats[k].innerHTML === "") cats[k].innerHTML = '<p style="font-size:12px; color:#999;">Belum ada foto.</p>';
+    });
+  }
+
+  async function setWinner(id, kategori) {
+    if (!confirm("Pilih foto ini sebagai pemenang? (Pemenang lain di kategori ini akan di-reset)")) return;
+    
+    await supabaseClient.from("gallery").update({ is_winner: false }).eq("kategori", kategori);
+    await supabaseClient.from("gallery").update({ is_winner: true }).eq("id", id);
+    
+    loadAdminGallery();
   }
 </script>
 </body>
