@@ -76,7 +76,6 @@
         <div class="gold-underline"></div>
       </div>
       <div class="hero-info" data-anim="fade">
-        <!-- PERUBAHAN: Enter diletakkan setelah kata Kamis -->
         <p class="hero-date">Kamis,<br>24 Desember 2026</p>
         <p class="hero-time">09.00 WIB — 13.00 WIB</p>
 
@@ -448,26 +447,37 @@ document.getElementById("directDoaForm").addEventListener("submit", async (e) =>
   }
 });
 
-// --- LOGIKA FAQ AKORDEON ---
-document.querySelectorAll(".faq-q").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const item = btn.parentElement;
-    const wasOpen = item.classList.contains("open");
-    
-    // Tutup semua FAQ yang sedang terbuka
-    document.querySelectorAll(".faq-item.open").forEach(i => {
-      i.classList.remove("open");
-      i.querySelector(".faq-a").style.maxHeight = null;
-    });
-    
-    // Buka FAQ yang diklik (jika sebelumnya tertutup)
-    if (!wasOpen) {
-      item.classList.add("open");
-      const answer = item.querySelector(".faq-a");
-      answer.style.maxHeight = answer.scrollHeight + "px";
-    }
+// ====== LOGIKA FAQ AKORDEON (DIPERBAIKI DENGAN WINDOW.ONLOAD) ======
+window.onload = function() {
+  const faqButtons = document.querySelectorAll(".faq-q");
+  
+  faqButtons.forEach(btn => {
+    // Hapus event listener lama jika ada (mencegah dobel)
+    btn.replaceWith(btn.cloneNode(true));
   });
-});
+
+  // Pasang event listener baru
+  document.querySelectorAll(".faq-q").forEach(btn => {
+    btn.addEventListener("click", function() {
+      const item = this.parentElement;
+      const wasOpen = item.classList.contains("open");
+      
+      // Tutup semua FAQ
+      document.querySelectorAll(".faq-item.open").forEach(i => {
+        i.classList.remove("open");
+        const answer = i.querySelector(".faq-a");
+        if (answer) answer.style.maxHeight = null;
+      });
+      
+      // Buka yang diklik
+      if (!wasOpen) {
+        item.classList.add("open");
+        const answer = item.querySelector(".faq-a");
+        if (answer) answer.style.maxHeight = answer.scrollHeight + "px";
+      }
+    });
+  });
+};
 </script>
 </body>
 </html>
