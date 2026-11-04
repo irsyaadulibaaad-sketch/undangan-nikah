@@ -221,7 +221,7 @@
 
   async function loadAdminData() {
     const { data: kuotaData } = await supabaseClient.from("total_pax").select("terpakai").single();
-    const sisa = 100 - (kuotaData?.terpakai || 0);
+    const sisa = 150 - (kuotaData?.terpakai || 0);
     document.getElementById("adminSisaKuota").textContent = sisa;
 
     const { data: rsvpData } = await supabaseClient.from("rsvp").select("*").order("created_at", { ascending: false });
