@@ -59,6 +59,14 @@
   .lightbox-close { position: absolute; top: 20px; right: 20px; color: #fff; font-size: 30px; cursor: pointer; background: none; border: none; }
   .admin-gal-img { cursor: pointer; transition: opacity 0.2s; }
   .admin-gal-img:hover { opacity: 0.8; }
+
+  /* ===== TOGGLE SWITCH ===== */
+  .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+  .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+  input:checked + .slider { background-color: #8A9A7B; }
+  input:checked + .slider:before { transform: translateX(24px); }
 </style>
 </head>
 <body>
@@ -77,6 +85,18 @@
   <div class="admin-header">
     <h2 class="admin-title">Guest List</h2>
     <button onclick="logout()" class="btn-outline" style="width: auto; margin: 0; padding: 10px 25px; color: var(--gold-dark); border-color: var(--gold-dark);">Logout</button>
+  </div>
+
+  <!-- PENGATURAN PHOTOBOOTH -->
+  <div style="margin-bottom: 25px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <strong style="display:block; font-family: var(--font-serif); font-size: 1.2rem; color: var(--gold-dark);">Akses Tombol Photobooth</strong>
+      <p style="font-size:0.75rem; color:#888; margin-top:5px;">Aktifkan agar tamu bisa mengakses Photobooth & Doorprize.</p>
+    </div>
+    <label class="switch">
+      <input type="checkbox" id="togglePhotobooth" onchange="updatePhotoboothStatus(this.checked)">
+      <span class="slider"></span>
+    </label>
   </div>
 
   <!-- QR CHECK-IN (untuk diprint) -->
@@ -124,17 +144,14 @@
     <p style="font-size: 0.8rem; color: #888; margin-bottom: 20px;">Klik foto untuk melihat ukuran penuh. Pilih 1 pemenang untuk masing-masing kategori.</p>
     
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
-      <!-- Kategori 1 -->
       <div>
         <h4 style="font-family: var(--font-sans); font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase;">Foto Bersama Pengantin</h4>
         <div id="adminGal1" style="display: flex; flex-direction: column; gap: 10px;"></div>
       </div>
-      <!-- Kategori 2 -->
       <div>
         <h4 style="font-family: var(--font-sans); font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase;">Momen Seru Tamu</h4>
         <div id="adminGal2" style="display: flex; flex-direction: column; gap: 10px;"></div>
       </div>
-      <!-- Kategori 3 -->
       <div>
         <h4 style="font-family: var(--font-sans); font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase;">Foto Pengantin</h4>
         <div id="adminGal3" style="display: flex; flex-direction: column; gap: 10px;"></div>
@@ -218,12 +235,31 @@
       document.getElementById("adminSection").classList.remove("hidden");
       loadAdminData();
       loadAdminGallery();
+      loadPhotoboothStatus();
     } else {
       document.getElementById("loginMsg").textContent = "Invalid PIN!";
     }
   }
 
   function logout() { location.reload(); }
+
+  // ===== PHOTOBOOTH TOGGLE =====
+  async function loadPhotoboothStatus() {
+    const { data, error } = await supabaseClient.from("pengaturan").select("photobooth_active").single();
+    if (!error && data) {
+      document.getElementById("togglePhotobooth").checked = data.photobooth_active;
+    }
+  }
+
+  async function updatePhotoboothStatus(isActive) {
+    const { error } = await supabaseClient.from("pengaturan").update({ photobooth_active: isActive }).eq("id", 1);
+    if (error) {
+      alert("Gagal mengubah status: " + error.message);
+      document.getElementById("togglePhotobooth").checked = !isActive; // revert if failed
+    } else {
+      alert(`Tombol Photobooth berhasil di-${isActive ? 'TAMPILKAN' : 'SEMBUNYIKAN'}! Tamu tidak perlu refresh halaman.`);
+    }
+  }
 
   // ===== MULTI-SELECT HELPERS =====
   function getChecked(table) {

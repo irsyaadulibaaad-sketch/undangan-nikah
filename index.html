@@ -74,7 +74,6 @@
         <p class="hero-date">Sabtu, 24 Desember 2026</p>
         <p class="hero-time">09.00 WIB — 13.00 WIB</p>
         
-        <!-- JADWAL ACARA BARU -->
         <div style="margin-top: 25px; display: flex; justify-content: center; gap: 30px; font-family: var(--font-sans); font-size: 0.85rem; letter-spacing: 1px;">
           <div style="text-align: center;">
             <span style="display:block; color: var(--gold-dark); font-weight: 600; text-transform: uppercase; font-size: 0.7rem; margin-bottom: 4px;">Akad Nikah</span>
@@ -146,7 +145,7 @@
     </div>
   </section>
 
-  <!-- SECTION 4: TAMAN DOA (PINDAH KE SINI) -->
+  <!-- SECTION 4: TAMAN DOA -->
   <section class="taman-section bg-cream" data-anim="taman">
     <div class="container">
       <h2 class="section-title" data-anim="fade">Garden of Prayers</h2>
@@ -174,15 +173,15 @@
         <div id="flowerContainer" class="flower-container"></div>
       </div>
 
-      <!-- TOMBOL MENUJU PHOTOBOOTH BARU -->
-      <a href="photobooth.html" class="btn-primary pb-toggle" style="text-decoration:none; display:inline-block; text-align:center; margin-top:30px;">Buka Photobooth & Ikut Doorprize</a>
+      <!-- TOMBOL MENUJU PHOTOBOOTH (Diberi ID & hidden by default) -->
+      <a href="photobooth.html" id="btnPhotobooth" class="btn-primary pb-toggle" style="text-decoration:none; display:none; text-align:center; margin-top:30px;">Buka Photobooth & Ikut Doorprize</a>
     </div>
     <div class="curve-divider">
       <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,0 C480,100 960,100 1440,0 L1440,100 L0,100 Z" fill="var(--bg-dark)"/></svg>
     </div>
   </section>
 
-  <!-- SECTION 5: TANYA JAWAB (PINDAH KE SINI) -->
+  <!-- SECTION 5: TANYA JAWAB -->
   <section class="faq-section bg-dark" data-anim="faq">
     <div class="container">
       <h2 class="section-title light" data-anim="fade">Tanya Jawab</h2>
@@ -356,6 +355,34 @@
     });
   }
 })();
+
+// ====== LOGIKA HIDE/UNHIDE TOMBOL PHOTOBOOTH ======
+const btnPhotobooth = document.getElementById("btnPhotobooth");
+
+async function checkPhotoboothStatus() {
+  const { data, error } = await supabaseClient.from("pengaturan").select("photobooth_active").single();
+  if (!error && data) {
+    if (data.photobooth_active) {
+      btnPhotobooth.style.display = "inline-block";
+    } else {
+      btnPhotobooth.style.display = "none";
+    }
+  }
+}
+
+// Cek status saat halaman dimuat
+checkPhotoboothStatus();
+
+// Pantau perubahan secara real-time (jika admin mengubah status)
+supabaseClient.channel("pengaturan-rt")
+  .on("postgres_changes", { event: "UPDATE", schema: "public", table: "pengaturan" }, (payload) => {
+    if (payload.new.photobooth_active) {
+      btnPhotobooth.style.display = "inline-block";
+    } else {
+      btnPhotobooth.style.display = "none";
+    }
+  })
+  .subscribe();
 </script>
 </body>
 </html>
