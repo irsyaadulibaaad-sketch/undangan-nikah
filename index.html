@@ -14,6 +14,11 @@
 </head>
 <body>
 
+<!-- BACKGROUND SONG -->
+<audio id="bg-music" loop>
+  <source src="pernikahan.mp3" type="audio/mpeg">
+</audio>
+
 <div class="noise-overlay"></div>
 <div class="vignette-overlay"></div>
 
@@ -73,7 +78,7 @@
       <div class="hero-info" data-anim="fade">
         <p class="hero-date">Sabtu, 24 Desember 2026</p>
         <p class="hero-time">09.00 WIB — 13.00 WIB</p>
-        
+
         <div style="margin-top: 25px; display: flex; justify-content: center; gap: 30px; font-family: var(--font-sans); font-size: 0.85rem; letter-spacing: 1px;">
           <div style="text-align: center;">
             <span style="display:block; color: var(--gold-dark); font-weight: 600; text-transform: uppercase; font-size: 0.7rem; margin-bottom: 4px;">Akad Nikah</span>
@@ -311,6 +316,16 @@
     cover.style.display = "none";
     mainContent.classList.remove("hidden");
     window.scrollTo(0, 0);
+    
+    // MAIN MUSIC
+    var bgMusic = document.getElementById("bg-music");
+    if (bgMusic) {
+      bgMusic.volume = 0.5;
+      bgMusic.play().catch(function(error) {
+        console.log("Autoplay dicegah oleh browser:", error);
+      });
+    }
+
     if (window.gsap) {
       gsap.fromTo(".bismillah-wrapper", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.6, ease: "power3.out", delay: 0.2 });
       gsap.fromTo(".hero-title-wrapper", { opacity: 0, scale: 0.96, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 2, ease: "power3.out", delay: 0.5 });
@@ -382,7 +397,7 @@ async function checkStatusTampilan() {
     } else {
       btnPhotobooth.style.display = "none";
     }
-    
+
     // Cek Form Doa
     if (data.doa_active) {
       directDoaContainer.style.display = "block";
@@ -412,12 +427,12 @@ document.getElementById("directDoaForm").addEventListener("submit", async (e) =>
   const msg = document.getElementById("ddMsg");
   const nama = document.getElementById("ddNama").value.trim();
   const pesan = document.getElementById("ddPesan").value.trim();
-  
+
   msg.textContent = "Mengirim...";
-  
+
   const { error } = await supabaseClient.from("doa").insert({
-    nama: nama, 
-    pesan: pesan, 
+    nama: nama,
+    pesan: pesan,
     sumber: "direct",
     bunga: ["mawar","tulip","matahari","sakura","lily"][Math.floor(Math.random()*5)]
   });
@@ -430,6 +445,27 @@ document.getElementById("directDoaForm").addEventListener("submit", async (e) =>
     e.target.reset();
     loadTaman(); // Panggil fungsi dari app.js untuk refresh bunga
   }
+});
+
+// --- LOGIKA FAQ AKORDEON ---
+document.querySelectorAll(".faq-q").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const item = btn.parentElement;
+    const wasOpen = item.classList.contains("open");
+    
+    // Tutup semua FAQ yang sedang terbuka
+    document.querySelectorAll(".faq-item.open").forEach(i => {
+      i.classList.remove("open");
+      i.querySelector(".faq-a").style.maxHeight = null;
+    });
+    
+    // Buka FAQ yang diklik (jika sebelumnya tertutup)
+    if (!wasOpen) {
+      item.classList.add("open");
+      const answer = item.querySelector(".faq-a");
+      answer.style.maxHeight = answer.scrollHeight + "px";
+    }
+  });
 });
 </script>
 </body>
