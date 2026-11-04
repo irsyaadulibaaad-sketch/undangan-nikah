@@ -410,7 +410,7 @@
               ? `<button class="btn-sm btn-del" onclick="cancelWinner('${item.id}')" style="padding:6px 10px; font-size:9px;">Batal</button>` 
               : `<button class="btn-sm btn-save" onclick="setWinner('${item.id}', '${item.kategori}')" style="padding:6px 10px; font-size:9px;">Pilih</button>`
             }
-            <button class="btn-sm btn-del" onclick="deleteGalleryPhoto('${item.id}')" style="padding:6px 10px; font-size:9px; background-color:#c9302c;">Hapus</button>
+            <button class="btn-sm btn-del" onclick="deleteGalleryPhoto('${item.id}', '${item.image_url}')" style="padding:6px 10px; font-size:9px; background-color:#c9302c;">Hapus</button>
           </div>
         </div>
       `;
@@ -432,9 +432,24 @@
     loadAdminGallery();
   }
 
-  async function deleteGalleryPhoto(id) {
+  // Fungsi hapus foto (Database + Storage)
+  async function deleteGalleryPhoto(id, imageUrl) {
     if (!confirm("Yakin ingin menghapus foto ini dari galeri? (Tindakan ini permanen)")) return;
-    await supabaseClient.from("gallery").delete().eq("id", id);
+    
+    // 1. Hapus data dari tabel gallery
+    const { error } = await supabaseClient.from("gallery").delete().eq("id", id);
+    if (error) { alert("Gagal menghapus data: " + error.message); return; }
+
+    // 2. Hapus file dari Storage Supabase
+    try {
+      // Ambil nama file dari URL (setelah tanda '/')
+      const fileName = imageUrl.split('/').pop();
+      await supabaseClient.storage.from("doorprize").remove([fileName]);
+    } catch (e) {
+      console.warn("Gagal hapus file storage (mungkin file sudah tidak ada):", e);
+    }
+
+    // 3. Refresh tampilan
     loadAdminGallery();
   }
 </script>
