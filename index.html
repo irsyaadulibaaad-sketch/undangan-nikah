@@ -378,8 +378,21 @@
       else if (type === "title") { fromVars = { opacity: 0, scale: 0.94, filter: "blur(12px)" }; toVars = { opacity: 1, scale: 1, filter: "blur(0px)", duration: 2, ease: "power3.out" }; }
       else if (type === "zoom") { fromVars = { opacity: 0, scale: 0.85 }; toVars = { opacity: 1, scale: 1, duration: 1.6, ease: "power2.out" }; }
       else if (type === "form") { fromVars = { opacity: 0, y: 30 }; toVars = { opacity: 1, y: 0, duration: 1.2, ease: "power2.out" }; }
+      
       gsap.fromTo(el, fromVars, { ...toVars, scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" } });
-      gsap.to(el.querySelector(".container") || el, { y: -60, ease: "none", scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true } });
+      
+      // EFEK MENGEcil SAAT SCROLL (Hanya jika bukan section hero)
+      if (type !== "hero") {
+        gsap.to(el.querySelector(".container") || el, { 
+          scale: 0.9, 
+          opacity: 0.5,
+          ease: "none", 
+          scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true } 
+        });
+      } else {
+        // Untuk hero, hanya geser sedikit
+        gsap.to(el.querySelector(".container") || el, { y: -60, ease: "none", scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true } });
+      }
     });
   }
 })();
@@ -447,7 +460,7 @@ document.getElementById("directDoaForm").addEventListener("submit", async (e) =>
   }
 });
 
-// ====== LOGIKA FAQ AKORDEON (DIPERBAIKI DENGAN WINDOW.ONLOAD) ======
+// ====== LOGIKA FAQ AKORDEON ======
 window.onload = function() {
   const faqButtons = document.querySelectorAll(".faq-q");
   
