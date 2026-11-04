@@ -381,12 +381,19 @@
       
       gsap.fromTo(el, fromVars, { ...toVars, scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" } });
       
-      // EFEK SCROLL: HANYA GESER (PARALLAX) TANPA MENGECIL ATAU MEMUDAR
-      gsap.to(el.querySelector(".container") || el, { 
-        y: -60, 
-        ease: "none", 
-        scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true } 
-      });
+      // EFEK SCROLL MEWAH: MENGEcil DAN MEMUDAR HALUS (TANPA BLUR)
+      if (type !== "hero") {
+        gsap.to(el.querySelector(".container") || el, { 
+          scale: 0.85,       // Menyusut elegan
+          opacity: 0.2,      // Memudar halus (tidak 0 agar tetap terlihat bentuknya)
+          y: -50,            // Sedikit terangkat
+          ease: "power2.out", 
+          scrollTrigger: { trigger: el, start: "top top", end: "bottom top", scrub: 1.2 } 
+        });
+      } else {
+        // Hero hanya digeser sedikit (tanpa menyusut) agar fokus ke judul
+        gsap.to(el.querySelector(".container") || el, { y: -80, ease: "none", scrollTrigger: { trigger: el, start: "top top", end: "bottom top", scrub: true } });
+      }
     });
   }
 })();
