@@ -53,12 +53,17 @@ button { font-family: inherit; }
   mix-blend-mode: multiply;
 }
 
-/* 2. Gradasi Opacity Hitam HANYA di Bawah (Bottom Fade) */
+/* 2. Gradasi Opacity Hitam HANYA di Bagian Bawah (1/4 Layar) */
 .vignette-overlay { 
   display: block; 
-  position: fixed; inset: 0; z-index: 9997; pointer-events: none;
-  /* Gradasi dimulai dari tengah (40%) dan semakin hitam di bawah (40% opacity) */
-  background: linear-gradient(to bottom, transparent 40%, rgba(20, 15, 10, 0.4) 100%);
+  position: fixed; 
+  bottom: 0; 
+  left: 0; 
+  right: 0; 
+  height: 25vh; /* Hanya mengambil 25% tinggi layar dari bawah */
+  z-index: 9997; 
+  pointer-events: none;
+  background: linear-gradient(to top, rgba(20, 15, 10, 0.4) 0%, transparent 100%);
   mix-blend-mode: multiply;
 }
 
