@@ -381,18 +381,12 @@
       
       gsap.fromTo(el, fromVars, { ...toVars, scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" } });
       
-      // EFEK MENGEcil SAAT SCROLL (Hanya jika bukan section hero)
-      if (type !== "hero") {
-        gsap.to(el.querySelector(".container") || el, { 
-          scale: 0.9, 
-          opacity: 0.5,
-          ease: "none", 
-          scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true } 
-        });
-      } else {
-        // Untuk hero, hanya geser sedikit
-        gsap.to(el.querySelector(".container") || el, { y: -60, ease: "none", scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true } });
-      }
+      // EFEK SCROLL: HANYA GESER (PARALLAX) TANPA MENGECIL ATAU MEMUDAR
+      gsap.to(el.querySelector(".container") || el, { 
+        y: -60, 
+        ease: "none", 
+        scrollTrigger: { trigger: el, start: "top bottom", end: "bottom top", scrub: true } 
+      });
     });
   }
 })();
