@@ -86,16 +86,31 @@
     <button onclick="logout()" class="btn-outline" style="width: auto; margin: 0; padding: 10px 25px; color: var(--gold-dark); border-color: var(--gold-dark);">Logout</button>
   </div>
 
-  <!-- PENGATURAN PHOTOBOOTH -->
-  <div style="margin-bottom: 25px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
-    <div>
-      <strong style="display:block; font-family: var(--font-serif); font-size: 1.2rem; color: var(--gold-dark);">Akses Tombol Photobooth</strong>
-      <p style="font-size:0.75rem; color:#888; margin-top:5px;">Aktifkan agar tamu bisa mengakses Photobooth & Doorprize.</p>
+  <!-- PENGATURAN TAMPILAN -->
+  <div style="margin-bottom: 25px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee; display: flex; flex-direction: column; gap: 15px;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <strong style="display:block; font-family: var(--font-serif); font-size: 1.2rem; color: var(--gold-dark);">Akses Tombol Photobooth</strong>
+        <p style="font-size:0.75rem; color:#888; margin-top:5px;">Aktifkan agar tamu bisa mengakses Photobooth & Doorprize.</p>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="togglePhotobooth" onchange="updateStatus('photobooth_active', this.checked)">
+        <span class="slider"></span>
+      </label>
     </div>
-    <label class="switch">
-      <input type="checkbox" id="togglePhotobooth" onchange="updatePhotoboothStatus(this.checked)">
-      <span class="slider"></span>
-    </label>
+    
+    <hr style="border: 0; border-top: 1px solid #eee; margin: 0;">
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <strong style="display:block; font-family: var(--font-serif); font-size: 1.2rem; color: var(--gold-dark);">Akses Form Doa Langsung</strong>
+        <p style="font-size:0.75rem; color:#888; margin-top:5px;">Aktifkan agar tamu bisa langsung menulis doa di bawah Taman Doa.</p>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="toggleDoa" onchange="updateStatus('doa_active', this.checked)">
+        <span class="slider"></span>
+      </label>
+    </div>
   </div>
 
   <!-- QR CHECK-IN -->
@@ -264,20 +279,31 @@
       document.getElementById("adminSection").classList.remove("hidden");
       loadAdminData();
       loadAdminGallery();
-      loadPhotoboothStatus();
+      loadSettings();
     } else {
       document.getElementById("loginMsg").textContent = "Invalid PIN!";
     }
   }
   function logout() { location.reload(); }
 
-  // --- Photobooth Toggle ---
-  async function loadPhotoboothStatus() {
-    const { data, error } = await supabaseClient.from("pengaturan").select("photobooth_active").single();
-    if (!error && data) document.getElementById("togglePhotobooth").checked = data.photobooth_active;
+  // --- Load & Update Settings (Toggle) ---
+  async function loadSettings() {
+    const { data, error } = await supabaseClient.from("pengaturan").select("*").single();
+    if (!error && data) {
+      document.getElementById("togglePhotobooth").checked = data.photobooth_active;
+      document.getElementById("toggleDoa").checked = data.doa_active;
+    }
   }
-  async function updatePhotoboothStatus(isActive) {
-    await supabaseClient.from("pengaturan").update({ photobooth_active: isActive }).eq("id", 1);
+
+  async function updateStatus(column, isActive) {
+    const { error } = await supabaseClient.from("pengaturan").update({ [column]: isActive }).eq("id", 1);
+    if (error) {
+      alert("Gagal mengubah status: " + error.message);
+      loadSettings(); // Revert if failed
+    } else {
+      const label = column === 'photobooth_active' ? 'Photobooth' : 'Form Doa';
+      alert(`${label} berhasil di-${isActive ? 'TAMPILKAN' : 'SEMBUNYIKAN'}! Tamu tidak perlu refresh halaman.`);
+    }
   }
 
   // --- Multi Select Helpers ---
@@ -370,7 +396,7 @@
           <td style="text-align:center;"><input type="checkbox" class="chk chk-row" data-table="doa" value="${d.id}" onchange="updateBulkBar('doa')"></td>
           <td style="font-weight:500;">${d.nama}</td>
           <td style="font-size:13px; color:#555; font-style:italic;">"${d.pesan}"</td>
-          <td><span class="badge ${d.sumber === 'checkin' ? 'bg-blue' : 'bg-green'}" style="text-transform:capitalize;">${d.sumber}</span></td>
+          <td><span class="badge ${d.sumber === 'checkin' ? 'bg-blue' : (d.sumber === 'direct' ? 'bg-green' : 'bg-green')}" style="text-transform:capitalize;">${d.sumber}</span></td>
           <td><button class="btn-sm btn-del" onclick="deleteSingle('doa', '${d.id}')">Hapus</button></td>
         `;
         dtbody.appendChild(tr);
@@ -408,7 +434,6 @@
       const div = document.createElement("div");
       div.style.cssText = `display:flex; align-items:center; gap:10px; background:var(--bg-cream); padding:8px; border-radius:6px; margin-bottom:8px; border: ${item.is_winner ? "2px solid #FFD700" : "1px solid #ddd"};`;
       
-      // Tampilan tombol: Checkbox, Pilih/Batal, dan Hapus
       div.innerHTML = `
         <input type="checkbox" class="chk chk-gallery" value="${item.id}" data-url="${item.image_url}" onchange="updateBulkBarGallery()">
         <img src="${item.image_url}" class="admin-gal-img" onclick="openAdminLightbox('${item.image_url}')" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
@@ -428,14 +453,9 @@
     Object.keys(cats).forEach(k => { if (cats[k].innerHTML === "") cats[k].innerHTML = '<p style="font-size:12px; color:#999;">Belum ada.</p>'; });
   }
 
-  // LOGIKA BARU: Maksimal 2 Pemenang per Kategori
   async function setWinner(id) {
     if (!confirm("Pilih foto ini sebagai pemenang? (Maksimal 2 per kategori)")) return;
-    
-    // Karena sistem mengizinkan lebih dari 1 pemenang, kita cukup update foto ini menjadi true
-    const { error } = await supabaseClient.from("gallery").update({ is_winner: true }).eq("id", id);
-    if (error) { alert("Gagal memilih pemenang: " + error.message); return; }
-    
+    await supabaseClient.from("gallery").update({ is_winner: true }).eq("id", id);
     loadAdminGallery();
   }
 

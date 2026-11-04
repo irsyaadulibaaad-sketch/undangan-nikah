@@ -173,6 +173,19 @@
         <div id="flowerContainer" class="flower-container"></div>
       </div>
 
+      <p id="gardenHint" class="garden-hint">Ketuk bunga untuk melihat doa</p>
+
+      <!-- FORM DOA LANGSUNG (Bisa disembunyikan dari admin) -->
+      <div id="directDoaFormContainer" style="display: none; margin-top: 40px; background: #fff; padding: 30px; border-radius: 12px; box-shadow: var(--shadow-soft); border: 1px solid #eee; max-width: 440px; margin-left: auto; margin-right: auto;">
+        <h3 style="font-family: var(--font-serif); color: var(--gold-dark); margin-bottom: 15px; font-size: 1.4rem; text-align: center;">Tinggalkan Doa & Ucapan</h3>
+        <form id="directDoaForm" class="rsvp-form" style="max-width: 100%;">
+          <div class="input-group"><label>Nama Anda</label><input id="ddNama" type="text" required maxlength="60" placeholder="Your name"></div>
+          <div class="input-group"><label>Doa / Ucapan</label><textarea id="ddPesan" rows="3" required maxlength="200" placeholder="Write your wishes..."></textarea></div>
+          <button type="submit" class="btn-primary" style="padding: 14px; font-size: 0.7rem;">Kirim Doa</button>
+          <p id="ddMsg" class="msg"></p>
+        </form>
+      </div>
+
       <!-- TOMBOL MENUJU PHOTOBOOTH BARU -->
       <a href="photobooth.html" id="btnPhotobooth" class="btn-primary pb-toggle" style="text-decoration:none; display:none; text-align:center; margin-top:30px;">Buka Photobooth & Ikut Doorprize</a>
     </div>
@@ -356,33 +369,68 @@
   }
 })();
 
-// ====== LOGIKA HIDE/UNHIDE TOMBOL PHOTOBOOTH ======
+// ====== LOGIKA HIDE/UNHIDE TOMBOL & FORM ======
 const btnPhotobooth = document.getElementById("btnPhotobooth");
+const directDoaContainer = document.getElementById("directDoaFormContainer");
 
-async function checkPhotoboothStatus() {
-  const { data, error } = await supabaseClient.from("pengaturan").select("photobooth_active").single();
+async function checkStatusTampilan() {
+  const { data, error } = await supabaseClient.from("pengaturan").select("*").single();
   if (!error && data) {
+    // Cek Photobooth
     if (data.photobooth_active) {
       btnPhotobooth.style.display = "inline-block";
     } else {
       btnPhotobooth.style.display = "none";
     }
+    
+    // Cek Form Doa
+    if (data.doa_active) {
+      directDoaContainer.style.display = "block";
+    } else {
+      directDoaContainer.style.display = "none";
+    }
   }
 }
 
-// Cek status saat halaman dimuat
-checkPhotoboothStatus();
+checkStatusTampilan();
 
-// Pantau perubahan secara real-time (jika admin mengubah status)
+// Pantau perubahan realtime
 supabaseClient.channel("pengaturan-rt")
   .on("postgres_changes", { event: "UPDATE", schema: "public", table: "pengaturan" }, (payload) => {
-    if (payload.new.photobooth_active) {
-      btnPhotobooth.style.display = "inline-block";
-    } else {
-      btnPhotobooth.style.display = "none";
+    if (payload.new.photobooth_active !== undefined) {
+      btnPhotobooth.style.display = payload.new.photobooth_active ? "inline-block" : "none";
+    }
+    if (payload.new.doa_active !== undefined) {
+      directDoaContainer.style.display = payload.new.doa_active ? "block" : "none";
     }
   })
   .subscribe();
+
+// Submit Form Doa Langsung
+document.getElementById("directDoaForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const msg = document.getElementById("ddMsg");
+  const nama = document.getElementById("ddNama").value.trim();
+  const pesan = document.getElementById("ddPesan").value.trim();
+  
+  msg.textContent = "Mengirim...";
+  
+  const { error } = await supabaseClient.from("doa").insert({
+    nama: nama, 
+    pesan: pesan, 
+    sumber: "direct",
+    bunga: ["mawar","tulip","matahari","sakura","lily"][Math.floor(Math.random()*5)]
+  });
+
+  if (error) {
+    msg.textContent = "Gagal kirim: " + error.message;
+  } else {
+    msg.style.color = "#8A9A7B";
+    msg.textContent = "Terima kasih! Doa Anda telah mekar di taman.";
+    e.target.reset();
+    loadTaman(); // Panggil fungsi dari app.js untuk refresh bunga
+  }
+});
 </script>
 </body>
 </html>
