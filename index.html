@@ -321,7 +321,7 @@
     // Mainkan musik saat undangan dibuka
     var bgMusic = document.getElementById("bg-music");
     if (bgMusic) {
-      bgMusic.volume = 0.5; // Atur volume (0.0 sampai 1.0)
+      bgMusic.volume = 0.5;
       bgMusic.play().catch(function(error) {
         console.log("Autoplay dicegah oleh browser:", error);
       });
@@ -438,17 +438,23 @@ document.getElementById("directDoaForm").addEventListener("submit", async (e) =>
   }
 });
 
-// FAQ Accordion
+// --- LOGIKA FAQ AKORDEON ---
 document.querySelectorAll(".faq-q").forEach(btn => {
   btn.addEventListener("click", () => {
     const item = btn.parentElement;
     const wasOpen = item.classList.contains("open");
-    document.querySelectorAll(".faq-item.open").forEach(i => i.classList.remove("open"));
+    
+    // Tutup semua FAQ yang sedang terbuka
+    document.querySelectorAll(".faq-item.open").forEach(i => {
+      i.classList.remove("open");
+      i.querySelector(".faq-a").style.maxHeight = null;
+    });
+    
+    // Buka FAQ yang diklik (jika sebelumnya tertutup)
     if (!wasOpen) {
       item.classList.add("open");
-      item.querySelector(".faq-a").style.maxHeight = item.querySelector(".faq-a").scrollHeight + "px";
-    } else {
-      item.querySelector(".faq-a").style.maxHeight = null;
+      const answer = item.querySelector(".faq-a");
+      answer.style.maxHeight = answer.scrollHeight + "px";
     }
   });
 });
