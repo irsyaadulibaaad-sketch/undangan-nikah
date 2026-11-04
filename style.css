@@ -43,9 +43,9 @@ img, iframe { max-width: 100%; display: block; }
 button { font-family: inherit; }
 
 /* ==========================================================================
-   OVERLAY — TEKSTUR KERTAS & GRADASI HITAM BAWAH (REVISI)
+   OVERLAY — TEKSTUR KERTAS (GRADASI HITAM DIHAPUS)
    ========================================================================== */
-/* 1. Tekstur Kertas (Noise/Grain) */
+/* Tekstur Kertas (Noise/Grain) */
 .noise-overlay {
   position: fixed; inset: 0; z-index: 9998; pointer-events: none; 
   opacity: 0.15;
@@ -53,18 +53,9 @@ button { font-family: inherit; }
   mix-blend-mode: multiply;
 }
 
-/* 2. Gradasi Opacity Hitam HANYA di Bagian Bawah (1/4 Layar) */
+/* Gradasi hitam (Vignette) dimatikan total */
 .vignette-overlay { 
-  display: block; 
-  position: fixed; 
-  bottom: 0; 
-  left: 0; 
-  right: 0; 
-  height: 25vh; /* Hanya mengambil 25% tinggi layar dari bawah */
-  z-index: 9997; 
-  pointer-events: none;
-  background: linear-gradient(to top, rgba(20, 15, 10, 0.4) 0%, transparent 100%);
-  mix-blend-mode: multiply;
+  display: none !important; 
 }
 
 /* ==========================================================================
