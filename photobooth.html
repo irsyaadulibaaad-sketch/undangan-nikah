@@ -8,9 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <style>
-  body { background-color: var(--bg-cream); }
+  body { background-color: var(--bg-cream); overflow-x: hidden; }
   .cover { display: none !important; }
   .page-header { text-align: center; padding: 40px 20px 20px; }
   .page-title { font-family: var(--font-serif); font-size: 2.5rem; color: var(--gold-dark); margin-bottom: 10px; }
@@ -26,17 +25,36 @@
   .upload-card button:hover { background: var(--gold-mid); }
   .upload-card button:disabled { background: #ccc; cursor: not-allowed; }
 
-  /* Galeri Bersama */
-  .gallery-section { margin-top: 50px; }
-  .gallery-title { font-family: var(--font-serif); font-size: 2rem; color: var(--text-main); text-align: center; margin-bottom: 30px; }
-  .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
-  .gallery-item { position: relative; border-radius: 8px; overflow: hidden; box-shadow: var(--shadow-soft); background: #fff; aspect-ratio: 1; }
+  /* Perbaikan Tombol Action (Download/Share) */
+  .photo-actions { display: flex; gap: 10px; justify-content: center; margin-top: 20px; width: 100%; }
+  .photo-actions button { flex: 1; padding: 14px 10px; font-size: 0.75rem; margin-top: 0; width: auto; white-space: nowrap; }
+
+  /* Tombol Hapus (Silang) di Slot Foto */
+  .pb-slot { position: relative; }
+  .pb-remove { position: absolute; top: -8px; right: -8px; background: #d9534f; color: white; border: none; border-radius: 50%; width: 26px; height: 26px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+
+  /* Galeri Marquee (Kolase Bergerak) */
+  .gallery-wrapper { overflow: hidden; width: 100%; position: relative; padding: 20px 0; margin-top: 20px; }
+  .gallery-marquee { display: flex; gap: 15px; width: max-content; animation: scroll 60s linear infinite; }
+  .gallery-marquee:hover { animation-play-state: paused; }
+  @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  
+  .gallery-item { position: relative; border-radius: 8px; overflow: hidden; box-shadow: var(--shadow-soft); background: #fff; width: 160px; height: 160px; flex-shrink: 0; cursor: pointer; transition: transform 0.3s; }
+  .gallery-item:hover { transform: scale(1.05); z-index: 2; }
   .gallery-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .gallery-info { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: #fff; padding: 15px 10px 8px; font-size: 0.7rem; }
-  .gallery-name { font-weight: 600; display: block; margin-bottom: 2px; }
+  
+  .gallery-info { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(to top, rgba(0,0,0,0.85), transparent); color: #fff; padding: 20px 10px 8px; font-size: 0.7rem; pointer-events: none; }
+  .gallery-name { font-weight: 600; display: block; margin-bottom: 2px; font-size: 0.75rem; }
   .gallery-cat { font-size: 0.6rem; opacity: 0.8; text-transform: capitalize; }
   .badge-winner { position: absolute; top: 10px; right: 10px; background: #FFD700; color: #000; padding: 4px 10px; border-radius: 20px; font-size: 0.6rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 2; }
-  
+
+  /* Modal Full Screen */
+  .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 99999; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
+  .lightbox.active { display: flex; }
+  .lightbox-img { max-width: 100%; max-height: 80vh; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+  .lightbox-info { color: #fff; margin-top: 15px; text-align: center; font-family: var(--font-sans); }
+  .lightbox-close { position: absolute; top: 20px; right: 20px; color: #fff; font-size: 30px; cursor: pointer; background: none; border: none; }
+
   .btn-back { display: inline-block; margin-top: 40px; padding: 14px 30px; text-decoration: none; color: var(--gold-dark); border: 1px solid var(--gold-dark); border-radius: 6px; font-size: 0.8rem; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase; transition: 0.3s; }
   .btn-back:hover { background: var(--gold-dark); color: #fff; }
 </style>
@@ -78,9 +96,9 @@
     <input type="file" id="pbPickMulti" accept="image/*" multiple hidden>
 
     <canvas id="photoCanvas" width="600" height="800" style="margin-top:20px;"></canvas>
-    <div class="photo-actions" style="display:flex; gap:15px; margin-top:20px;">
-      <button id="downloadBtn" class="btn-primary" style="flex:1;" hidden>Download</button>
-      <button id="shareBtn" class="btn-outline" style="flex:1;" hidden>Share</button>
+    <div class="photo-actions" id="pbActions" style="display:none;">
+      <button id="downloadBtn" class="btn-primary">Download</button>
+      <button id="shareBtn" class="btn-outline">Share</button>
     </div>
   </div>
 
@@ -109,11 +127,14 @@
     </form>
   </div>
 
-  <!-- GALERI BERSAMA -->
+  <!-- GALERI BERSAMA (MARQUEE) -->
   <div class="gallery-section">
-    <h2 class="gallery-title">Galeri Bersama</h2>
-    <div class="gallery-grid" id="galleryGrid">
-      <p style="text-align:center; grid-column: 1/-1; color:#888; font-size:0.9rem;">Memuat galeri...</p>
+    <h2 class="gallery-title" style="text-align:center; font-family:var(--font-serif); font-size:2rem; margin-bottom:10px;">Galeri Bersama</h2>
+    <p style="text-align:center; font-size:0.8rem; color:var(--text-muted); margin-bottom:20px;">Geser/klik foto untuk melihat layar penuh</p>
+    <div class="gallery-wrapper">
+      <div class="gallery-marquee" id="galleryMarquee">
+        <p style="color:#888; font-size:0.9rem; margin:0 auto;">Memuat galeri...</p>
+      </div>
     </div>
   </div>
 
@@ -122,11 +143,17 @@
   </div>
 </div>
 
+<!-- LIGHTBOX MODAL -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" onclick="closeLightbox()">&times;</button>
+  <img src="" alt="Full Screen" class="lightbox-img" id="lightboxImg">
+  <div class="lightbox-info" id="lightboxInfo"></div>
+</div>
+
 <script src="supabase.js"></script>
-<script src="app.js"></script> <!-- Untuk memuat fungsi taman doa jika diperlukan -->
 <script>
   // ============================================================
-  // MESIN VIRTUAL PHOTOBOOTH (Dipindahkan utuh dari app.js)
+  // MESIN VIRTUAL PHOTOBOOTH
   // ============================================================
   const photoCanvas = document.getElementById("photoCanvas");
   const pctx = photoCanvas.getContext("2d");
@@ -515,8 +542,7 @@
     st.fg(pctx, L.W, L.H, hdrY, ftrY);
 
     const ada = PB.slots.some(s => s);
-    document.getElementById("downloadBtn").hidden = !ada;
-    document.getElementById("shareBtn").hidden = !ada;
+    document.getElementById("pbActions").style.display = ada ? "flex" : "none";
   }
 
   function pbRenderPreview(st, mini, mw, mh) {
@@ -575,13 +601,20 @@
       b.type = "button";
       b.className = "pb-slot" + (PB.slots[i] ? " filled" : "");
       b.dataset.i = i;
+      
       if (PB.slots[i]) {
         b.style.backgroundImage = `url(${PB.slots[i].url})`;
-        b.innerHTML = `<span>Foto ${i + 1} — ganti</span>`;
+        b.innerHTML = `<span>Foto ${i + 1} — ganti</span>
+                       <button type="button" class="pb-remove" onclick="removePhoto(event, ${i})">&times;</button>`;
       } else {
         b.innerHTML = `<span>+ Foto ${i + 1}</span>`;
       }
-      b.addEventListener("click", () => {
+      
+      // Hanya daftarkan event klik ke b (jika klik area kosong/span)
+      b.addEventListener("click", (e) => {
+        // Abaikan jika yang diklik adalah tombol silang
+        if (e.target.classList.contains('pb-remove')) return;
+        
         pbPending = i;
         const pick = document.getElementById("pbPick");
         pick.value = "";
@@ -591,6 +624,14 @@
       });
       wrap.appendChild(b);
     }
+  }
+
+  // Fungsi Hapus Foto
+  window.removePhoto = function(e, index) {
+    e.stopPropagation();
+    PB.slots[index] = null;
+    pbBuildSlots();
+    pbRender();
   }
 
   function pbSetCount(n) {
@@ -694,10 +735,21 @@
   });
 
   // ==========================================
-  // LOGIKA UPLOAD DOORPRIZE & GALERI
+  // LOGIKA UPLOAD DOORPRIZE & GALERI (MARQUEE)
   // ==========================================
   const upForm = document.getElementById("uploadForm");
-  const galleryGrid = document.getElementById("galleryGrid");
+  const galleryMarquee = document.getElementById("galleryMarquee");
+
+  // Fungsi Lightbox
+  window.openLightbox = function(url, nama, kategori) {
+    document.getElementById("lightboxImg").src = url;
+    document.getElementById("lightboxInfo").innerHTML = `<b>${nama}</b><br><span style="font-size:0.8rem; opacity:0.8; text-transform:capitalize;">${kategori.replace(/_/g, ' ')}</span>`;
+    document.getElementById("lightbox").classList.add("active");
+  }
+
+  window.closeLightbox = function() {
+    document.getElementById("lightbox").classList.remove("active");
+  }
 
   async function loadGallery() {
     const { data, error } = await supabaseClient
@@ -705,29 +757,36 @@
     
     if (error) { console.error(error); return; }
     
-    galleryGrid.innerHTML = "";
     if (!data || data.length === 0) {
-      galleryGrid.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color:#888; font-size:0.9rem;">Belum ada foto yang diupload.</p>';
+      galleryMarquee.innerHTML = '<p style="color:#888; font-size:0.9rem; margin:0 auto;">Belum ada foto.</p>';
       return;
     }
 
-    data.forEach(item => {
-      const div = document.createElement("div");
-      div.className = "gallery-item";
-      
+    // Duplikasi data agar animasi loop terlihat mulus (seamless)
+    const loopData = [...data, ...data, ...data];
+
+    let html = "";
+    loopData.forEach(item => {
       let badge = item.is_winner ? `<div class="badge-winner">🏆 Pemenang</div>` : "";
       let catLabel = item.kategori.replace(/_/g, ' ');
 
-      div.innerHTML = `
-        ${badge}
-        <img src="${item.image_url}" alt="${item.nama}" loading="lazy">
-        <div class="gallery-info">
-          <span class="gallery-name">${item.nama}</span>
-          <span class="gallery-cat">${catLabel}</span>
+      html += `
+        <div class="gallery-item" onclick="openLightbox('${item.image_url}', '${item.nama}', '${item.kategori}')">
+          ${badge}
+          <img src="${item.image_url}" alt="${item.nama}" loading="lazy">
+          <div class="gallery-info">
+            <span class="gallery-name">${item.nama}</span>
+            <span class="gallery-cat">${catLabel}</span>
+          </div>
         </div>
       `;
-      galleryGrid.appendChild(div);
     });
+    
+    galleryMarquee.innerHTML = html;
+    
+    // Atur durasi animasi berdasarkan jumlah foto agar kecepatannya konstan
+    const duration = data.length * 4; 
+    galleryMarquee.style.animationDuration = `${duration}s`;
   }
 
   upForm.addEventListener("submit", async (e) => {
