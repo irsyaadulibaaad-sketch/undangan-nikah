@@ -145,6 +145,13 @@
   <!-- DOORPRIZE GALLERY ADMIN -->
   <div style="margin-bottom: 50px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee;">
     <h3 class="admin-title" style="font-size: 1.5rem; margin-bottom: 15px;">Doorprize Winners</h3>
+    
+    <!-- BULK BAR GALERI -->
+    <div class="bulk-bar" id="bulkBarGallery" style="display:none;">
+      <span><b id="countGallery">0</b> foto dipilih</span>
+      <button class="btn-bulk" onclick="deleteSelectedGallery()">Hapus Foto Terpilih</button>
+    </div>
+
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
       <div><h4 style="font-family: var(--font-sans); font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase;">Bersama Pengantin</h4><div id="adminGal1"></div></div>
       <div><h4 style="font-family: var(--font-sans); font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase;">Momen Seru</h4><div id="adminGal2"></div></div>
@@ -400,8 +407,9 @@
       const div = document.createElement("div");
       div.style.cssText = `display:flex; align-items:center; gap:10px; background:var(--bg-cream); padding:8px; border-radius:6px; margin-bottom:8px; border: ${item.is_winner ? "2px solid #FFD700" : "1px solid #ddd"};`;
       
-      // Tampilan tombol: Pilih/Batal, dan Hapus
+      // Tampilan tombol: Checkbox, Pilih/Batal, dan Hapus
       div.innerHTML = `
+        <input type="checkbox" class="chk chk-gallery" value="${item.id}" data-url="${item.image_url}" onchange="updateBulkBarGallery()">
         <img src="${item.image_url}" class="admin-gal-img" onclick="openAdminLightbox('${item.image_url}')" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
         <div style="flex: 1;">
           <div style="font-size: 12px; font-weight: 600; margin-bottom:4px;">${item.nama}</div>
@@ -432,25 +440,46 @@
     loadAdminGallery();
   }
 
-  // Fungsi hapus foto (Database + Storage)
+  // Fungsi hapus single foto (Database + Storage)
   async function deleteGalleryPhoto(id, imageUrl) {
     if (!confirm("Yakin ingin menghapus foto ini dari galeri? (Tindakan ini permanen)")) return;
-    
-    // 1. Hapus data dari tabel gallery
     const { error } = await supabaseClient.from("gallery").delete().eq("id", id);
     if (error) { alert("Gagal menghapus data: " + error.message); return; }
+    try { const fileName = imageUrl.split('/').pop(); await supabaseClient.storage.from("doorprize").remove([fileName]); } catch (e) { console.warn(e); }
+    loadAdminGallery();
+  }
 
-    // 2. Hapus file dari Storage Supabase
+  // --- FITUR MULTI-SELECT GALERI ---
+  function updateBulkBarGallery() {
+    const selected = document.querySelectorAll(".chk-gallery:checked");
+    const bar = document.getElementById("bulkBarGallery");
+    const count = document.getElementById("countGallery");
+    count.textContent = selected.length;
+    bar.style.display = selected.length > 0 ? "flex" : "none";
+  }
+
+  async function deleteSelectedGallery() {
+    const selected = document.querySelectorAll(".chk-gallery:checked");
+    if (selected.length === 0 || !confirm(`Hapus ${selected.length} foto terpilih? (Tindakan ini permanen)`)) return;
+
+    // Kumpulkan ID dan URL file
+    const ids = Array.from(selected).map(cb => cb.value);
+    const fileNames = Array.from(selected).map(cb => cb.dataset.url.split('/').pop());
+
+    // 1. Hapus data dari database (massal)
+    const { error } = await supabaseClient.from("gallery").delete().in("id", ids);
+    if (error) { alert("Gagal menghapus data: " + error.message); return; }
+
+    // 2. Hapus file dari Storage (massal)
     try {
-      // Ambil nama file dari URL (setelah tanda '/')
-      const fileName = imageUrl.split('/').pop();
-      await supabaseClient.storage.from("doorprize").remove([fileName]);
+      await supabaseClient.storage.from("doorprize").remove(fileNames);
     } catch (e) {
-      console.warn("Gagal hapus file storage (mungkin file sudah tidak ada):", e);
+      console.warn("Gagal hapus file storage:", e);
     }
 
-    // 3. Refresh tampilan
+    // 3. Refresh
     loadAdminGallery();
+    updateBulkBarGallery(); // Reset bar
   }
 </script>
 </body>
