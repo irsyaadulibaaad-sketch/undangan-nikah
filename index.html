@@ -380,20 +380,24 @@
       else if (type === "form") { fromVars = { opacity: 0, y: 30 }; toVars = { opacity: 1, y: 0, duration: 1.2, ease: "power2.out" }; }
       
       gsap.fromTo(el, fromVars, { ...toVars, scrollTrigger: { trigger: el, start: "top 85%", toggleActions: "play none none none" } });
-      
-      // EFEK SCROLL MEWAH: MENGEcil DAN MEMUDAR HALUS (TANPA BLUR)
-      if (type !== "hero") {
-        gsap.to(el.querySelector(".container") || el, { 
-          scale: 0.85,       // Menyusut elegan
-          opacity: 0.2,      // Memudar halus (tidak 0 agar tetap terlihat bentuknya)
-          y: -50,            // Sedikit terangkat
-          ease: "power2.out", 
-          scrollTrigger: { trigger: el, start: "top top", end: "bottom top", scrub: 1.2 } 
-        });
-      } else {
-        // Hero hanya digeser sedikit (tanpa menyusut) agar fokus ke judul
-        gsap.to(el.querySelector(".container") || el, { y: -80, ease: "none", scrollTrigger: { trigger: el, start: "top top", end: "bottom top", scrub: true } });
-      }
+    });
+
+    // EFEK SCROLL (Dipisah agar tidak bentrok dengan animasi masuk)
+    document.querySelectorAll(".container").forEach(function (container) {
+      // Mengecilkan dan memudarkan saat di-scroll
+      gsap.to(container, {
+        scale: 0.9,
+        opacity: 0.4,
+        ease: "none",
+        scrollTrigger: {
+          trigger: container.parentElement, // Menggunakan parent section sebagai trigger
+          start: "top top", // Mulai saat bagian atas section menyentuh atas layar
+          end: "bottom top", // Berakhir saat bagian bawah section menyentuh atas layar
+          scrub: 1.5, // Efek smoothing 1.5 detik agar sangat mewah
+          // Toggle actions untuk memastikan kembali normal saat scroll naik
+          toggleActions: "play none none reverse" 
+        }
+      });
     });
   }
 })();
