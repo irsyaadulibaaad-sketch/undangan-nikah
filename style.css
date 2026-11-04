@@ -43,22 +43,21 @@ img, iframe { max-width: 100%; display: block; }
 button { font-family: inherit; }
 
 /* ==========================================================================
-   OVERLAY — TEKSTUR KERTAS & GRADASI HITAM (REVISI)
+   OVERLAY — TEKSTUR KERTAS & GRADASI HITAM BAWAH (REVISI)
    ========================================================================== */
 /* 1. Tekstur Kertas (Noise/Grain) */
 .noise-overlay {
   position: fixed; inset: 0; z-index: 9998; pointer-events: none; 
-  opacity: 0.15; /* Dibuat lebih tebal agar terasa tekstur kasarnya */
+  opacity: 0.15;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
   mix-blend-mode: multiply;
 }
 
-/* 2. Gradasi Opacity Hitam (Vignette) */
+/* 2. Gradasi Opacity Hitam HANYA di Bawah (Bottom Fade) */
 .vignette-overlay { 
-  display: block; /* Diaktifkan */
+  display: block; 
   position: fixed; inset: 0; z-index: 9997; pointer-events: none;
-  /* Efek gelap halus di sudut-sudut layar */
-  background: radial-gradient(circle at center, transparent 40%, rgba(20, 15, 10, 0.15) 100%);
+  background: linear-gradient(to bottom, transparent 60%, rgba(20, 15, 10, 0.15) 100%);
   mix-blend-mode: multiply;
 }
 
