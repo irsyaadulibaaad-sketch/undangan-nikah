@@ -144,7 +144,8 @@
 
   <!-- DOORPRIZE GALLERY ADMIN -->
   <div style="margin-bottom: 50px; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee;">
-    <h3 class="admin-title" style="font-size: 1.5rem; margin-bottom: 15px;">Doorprize Winners</h3>
+    <h3 class="admin-title" style="font-size: 1.5rem; margin-bottom: 5px;">Doorprize Winners</h3>
+    <p style="font-size: 0.8rem; color: #888; margin-bottom: 15px;">Maksimal 2 pemenang per kategori.</p>
     
     <!-- BULK BAR GALERI -->
     <div class="bulk-bar" id="bulkBarGallery" style="display:none;">
@@ -416,7 +417,7 @@
           <div style="display:flex; gap:5px;">
             ${item.is_winner 
               ? `<button class="btn-sm btn-del" onclick="cancelWinner('${item.id}')" style="padding:6px 10px; font-size:9px;">Batal</button>` 
-              : `<button class="btn-sm btn-save" onclick="setWinner('${item.id}', '${item.kategori}')" style="padding:6px 10px; font-size:9px;">Pilih</button>`
+              : `<button class="btn-sm btn-save" onclick="setWinner('${item.id}')" style="padding:6px 10px; font-size:9px;">Pilih</button>`
             }
             <button class="btn-sm btn-del" onclick="deleteGalleryPhoto('${item.id}', '${item.image_url}')" style="padding:6px 10px; font-size:9px; background-color:#c9302c;">Hapus</button>
           </div>
@@ -427,10 +428,14 @@
     Object.keys(cats).forEach(k => { if (cats[k].innerHTML === "") cats[k].innerHTML = '<p style="font-size:12px; color:#999;">Belum ada.</p>'; });
   }
 
-  async function setWinner(id, kategori) {
-    if (!confirm("Pilih foto ini sebagai pemenang?")) return;
-    await supabaseClient.from("gallery").update({ is_winner: false }).eq("kategori", kategori);
-    await supabaseClient.from("gallery").update({ is_winner: true }).eq("id", id);
+  // LOGIKA BARU: Maksimal 2 Pemenang per Kategori
+  async function setWinner(id) {
+    if (!confirm("Pilih foto ini sebagai pemenang? (Maksimal 2 per kategori)")) return;
+    
+    // Karena sistem mengizinkan lebih dari 1 pemenang, kita cukup update foto ini menjadi true
+    const { error } = await supabaseClient.from("gallery").update({ is_winner: true }).eq("id", id);
+    if (error) { alert("Gagal memilih pemenang: " + error.message); return; }
+    
     loadAdminGallery();
   }
 
