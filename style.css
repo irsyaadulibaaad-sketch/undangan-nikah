@@ -294,12 +294,15 @@ section { position: relative; padding: 170px 25px 130px; width: 100%; overflow: 
 .hero-date { font-family: var(--font-sans); font-size: 0.9rem; letter-spacing: 5px; color: var(--text-muted); margin-bottom: 10px; font-weight: 500; text-transform: uppercase; }
 .hero-time { font-family: var(--font-sans); font-size: 0.85rem; letter-spacing: 3px; color: var(--gold-dark); font-weight: 400; }
 
-.countdown-wrapper { display: flex; justify-content: center; }
-.countdown { display: flex; gap: 22px; }
+/* === PERBAIKAN COUNTDOWN DI MOBILE === */
+.countdown-wrapper { display: flex; justify-content: center; width: 100%; padding: 0 10px; }
+.countdown { display: flex; gap: 10px; justify-content: center; width: 100%; max-width: 400px; }
 .cd-box {
   background: #FFFFFF;
   border: 1px solid rgba(158,122,62,0.20);
-  border-radius: 4px; width: 84px; height: 96px;
+  border-radius: 4px; 
+  flex: 1; /* Agar membagi rata lebar layar */
+  aspect-ratio: 4/5; /* Menjaga proporsi kotak */
   display: flex; flex-direction: column; justify-content: center; align-items: center;
   box-shadow: var(--shadow-soft);
   position: relative; overflow: hidden;
@@ -309,8 +312,8 @@ section { position: relative; padding: 170px 25px 130px; width: 100%; overflow: 
   background: linear-gradient(to right, transparent, var(--gold-mid), transparent);
   opacity: 0.8;
 }
-.cd-box span { font-family: var(--font-serif); font-size: 2.3rem; font-weight: 400; color: var(--text-main); display: block; line-height: 1; margin-bottom: 9px; font-variant-numeric: tabular-nums; }
-.cd-box small { font-size: 0.56rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2.5px; font-weight: 500; }
+.cd-box span { font-family: var(--font-serif); font-size: 1.8rem; font-weight: 400; color: var(--text-main); display: block; line-height: 1; margin-bottom: 5px; font-variant-numeric: tabular-nums; }
+.cd-box small { font-size: 0.5rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 500; }
 .cd-done { font-family: var(--font-serif); font-size: 2rem; color: var(--gold-dark); font-style: italic; }
 
 /* ==========================================================================
@@ -795,9 +798,10 @@ footer small { font-family: var(--font-sans); font-size: 0.66rem; text-transform
   .name-script { display: inline; }
   .ampersand-hero { display: inline; margin: 0 20px; font-size: 3.8rem; }
   .cover-title { font-size: 5rem; }
-  .countdown { gap: 26px; }
-  .cd-box { width: 104px; height: 114px; }
-  .cd-box span { font-size: 2.9rem; }
+  .countdown { gap: 20px; } /* Jarak lebih lebar di desktop */
+  .cd-box { aspect-ratio: auto; height: 100px; } /* Kembalikan tinggi fix di desktop */
+  .cd-box span { font-size: 2.5rem; }
+  .cd-box small { font-size: 0.6rem; letter-spacing: 2px; }
 }
 
 @media (max-width: 480px) {
@@ -923,34 +927,6 @@ footer small { font-family: var(--font-sans); font-size: 0.66rem; text-transform
 .pb-toggle { margin-top: 38px; }
 .pb-panel { margin-top: 6px; }
 .pb-panel .sub-title { text-align: center; }
-/* ===== FAQ AKORDEON ===== */
-.faq-list { max-width: 560px; margin: 0 auto; text-align: left; }
-.faq-item {
-  border: 1px solid rgba(158,122,62,0.25); border-radius: 6px;
-  margin-bottom: 14px; background: #FFFFFF; overflow: hidden;
-  transition: box-shadow 0.3s, border-color 0.3s;
-}
-.faq-item.open { box-shadow: var(--shadow-soft); border-color: rgba(158,122,62,0.55); }
-.faq-q {
-  width: 100%; display: flex; justify-content: space-between; align-items: center;
-  gap: 14px; padding: 18px 22px; background: transparent; border: none;
-  cursor: pointer; text-align: left;
-  font-family: var(--font-sans); font-size: 0.9rem; font-weight: 600;
-  color: var(--text-main); letter-spacing: 0.3px;
-}
-.faq-arrow {
-  width: 9px; height: 9px; flex: none;
-  border-right: 2px solid var(--gold-dark); border-bottom: 2px solid var(--gold-dark);
-  transform: rotate(45deg); transition: transform 0.3s;
-}
-.faq-item.open .faq-arrow { transform: rotate(225deg); }
-.faq-a { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
-.faq-a p {
-  padding: 0 22px 20px; font-size: 0.85rem; color: var(--text-muted);
-  font-weight: 300; line-height: 1.85;
-}
-.faq-a p b { color: var(--gold-dark); font-weight: 600; }
-.faq-item.open .faq-a { max-height: 320px; }
 /* ===== FAQ AKORDEON ===== */
 .faq-list { max-width: 560px; margin: 0 auto; text-align: left; }
 .faq-item {
