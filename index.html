@@ -14,11 +14,6 @@
 </head>
 <body>
 
-<!-- MUSIK LATAR (Pastikan file lagu-pernikahan.mp3 ada di folder yang sama) -->
-<audio id="bg-music" loop>
-  <source src="lagu-pernikahan.mp3" type="audio/mpeg">
-</audio>
-
 <div class="noise-overlay"></div>
 <div class="vignette-overlay"></div>
 
@@ -178,9 +173,10 @@
         <div id="flowerContainer" class="flower-container"></div>
       </div>
 
-      <p id="gardenHint" class="garden-hint" style="text-align:center; margin-top:20px; font-size:0.75rem; letter-spacing:2px; color:var(--text-muted);">Ketuk bunga untuk melihat doa</p>
+      <p id="gardenHint" class="garden-hint">Ketuk bunga untuk melihat doa</p>
 
-      <div id="directDoaFormContainer" style="display: none; margin-top: 50px; background: #fff; padding: 30px; border-radius: 12px; box-shadow: var(--shadow-soft); border: 1px solid #eee; max-width: 440px; margin-left: auto; margin-right: auto;">
+      <!-- FORM DOA LANGSUNG (Bisa disembunyikan dari admin) -->
+      <div id="directDoaFormContainer" style="display: none; margin-top: 40px; background: #fff; padding: 30px; border-radius: 12px; box-shadow: var(--shadow-soft); border: 1px solid #eee; max-width: 440px; margin-left: auto; margin-right: auto;">
         <h3 style="font-family: var(--font-serif); color: var(--gold-dark); margin-bottom: 15px; font-size: 1.4rem; text-align: center;">Tinggalkan Doa & Ucapan</h3>
         <form id="directDoaForm" class="rsvp-form" style="max-width: 100%;">
           <div class="input-group"><label>Nama Anda</label><input id="ddNama" type="text" required maxlength="60" placeholder="Your name"></div>
@@ -190,6 +186,7 @@
         </form>
       </div>
 
+      <!-- TOMBOL MENUJU PHOTOBOOTH BARU -->
       <a href="photobooth.html" id="btnPhotobooth" class="btn-primary pb-toggle" style="text-decoration:none; display:none; text-align:center; margin-top:30px;">Buka Photobooth & Ikut Doorprize</a>
     </div>
     <div class="curve-divider">
@@ -262,6 +259,7 @@
     </div>
   </section>
 
+  <!-- FOOTER -->
   <footer class="bg-light">
       <svg class="divider" viewBox="0 0 200 20" xmlns="http://www.w3.org/2000/svg"><path d="M0,10 L80,10 M120,10 L200,10" stroke="currentColor" stroke-width="0.5"/><path d="M90,10 L95,5 L100,10 L105,15 Z" fill="currentColor"/></svg>
       <p>Irsyaad &amp; Refalina</p>
@@ -270,6 +268,7 @@
 
 </div>
 
+<!-- POPUP DOA ELEGAN -->
 <div id="prayerModal" class="prayer-modal" hidden>
   <div class="prayer-modal-backdrop" id="prayerBackdrop"></div>
   <div class="prayer-card" id="prayerCard">
@@ -312,15 +311,6 @@
     cover.style.display = "none";
     mainContent.classList.remove("hidden");
     window.scrollTo(0, 0);
-    
-    var bgMusic = document.getElementById("bg-music");
-    if (bgMusic) {
-      bgMusic.volume = 0.5;
-      bgMusic.play().catch(function(error) {
-        console.log("Autoplay dicegah oleh browser:", error);
-      });
-    }
-
     if (window.gsap) {
       gsap.fromTo(".bismillah-wrapper", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.6, ease: "power3.out", delay: 0.2 });
       gsap.fromTo(".hero-title-wrapper", { opacity: 0, scale: 0.96, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 2, ease: "power3.out", delay: 0.5 });
@@ -386,15 +376,25 @@ const directDoaContainer = document.getElementById("directDoaFormContainer");
 async function checkStatusTampilan() {
   const { data, error } = await supabaseClient.from("pengaturan").select("*").single();
   if (!error && data) {
-    if (data.photobooth_active) btnPhotobooth.style.display = "inline-block";
-    else btnPhotobooth.style.display = "none";
+    // Cek Photobooth
+    if (data.photobooth_active) {
+      btnPhotobooth.style.display = "inline-block";
+    } else {
+      btnPhotobooth.style.display = "none";
+    }
     
-    if (data.doa_active) directDoaContainer.style.display = "block";
-    else directDoaContainer.style.display = "none";
+    // Cek Form Doa
+    if (data.doa_active) {
+      directDoaContainer.style.display = "block";
+    } else {
+      directDoaContainer.style.display = "none";
+    }
   }
 }
+
 checkStatusTampilan();
 
+// Pantau perubahan realtime
 supabaseClient.channel("pengaturan-rt")
   .on("postgres_changes", { event: "UPDATE", schema: "public", table: "pengaturan" }, (payload) => {
     if (payload.new.photobooth_active !== undefined) {
@@ -428,29 +428,8 @@ document.getElementById("directDoaForm").addEventListener("submit", async (e) =>
     msg.style.color = "#8A9A7B";
     msg.textContent = "Terima kasih! Doa Anda telah mekar di taman.";
     e.target.reset();
-    loadTaman(); 
+    loadTaman(); // Panggil fungsi dari app.js untuk refresh bunga
   }
-});
-
-// --- LOGIKA FAQ AKORDEON (DITAMBAHKAN KEMBALI) ---
-document.querySelectorAll(".faq-q").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const item = btn.parentElement;
-    const wasOpen = item.classList.contains("open");
-    
-    // Tutup semua FAQ yang sedang terbuka
-    document.querySelectorAll(".faq-item.open").forEach(i => {
-      i.classList.remove("open");
-      i.querySelector(".faq-a").style.maxHeight = null;
-    });
-    
-    // Buka FAQ yang diklik (jika sebelumnya tertutup)
-    if (!wasOpen) {
-      item.classList.add("open");
-      const answer = item.querySelector(".faq-a");
-      answer.style.maxHeight = answer.scrollHeight + "px";
-    }
-  });
 });
 </script>
 </body>
