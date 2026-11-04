@@ -33,11 +33,25 @@
   .pb-slot { position: relative; }
   .pb-remove { position: absolute; top: -8px; right: -8px; background: #d9534f; color: white; border: none; border-radius: 50%; width: 26px; height: 26px; font-size: 14px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
 
-  /* Galeri Marquee (Kolase Bergerak) */
-  .gallery-wrapper { overflow: hidden; width: 100%; position: relative; padding: 20px 0; margin-top: 20px; }
-  .gallery-marquee { display: flex; gap: 15px; width: max-content; animation: scroll 60s linear infinite; }
-  .gallery-marquee:hover { animation-play-state: paused; }
-  @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  /* Galeri Marquee 3 Baris */
+  .gallery-wrapper { overflow: hidden; width: 100%; position: relative; padding: 20px 0; margin-top: 20px; display: flex; flex-direction: column; gap: 15px; }
+  .marquee-row { display: flex; overflow: hidden; width: 100%; }
+  .marquee-track { display: flex; gap: 15px; width: max-content; }
+  
+  /* Animasi Baris */
+  .marquee-row.left .marquee-track { animation: scrollLeft 80s linear infinite; }
+  .marquee-row.right .marquee-track { animation: scrollRight 80s linear infinite; }
+  
+  .marquee-row:hover .marquee-track { animation-play-state: paused; }
+  
+  @keyframes scrollLeft { 
+    0% { transform: translateX(0); } 
+    100% { transform: translateX(-50%); } 
+  }
+  @keyframes scrollRight { 
+    0% { transform: translateX(-50%); } 
+    100% { transform: translateX(0); } 
+  }
   
   .gallery-item { position: relative; border-radius: 8px; overflow: hidden; box-shadow: var(--shadow-soft); background: #fff; width: 160px; height: 160px; flex-shrink: 0; cursor: pointer; transition: transform 0.3s; }
   .gallery-item:hover { transform: scale(1.05); z-index: 2; }
@@ -127,13 +141,19 @@
     </form>
   </div>
 
-  <!-- GALERI BERSAMA (MARQUEE) -->
+  <!-- GALERI BERSAMA (3 BARIS MARQUEE) -->
   <div class="gallery-section">
     <h2 class="gallery-title" style="text-align:center; font-family:var(--font-serif); font-size:2rem; margin-bottom:10px;">Galeri Bersama</h2>
-    <p style="text-align:center; font-size:0.8rem; color:var(--text-muted); margin-bottom:20px;">Geser/klik foto untuk melihat layar penuh</p>
+    <p style="text-align:center; font-size:0.8rem; color:var(--text-muted); margin-bottom:20px;">Klik foto untuk melihat layar penuh</p>
     <div class="gallery-wrapper">
-      <div class="gallery-marquee" id="galleryMarquee">
-        <p style="color:#888; font-size:0.9rem; margin:0 auto;">Memuat galeri...</p>
+      <div class="marquee-row left">
+        <div class="marquee-track" id="track1"><p style="color:#888; font-size:0.9rem;">Memuat galeri...</p></div>
+      </div>
+      <div class="marquee-row right">
+        <div class="marquee-track" id="track2"></div>
+      </div>
+      <div class="marquee-row left">
+        <div class="marquee-track" id="track3"></div>
       </div>
     </div>
   </div>
@@ -610,11 +630,8 @@
         b.innerHTML = `<span>+ Foto ${i + 1}</span>`;
       }
       
-      // Hanya daftarkan event klik ke b (jika klik area kosong/span)
       b.addEventListener("click", (e) => {
-        // Abaikan jika yang diklik adalah tombol silang
         if (e.target.classList.contains('pb-remove')) return;
-        
         pbPending = i;
         const pick = document.getElementById("pbPick");
         pick.value = "";
@@ -626,7 +643,6 @@
     }
   }
 
-  // Fungsi Hapus Foto
   window.removePhoto = function(e, index) {
     e.stopPropagation();
     PB.slots[index] = null;
@@ -735,12 +751,13 @@
   });
 
   // ==========================================
-  // LOGIKA UPLOAD DOORPRIZE & GALERI (MARQUEE)
+  // LOGIKA UPLOAD DOORPRIZE & GALERI (MARQUEE 3 BARIS)
   // ==========================================
   const upForm = document.getElementById("uploadForm");
-  const galleryMarquee = document.getElementById("galleryMarquee");
+  const track1 = document.getElementById("track1");
+  const track2 = document.getElementById("track2");
+  const track3 = document.getElementById("track3");
 
-  // Fungsi Lightbox
   window.openLightbox = function(url, nama, kategori) {
     document.getElementById("lightboxImg").src = url;
     document.getElementById("lightboxInfo").innerHTML = `<b>${nama}</b><br><span style="font-size:0.8rem; opacity:0.8; text-transform:capitalize;">${kategori.replace(/_/g, ' ')}</span>`;
@@ -758,19 +775,20 @@
     if (error) { console.error(error); return; }
     
     if (!data || data.length === 0) {
-      galleryMarquee.innerHTML = '<p style="color:#888; font-size:0.9rem; margin:0 auto;">Belum ada foto.</p>';
+      track1.innerHTML = '<p style="color:#888; font-size:0.9rem;">Belum ada foto.</p>';
+      track2.innerHTML = '';
+      track3.innerHTML = '';
       return;
     }
 
-    // Duplikasi data agar animasi loop terlihat mulus (seamless)
-    const loopData = [...data, ...data, ...data];
+    // Acak urutan data (Shuffle) agar baris 1, 2, 3 isinya berbeda-beda
+    const shuffled = [...data].sort(() => Math.random() - 0.5);
 
-    let html = "";
-    loopData.forEach(item => {
+    // Fungsi bantu membuat HTML foto
+    const createPhotoHTML = (item) => {
       let badge = item.is_winner ? `<div class="badge-winner">🏆 Pemenang</div>` : "";
       let catLabel = item.kategori.replace(/_/g, ' ');
-
-      html += `
+      return `
         <div class="gallery-item" onclick="openLightbox('${item.image_url}', '${item.nama}', '${item.kategori}')">
           ${badge}
           <img src="${item.image_url}" alt="${item.nama}" loading="lazy">
@@ -780,13 +798,32 @@
           </div>
         </div>
       `;
-    });
+    };
+
+    // Isi Baris 1 (Semua Foto)
+    let html1 = "";
+    const loop1 = [...data, ...data]; // Duplikasi untuk loop seamless
+    loop1.forEach(item => html1 += createPhotoHTML(item));
+    track1.innerHTML = html1;
+
+    // Isi Baris 2 (Foto Acak)
+    let html2 = "";
+    const loop2 = [...shuffled, ...shuffled];
+    loop2.forEach(item => html2 += createPhotoHTML(item));
+    track2.innerHTML = html2;
+
+    // Isi Baris 3 (Foto Acak, dibalik urutannya)
+    let html3 = "";
+    const reversed = [...data].reverse();
+    const loop3 = [...reversed, ...reversed];
+    loop3.forEach(item => html3 += createPhotoHTML(item));
+    track3.innerHTML = html3;
     
-    galleryMarquee.innerHTML = html;
-    
-    // Atur durasi animasi berdasarkan jumlah foto agar kecepatannya konstan
-    const duration = data.length * 4; 
-    galleryMarquee.style.animationDuration = `${duration}s`;
+    // Atur durasi animasi (makin banyak foto, makin lama durasinya agar kecepatan konstan & lambat)
+    const baseSpeed = 10; // detik per foto (diperlambat)
+    track1.style.animationDuration = `${data.length * baseSpeed}s`;
+    track2.style.animationDuration = `${data.length * baseSpeed + 5}s`; // Sedikit beda agar tidak monoton
+    track3.style.animationDuration = `${data.length * baseSpeed + 10}s`;
   }
 
   upForm.addEventListener("submit", async (e) => {
