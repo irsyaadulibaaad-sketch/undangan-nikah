@@ -74,6 +74,18 @@
   .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
   input:checked + .slider { background-color: #8A9A7B; }
   input:checked + .slider:before { transform: translateX(24px); }
+
+  /* ===== BROADCAST GENERATOR ===== */
+  .bc-container { background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #eee; margin-bottom: 30px; }
+  .bc-mode { display: flex; gap: 10px; margin-bottom: 15px; }
+  .bc-mode label { cursor: pointer; padding: 8px 15px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.8rem; font-family: var(--font-sans); font-weight: 500; background: var(--bg-cream); }
+  .bc-mode input[type="radio"] { margin-right: 5px; accent-color: var(--gold-dark); }
+  .bc-mode input[type="radio"]:checked + span { color: var(--gold-dark); font-weight: 600; }
+  .bc-input-group { margin-bottom: 15px; }
+  .bc-input-group label { display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-bottom: 5px; }
+  .bc-result { width: 100%; height: 220px; padding: 15px; border: 1px solid #ddd; border-radius: 6px; font-family: monospace; font-size: 12px; line-height: 1.5; background: var(--bg-cream); resize: vertical; }
+  .btn-copy { background: var(--gold-dark); color: #fff; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-family: var(--font-sans); font-weight: 600; letter-spacing: 1px; font-size: 0.8rem; transition: 0.3s; margin-top: 10px; }
+  .btn-copy:hover { background: var(--gold-mid); }
 </style>
 </head>
 <body>
@@ -92,6 +104,26 @@
   <div class="admin-header">
     <h2 class="admin-title">Dashboard</h2>
     <button onclick="logout()" class="btn-outline" style="width: auto; margin: 0; padding: 10px 25px; color: var(--gold-dark); border-color: var(--gold-dark);">Logout</button>
+  </div>
+
+  <!-- BROADCAST GENERATOR -->
+  <div class="bc-container">
+    <h3 class="admin-title" style="font-size: 1.5rem; margin-bottom: 5px;">Broadcast Generator</h3>
+    <p style="font-size: 0.8rem; color: #888; margin-bottom: 15px;">Buat pesan WA otomatis dengan format tebal (bold) dan link yang sesuai.</p>
+    
+    <div class="bc-mode">
+      <label><input type="radio" name="bcType" value="grup" checked><span>Grup (Link Biasa)</span></label>
+      <label><input type="radio" name="bcType" value="personal"><span>Personal (Link Nama)</span></label>
+    </div>
+
+    <div class="bc-input-group" id="bcNameGroup" style="display: none;">
+      <label>Nama Tamu (Untuk Link)</label>
+      <input type="text" id="bcGuestName" placeholder="Contoh: Budi Santoso">
+    </div>
+
+    <label style="display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-bottom: 5px;">Hasil Teks:</label>
+    <textarea id="bcOutput" class="bc-result" readonly></textarea>
+    <button class="btn-copy" onclick="copyBC()">Salin Teks</button>
   </div>
 
   <!-- PENGATURAN TAMPILAN -->
@@ -288,6 +320,7 @@
       loadAdminData();
       loadAdminGallery();
       loadSettings();
+      generateBC(); // Panggil fungsi generator saat login
     } else {
       document.getElementById("loginMsg").textContent = "Invalid PIN!";
     }
@@ -513,6 +546,69 @@
     // 3. Refresh
     loadAdminGallery();
     updateBulkBarGallery(); // Reset bar
+  }
+
+  // --- LOGIKA BROADCAST GENERATOR ---
+  const bcRadios = document.querySelectorAll('input[name="bcType"]');
+  const bcNameGroup = document.getElementById("bcNameGroup");
+  const bcGuestName = document.getElementById("bcGuestName");
+  const bcOutput = document.getElementById("bcOutput");
+
+  bcRadios.forEach(radio => {
+    radio.addEventListener("change", function() {
+      if (this.value === "personal") {
+        bcNameGroup.style.display = "block";
+      } else {
+        bcNameGroup.style.display = "none";
+      }
+      generateBC();
+    });
+  });
+
+  bcGuestName.addEventListener("input", generateBC);
+
+  function generateBC() {
+    const isPersonal = document.querySelector('input[name="bcType"]:checked').value === "personal";
+    const guestName = bcGuestName.value.trim();
+    
+    // Tentukan link
+    let link = "https://irsyaad-refa.vercel.app/";
+    if (isPersonal && guestName) {
+      // Ubah spasi menjadi + untuk format URL
+      const encodedName = encodeURIComponent(guestName).replace(/%20/g, '+');
+      link = `https://irsyaad-refa.vercel.app/?to=${encodedName}`;
+    }
+
+    // Template Broadcast dengan Format Bold WA (*) dan Italic (_)
+    const teksBC = 
+`*Halo semuanya!* 👋
+
+Kabar bahagia datang dari kami. Kami mengundang teman-teman semua untuk merayakan hari bahagia pernikahan kami:
+
+*Irsyaadul & Refalina*
+
+Acara akan dilaksanakan pada:
+📅 *Kamis, 24 Desember 2026*
+🕚 *Pukul 11.00 - 13.00 WIB*
+📍 *Rumah Makan Alam Pilemburan*, Bandung Barat
+
+Yuk, cek undangan digital kami di link berikut untuk melihat detail lokasi dan konfirmasi kehadiran (RSVP):
+
+🔗 ${link}
+
+Kami sangat berharap bisa bertemu dan merayakannya bersama teman-teman sekalian. Terima kasih banyak! ✨`;
+
+    bcOutput.value = teksBC;
+  }
+
+  function copyBC() {
+    bcOutput.select();
+    bcOutput.setSelectionRange(0, 99999); // Untuk mobile
+    navigator.clipboard.writeText(bcOutput.value).then(() => {
+      alert("Teks Broadcast berhasil disalin! Silakan paste di WhatsApp.");
+    }).catch(err => {
+      alert("Gagal menyalin teks: " + err);
+    });
   }
 </script>
 </body>
