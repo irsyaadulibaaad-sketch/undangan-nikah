@@ -250,11 +250,10 @@ section { position: relative; padding: 170px 25px 130px; width: 100%; overflow: 
   max-width: 480px;
   margin-left: auto;
   margin-right: auto;
-  display: inline-block;
+  display: block;
   width: 100%;
   position: relative;
-  left: 50%;
-  transform: translateX(-50%);
+  text-align: center;
 }
 .hero-date { font-family: var(--font-sans); font-size: 0.95rem; letter-spacing: 5px; color: var(--text-main); margin-bottom: 10px; font-weight: 600; text-transform: uppercase; }
 .hero-time { font-family: var(--font-sans); font-size: 0.9rem; letter-spacing: 3px; color: var(--gold-dark); font-weight: 600; }
