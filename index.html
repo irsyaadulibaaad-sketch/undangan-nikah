@@ -327,11 +327,11 @@
     opened = true;
     if (!window.gsap) { revealMain(); return; }
 
-    // 1. Animasi Tarik Pita Lepas (CSS)
+    // 1. Animasi Tarik Pita: satu sisi ditarik, simpul terbuka jadi tali lurus, tali lepas (diatur di app.js, ±1.45 detik)
     if (envelope) envelope.classList.add("ribbon-off");
 
     // 2. Animasi Amplop Terbuka
-    var tl = gsap.timeline({ defaults: { ease: "power3.inOut" }, delay: 0.6 }); // Delay 0.6s agar pita sempat lepas
+    var tl = gsap.timeline({ defaults: { ease: "power3.inOut" }, delay: 0.2 }); // Delay 0.2s + 1.25s tween awal = undangan mulai terbuka tepat saat pita lepas (±1.45s)
     tl.to(openBtn, { scale: 1.15, duration: 0.35, ease: "power2.out" })
       .to(openBtn, { scale: 0.9, duration: 0.2, ease: "power2.in" })
       .to(openBtn, { scale: 1.6, opacity: 0, filter: "blur(6px)", duration: 0.7, ease: "power2.in" })
@@ -475,3 +475,6 @@ window.onload = function() {
 </script>
 </body>
 </html>
+
+
+
