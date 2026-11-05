@@ -510,12 +510,19 @@ window.onload = function() {
   });
 };
 
-// ====== LOGIKA AUTO SCROLL ======
+// ====== LOGIKA AUTO SCROLL (LANGSUNG ON & SEDIKIT DIPERCEPAT) ======
 (function() {
-  let autoScrollActive = false;
+  let autoScrollActive = true; // Langsung ON
   let autoScrollInterval = null;
   const btnToggle = document.getElementById("autoScrollToggle");
   const textToggle = document.getElementById("autoScrollText");
+
+  // Setel tampilan tombol langsung ke ON
+  if (btnToggle && textToggle) {
+    btnToggle.style.background = "var(--gold-dark)";
+    btnToggle.style.color = "#fff";
+    textToggle.textContent = "Auto Scroll: ON";
+  }
 
   function toggleAutoScroll() {
     autoScrollActive = !autoScrollActive;
@@ -545,8 +552,8 @@ window.onload = function() {
         clearInterval(autoScrollInterval);
         return;
       }
-      window.scrollBy(0, 1); // Kecepatan lambat (1 pixel per interval)
-    }, 50); // Semakin besar angka, semakin lambat
+      window.scrollBy(0, 2); // Kecepatan ditambah sedikit (2 pixel per interval)
+    }, 50); 
   }
 
   function stopAutoScroll() {
@@ -570,7 +577,17 @@ window.onload = function() {
     }
   }
 
-  btnToggle.addEventListener("click", toggleAutoScroll);
+  if (btnToggle) {
+    btnToggle.addEventListener("click", toggleAutoScroll);
+  }
+
+  // Jalankan auto scroll setelah undangan dibuka (delay 3 detik agar animasi pembuka selesai)
+  setTimeout(function() {
+    if (autoScrollActive) {
+      startAutoScroll();
+    }
+  }, 3000);
+
 })();
 </script>
 </body>
