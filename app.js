@@ -225,11 +225,13 @@ supabaseClient.channel("doa-rt")
   // ---------- konstanta ----------
   const DPR = Math.min(window.devicePixelRatio || 1, 2);
   const EW = env.offsetWidth || 340, EH = env.offsetHeight || 460; // ukuran amplop sebenarnya (HP = 300 x 420)
-  const CW = EW + 380, CH = EH + 140;             // ukuran kanvas (px CSS), lebih besar dari amplop agar pita bisa keluar
+  
+  // PERBAIKAN: Lebar kanvas dikurangi agar pita tidak keluar dari batas amplop (sebelumnya + 380)
+  const CW = EW + 200, CH = EH + 140;             
   const OX = (CW - EW) / 2, OY = (CH - EH) / 2;   // posisi amplop di dalam kanvas
   const KX = EW / 2, KY = EH / 2;                 // pusat simpul = tengah amplop
   const W = 24;                                   // lebar pita
-  const REACH = 250;                              // panjang tali lurus ke kiri/kanan dari simpul
+  const REACH = 180;                              // PERBAIKAN: panjang tali lurus dikurangi (sebelumnya 250)
 
   // durasi (detik)
   const T_PULL = 1.15;   // tarik + simpul terbuka
@@ -452,7 +454,7 @@ supabaseClient.channel("doa-rt")
   }
 
   // ---------- jalur tarik lepas ----------
-  const FX = EW + 100, FR = 80, ARC = Math.PI * FR / 2;
+  const FX = EW + 60, FR = 60, ARC = Math.PI * FR / 2;
   function feedPt(sg) {
     if (sg <= FX) return { x: sg, y: KY };
     const d = sg - FX;
@@ -582,6 +584,3 @@ document.querySelectorAll(".faq-q").forEach(btn => {
     if (!wasOpen) item.classList.add("open");
   });
 });
-
-
-
