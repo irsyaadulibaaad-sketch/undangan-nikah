@@ -33,30 +33,27 @@
   .autoscroll-btn:hover { background: var(--gold-mid); color: #fff; }
   .autoscroll-btn svg { width: 14px; height: 14px; fill: currentColor; }
 
-  /* CSS Tambahan untuk Teks Tamu di Amplop (Efek Lipatan 3D) */
+  /* CSS Tambahan untuk Teks Tamu di Amplop (DIPERBAIKI) */
   .guest-greeting {
     position: absolute;
-    top: 50%;
+    top: 35%; /* Dipindah ke atas agar tidak tertutup pita */
     left: 0;
     width: 100%;
     text-align: center;
-    z-index: 6; /* Di atas kertas lipat, di bawah pita */
+    z-index: 20; /* Di paling atas */
     pointer-events: none;
-    /* Membuat teks melengkung mengikuti lipatan buku */
     transform-style: preserve-3d;
     perspective: 1000px;
   }
   .guest-greeting-inner {
     display: inline-block;
-    transform: rotateX(15deg); /* Sedikit miring ke belakang sesuai perspektif amplop */
-    background: rgba(255, 255, 255, 0.4);
-    padding: 10px 25px;
-    border-radius: 4px;
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    border: 1px solid rgba(158,122,62,0.15);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
-    opacity: 0; /* Disembunyikan secara default */
+    transform: rotateX(10deg); /* Efek lipatan 3D */
+    background: #FFFCF5; /* Latar solid agar tidak transparan/tertutup bayangan */
+    padding: 15px 30px;
+    border-radius: 6px;
+    border: 1px solid rgba(158,122,62,0.3);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    opacity: 0;
     transition: opacity 1s ease;
   }
   .guest-greeting-inner.show {
@@ -65,17 +62,17 @@
   .guest-label {
     display: block;
     font-family: var(--font-sans);
-    font-size: 0.6rem;
-    letter-spacing: 3px;
+    font-size: 0.65rem;
+    letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--gold-dark);
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     font-weight: 600;
   }
   .guest-name-text {
     display: block;
     font-family: var(--font-serif);
-    font-size: 1.1rem;
+    font-size: 1.4rem;
     font-style: italic;
     color: var(--text-main);
     font-weight: 600;
