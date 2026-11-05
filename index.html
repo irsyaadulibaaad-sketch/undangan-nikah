@@ -33,26 +33,25 @@
   .autoscroll-btn:hover { background: var(--gold-mid); color: #fff; }
   .autoscroll-btn svg { width: 14px; height: 14px; fill: currentColor; }
 
-  /* CSS Tambahan untuk Teks Tamu di Amplop (DIPERBAIKI) */
+  /* CSS Teks Tamu (DIPERBAIKI TOTAL) */
   .guest-greeting {
     position: absolute;
-    top: 35%; /* Dipindah ke atas agar tidak tertutup pita */
+    top: 38%;
     left: 0;
     width: 100%;
     text-align: center;
-    z-index: 20; /* Di paling atas */
+    z-index: 999; /* Paksa paling atas */
     pointer-events: none;
-    transform-style: preserve-3d;
-    perspective: 1000px;
   }
   .guest-greeting-inner {
     display: inline-block;
-    transform: rotateX(10deg); /* Efek lipatan 3D */
-    background: #FFFCF5; /* Latar solid agar tidak transparan/tertutup bayangan */
-    padding: 15px 30px;
-    border-radius: 6px;
-    border: 1px solid rgba(158,122,62,0.3);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    background: #FFFCF5;
+    padding: 15px 35px;
+    border-radius: 4px;
+    border: 1px solid rgba(158,122,62,0.4);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    /* Efek perspektif lipatan kertas */
+    transform: perspective(500px) rotateX(15deg);
     opacity: 0;
     transition: opacity 1s ease;
   }
@@ -62,11 +61,11 @@
   .guest-label {
     display: block;
     font-family: var(--font-sans);
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     letter-spacing: 2px;
     text-transform: uppercase;
     color: var(--gold-dark);
-    margin-bottom: 8px;
+    margin-bottom: 6px;
     font-weight: 600;
   }
   .guest-name-text {
@@ -101,6 +100,8 @@
   <div class="golden-glow"></div>
   <div class="light-rays"><span></span><span></span><span></span></div>
   <div class="luxury-envelope" id="luxuryEnvelope">
+    
+    <!-- KERTAS BELAKANG (Tempat Teks Tamu) -->
     <div class="paper-back">
       <svg class="ornament-frame" viewBox="0 0 300 400" xmlns="http://www.w3.org/2000/svg">
         <path d="M15,15 L285,15 L285,385 L15,385 Z" fill="none" stroke="currentColor" stroke-width="0.8"/>
@@ -117,18 +118,20 @@
         <h1 class="cover-title">Irsyaad<br><span class="ampersand-cover">&</span><br>Refalina</h1>
         <p class="cover-date">24 . 12 . 2026</p>
       </div>
+
+      <!-- Teks Tamu Dipindah ke Sini -->
+      <div class="guest-greeting" id="guestGreeting">
+        <div class="guest-greeting-inner" id="guestGreetingInner">
+          <span class="guest-label">Kepada Yth. Bapak/Ibu/Saudara/i</span>
+          <span class="guest-name-text" id="guestNameText"></span>
+        </div>
+      </div>
+
     </div>
+    
     <div class="paper-front left" id="paperLeft"><div class="emboss-pattern"></div><div class="emboss-shadow"></div></div>
     <div class="paper-front right" id="paperRight"><div class="emboss-pattern"></div><div class="emboss-shadow"></div></div>
     
-    <!-- TAMBAHAN: Teks Nama Tamu di Amplop -->
-    <div class="guest-greeting" id="guestGreeting">
-      <div class="guest-greeting-inner" id="guestGreetingInner">
-        <span class="guest-label">Kepada Yth. Bapak/Ibu/Saudara/i</span>
-        <span class="guest-name-text" id="guestNameText"></span>
-      </div>
-    </div>
-
     <div class="wax-seal" id="openBtn">
       <span class="seal-initials">I&amp;R</span>
       <div class="seal-shine"></div>
@@ -383,15 +386,23 @@
   const urlParams = new URLSearchParams(window.location.search);
   const guestName = urlParams.get('to') || urlParams.get('nama') || urlParams.get('kepada');
   
+  // Jika ada parameter nama di URL
   if (guestName) {
     const greetingBox = document.getElementById("guestGreetingInner");
     const nameText = document.getElementById("guestNameText");
     if (greetingBox && nameText) {
-      // Format nama: ganti tanda + atau %20 dengan spasi, lalu Title Case
       let formattedName = decodeURIComponent(guestName.replace(/\+/g, ' '));
       formattedName = formattedName.replace(/\b\w/g, c => c.toUpperCase());
-      
       nameText.textContent = formattedName;
+      greetingBox.classList.add("show");
+    }
+  } 
+  // TEKS DUMMY UNTUK TES (Akan dihapus nanti jika sudah berhasil)
+  else {
+    const greetingBox = document.getElementById("guestGreetingInner");
+    const nameText = document.getElementById("guestNameText");
+    if (greetingBox && nameText) {
+      nameText.textContent = "Tamu Undangan (Tes)";
       greetingBox.classList.add("show");
     }
   }
