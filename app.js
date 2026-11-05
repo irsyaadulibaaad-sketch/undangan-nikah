@@ -217,252 +217,349 @@ supabaseClient.channel("doa-rt")
   }
 })();
 
-// ====== SIMPUL PITA DI COVER (bow) — versi tarik & lepas realistis ======
+// ====== SIMPUL PITA DI COVER (bow) — pita satin realistis: ditarik, simpul lepas, tali lurus terlepas ======
 (function () {
   const env = document.getElementById("luxuryEnvelope");
   if (!env || document.getElementById("ribbonBow")) return;
 
-  const NS = "http://www.w3.org/2000/svg";
-  const CX = 170, CY = 230;          // pusat amplop (340 x 460)
-  const BAND_W = 24;                 // lebar pita
-  const BAND_X0 = -16, BAND_X1 = 356; // pita membungkus sedikit melewati sisi amplop
+  // ---------- konstanta ----------
+  const DPR = Math.min(window.devicePixelRatio || 1, 2);
+  const CW = 720, CH = 600;                       // ukuran kanvas (px CSS), lebih besar dari amplop agar pita bisa keluar
+  const OX = (CW - 340) / 2, OY = (CH - 460) / 2; // posisi amplop di dalam kanvas
+  const KX = 170, KY = 230;                       // pusat simpul = tengah amplop
+  const W = 24;                                   // lebar pita
+  const REACH = 250;                              // panjang tali lurus ke kiri/kanan dari simpul
+
+  // durasi (detik)
+  const T_PULL = 1.15;   // tarik + simpul terbuka
+  const T_HOLD = 0.18;   // tali lurus menegang
+  const T_REL = 0.95;    // tali ditarik lepas
+  const FEED_MAX = 900;  // total panjang tali yang ditarik keluar
+  const FEED_POW = 1.6;
+  const FEED_READY = 450; // tali sudah lepas dari amplop saat ini
+  const T_READY = T_PULL + T_HOLD + T_REL * Math.pow(FEED_READY / FEED_MAX, 1 / FEED_POW);
+  window.ribbonUntieDuration = T_READY;           // dibaca oleh fungsi buka undangan (index.html)
 
   // ---------- util ----------
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const lerp = (a, b, t) => a + (b - a) * t;
-  const easeInOut = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-  const easeOut = t => 1 - Math.pow(1 - t, 3);
-  const easeIn = t => t * t * t;
-  const easeInOutBack = t => {
-    const c1 = 1.2, c2 = c1 * 1.525;
-    return t < 0.5
-      ? (Math.pow(2 * t, 2) * ((c2 + 1) * 2 * t - c2)) / 2
-      : (Math.pow(2 * t - 2, 2) * ((c2 + 1) * (t * 2 - 2) + c2) + 2) / 2;
-  };
-  function bez(p0, p1, p2, p3, t) {
+  const ease = t => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  function bez(p, t) {
     const u = 1 - t;
     return {
-      x: u * u * u * p0.x + 3 * u * u * t * p1.x + 3 * u * t * t * p2.x + t * t * t * p3.x,
-      y: u * u * u * p0.y + 3 * u * u * t * p1.y + 3 * u * t * t * p2.y + t * t * t * p3.y
+      x: u * u * u * p[0].x + 3 * u * u * t * p[1].x + 3 * u * t * t * p[2].x + t * t * t * p[3].x,
+      y: u * u * u * p[0].y + 3 * u * u * t * p[1].y + 3 * u * t * t * p[2].y + t * t * t * p[3].y
     };
   }
 
-  // ---------- bangun SVG ----------
+  // palet satin merah (gelap -> kilau)
+  const PAL = [[0, 58, 4, 12], [.3, 128, 10, 24], [.55, 196, 24, 40], [.8, 240, 70, 80], [1, 255, 170, 172]];
+  function pal(l) {
+    l = clamp(l, 0, 1);
+    for (let i = 1; i < PAL.length; i++) {
+      if (l <= PAL[i][0]) {
+        const a = PAL[i - 1], b = PAL[i], f = (l - a[0]) / (b[0] - a[0]);
+        return "rgb(" + Math.round(lerp(a[1], b[1], f)) + "," + Math.round(lerp(a[2], b[2], f)) + "," + Math.round(lerp(a[3], b[3], f)) + ")";
+      }
+    }
+    return "rgb(255,170,172)";
+  }
+
+  // ---------- kanvas ----------
   const wrap = document.createElement("div");
   wrap.className = "ribbon-bow";
   wrap.id = "ribbonBow";
-  wrap.innerHTML = `
-    <svg class="ribbon-svg" viewBox="0 0 340 460" xmlns="${NS}" aria-hidden="true">
-      <defs>
-        <linearGradient id="rbLoop" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#ff5d63"/>
-          <stop offset=".35" stop-color="#d62839"/>
-          <stop offset="1" stop-color="#7d0b14"/>
-        </linearGradient>
-        <linearGradient id="rbKnot" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#ff6b70"/>
-          <stop offset=".45" stop-color="#c8182a"/>
-          <stop offset="1" stop-color="#6d0911"/>
-        </linearGradient>
-        <radialGradient id="rbGloss" cx=".35" cy=".25" r=".7">
-          <stop offset="0" stop-color="#fff" stop-opacity=".55"/>
-          <stop offset="1" stop-color="#fff" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <g id="rbRoot">
-        <g id="rbBand"></g>
-        <g id="rbTailL"></g>
-        <g id="rbTailR"></g>
-        <g id="rbLoopL"></g>
-        <g id="rbLoopR"></g>
-        <g id="rbKnot"></g>
-      </g>
-    </svg>`;
-  env.insertAdjacentHTML("beforeend", wrap.outerHTML);
+  wrap.style.width = CW + "px";
+  wrap.style.height = CH + "px";
+  wrap.style.left = -OX + "px";
+  wrap.style.top = -OY + "px";
+  const cv = document.createElement("canvas");
+  cv.className = "ribbon-canvas";
+  cv.style.width = CW + "px";
+  cv.style.height = CH + "px";
+  cv.width = Math.round(CW * DPR);
+  cv.height = Math.round(CH * DPR);
+  wrap.appendChild(cv);
+  env.appendChild(wrap);
+  const ctx = cv.getContext("2d");
+  if (!ctx) { wrap.style.display = "none"; window.ribbonUntieDuration = 0.6; return; }
 
-  const $ = id => document.getElementById(id);
-  const gRoot = $("rbRoot"), gBand = $("rbBand"), gTailL = $("rbTailL"), gTailR = $("rbTailR");
-  const gLoopL = $("rbLoopL"), gLoopR = $("rbLoopR"), gKnot = $("rbKnot");
-
-  function mk(tag, attrs, parent) {
-    const el = document.createElementNS(NS, tag);
-    for (const k in attrs) el.setAttribute(k, attrs[k]);
-    if (parent) parent.appendChild(el);
-    return el;
-  }
-
-  // ---------- pita satin (lapisan berundak agar terlihat berkilau) ----------
-  const LAYERS = [
-    { w: 1.00, off: 0,     fill: "#7a0a13", op: 1 },
-    { w: 0.84, off: 0,     fill: "#b11222", op: 1 },
-    { w: 0.58, off: -0.04, fill: "#d9303f", op: 1 },
-    { w: 0.20, off: -0.16, fill: "#ff8a8f", op: 0.55 }
-  ];
-
-  function makeRibbon(group, notch) {
-    const shadow = mk("path", { fill: "rgba(40,20,10,0.22)", transform: "translate(2 7)" }, group);
-    const layers = LAYERS.map(L => mk("path", { fill: L.fill, "fill-opacity": L.op }, group));
-    return { shadow, layers, notch };
-  }
-
-  // pts = titik tengah pita; menghasilkan poligon dengan ujung berbentuk V
-  function shapeRibbon(r, pts, width) {
+  // ---------- satu helai pita satin ----------
+  // pts: titik tengah; o.w(i): lebar; o.tw(i): faktor putaran 0..1; o.nS/o.nE: ujung bentuk V; o.sh: kekuatan bayangan
+  function strip(pts, o) {
     const n = pts.length;
-    const nrm = [];
+    const nx = [], ny = [], ang = [], tx = [], ty = [];
     for (let i = 0; i < n; i++) {
       const a = pts[Math.max(0, i - 1)], b = pts[Math.min(n - 1, i + 1)];
-      let dx = b.x - a.x, dy = b.y - a.y;
-      const len = Math.hypot(dx, dy) || 1;
-      nrm.push({ x: -dy / len, y: dx / len, tx: dx / len, ty: dy / len });
+      const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1;
+      tx[i] = dx / len; ty[i] = dy / len; nx[i] = -ty[i]; ny[i] = tx[i];
+      ang[i] = Math.atan2(ty[i], tx[i]);
     }
-    const build = (w, off, notchDepth) => {
-      const L = [], R = [];
-      for (let i = 0; i < n; i++) {
-        const o = off * width, h = (w * width) / 2;
-        L.push((pts[i].x + nrm[i].x * (o + h)).toFixed(2) + "," + (pts[i].y + nrm[i].y * (o + h)).toFixed(2));
-        R.push((pts[i].x + nrm[i].x * (o - h)).toFixed(2) + "," + (pts[i].y + nrm[i].y * (o - h)).toFixed(2));
-      }
-      let d = "M" + L.join(" L");
-      if (r.notch) {
-        const e = pts[n - 1], t = nrm[n - 1];
-        d += " L" + (e.x - t.tx * notchDepth).toFixed(2) + "," + (e.y - t.ty * notchDepth).toFixed(2);
-      }
-      d += " L" + R.reverse().join(" L") + " Z";
-      return d;
+    const wv = [], L = [], R = [], lum = [];
+    for (let i = 0; i < n; i++) {
+      const tw = o.tw ? o.tw(i) : 1;
+      wv[i] = (o.w ? o.w(i) : W) * (0.55 + 0.45 * tw);
+      const h = wv[i] / 2;
+      L[i] = { x: pts[i].x + nx[i] * h, y: pts[i].y + ny[i] * h };
+      R[i] = { x: pts[i].x - nx[i] * h, y: pts[i].y - ny[i] * h };
+      const g = Math.cos(2 * ang[i] - 1.0) - Math.cos(-1.0);
+      lum[i] = 0.56 + 0.15 * g + 0.30 * (tw - 1) + 0.03 * Math.sin((pts[i].x + pts[i].y * 0.5) * 0.05);
+    }
+    const nd = i => wv[i] * 0.55;
+    const notchE = o.nE ? { x: pts[n - 1].x - tx[n - 1] * nd(n - 1), y: pts[n - 1].y - ty[n - 1] * nd(n - 1) } : null;
+    const notchS = o.nS ? { x: pts[0].x + tx[0] * nd(0), y: pts[0].y + ty[0] * nd(0) } : null;
+
+    // 1) siluet + bayangan jatuh ke kertas
+    ctx.beginPath();
+    ctx.moveTo(L[0].x, L[0].y);
+    for (let i = 1; i < n; i++) ctx.lineTo(L[i].x, L[i].y);
+    if (notchE) ctx.lineTo(notchE.x, notchE.y);
+    for (let i = n - 1; i >= 0; i--) ctx.lineTo(R[i].x, R[i].y);
+    if (notchS) ctx.lineTo(notchS.x, notchS.y);
+    ctx.closePath();
+    const sh = o.sh == null ? 0.38 : o.sh;
+    if (sh > 0.01) {
+      ctx.save();
+      ctx.shadowColor = "rgba(40,20,8," + sh + ")";
+      ctx.shadowBlur = 9 * DPR; ctx.shadowOffsetY = 7 * DPR; ctx.shadowOffsetX = 2 * DPR;
+      ctx.fillStyle = "#6a0812"; ctx.fill();
+      ctx.restore();
+    } else { ctx.fillStyle = "#6a0812"; ctx.fill(); }
+
+    // 2) potongan kain berwarna menurut cahaya
+    for (let i = 0; i < n - 1; i++) {
+      const col = pal((lum[i] + lum[i + 1]) / 2);
+      ctx.beginPath();
+      ctx.moveTo(L[i].x, L[i].y); ctx.lineTo(L[i + 1].x, L[i + 1].y);
+      if (notchE && i === n - 2) ctx.lineTo(notchE.x, notchE.y);
+      ctx.lineTo(R[i + 1].x, R[i + 1].y); ctx.lineTo(R[i].x, R[i].y);
+      if (notchS && i === 0) ctx.lineTo(notchS.x, notchS.y);
+      ctx.closePath();
+      ctx.fillStyle = col; ctx.strokeStyle = col; ctx.lineWidth = 0.8; ctx.fill(); ctx.stroke();
+    }
+
+    // 3) gradasi melintang lebar pita (efek satin)
+    // sisi terang selalu menghadap sumber cahaya (kiri-atas), apa pun arah pita
+    const sg = nx.map((v, i) => clamp(2.5 * (v * -0.45 + ny[i] * -0.89), -1, 1));
+    const off = f => pts.map((p, i) => ({ x: p.x + nx[i] * f * wv[i] * sg[i], y: p.y + ny[i] * f * wv[i] * sg[i] }));
+    const offSym = f => pts.map((p, i) => ({ x: p.x + nx[i] * f * wv[i], y: p.y + ny[i] * f * wv[i] }));
+    const poly = (arr, color, lw) => {
+      ctx.beginPath(); ctx.moveTo(arr[0].x, arr[0].y);
+      for (let i = 1; i < arr.length; i++) ctx.lineTo(arr[i].x, arr[i].y);
+      ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineJoin = "round"; ctx.lineCap = "butt"; ctx.stroke();
     };
-    const full = build(1, 0, width * 0.55);
-    r.shadow.setAttribute("d", full);
-    r.layers.forEach((el, i) => el.setAttribute("d", build(LAYERS[i].w, LAYERS[i].off, width * 0.55 * LAYERS[i].w)));
+    const wm = wv.reduce((a, b) => a + b, 0) / n;
+    poly(off(-0.34), "rgba(60,0,10,0.30)", wm * 0.30);        // sisi teduh
+    poly(off(0.30), "rgba(255,120,125,0.20)", wm * 0.26);      // sisi terang
+    // kilau memanjang, kuat-lemahnya mengikuti cahaya
+    const hl = off(0.12);
+    for (let i = 0; i < n - 1; i++) {
+      const a = clamp((lum[i] + lum[i + 1]) / 2 * 0.9, 0, 0.7);
+      ctx.beginPath(); ctx.moveTo(hl[i].x, hl[i].y); ctx.lineTo(hl[i + 1].x, hl[i + 1].y);
+      ctx.strokeStyle = "rgba(255,222,222," + a.toFixed(3) + ")"; ctx.lineWidth = wm * 0.11; ctx.lineCap = "round"; ctx.stroke();
+    }
+    // 4) tepi pita (selvedge) + jahitan tipis
+    poly(L, "rgba(45,0,8,0.55)", 1);
+    poly(R, "rgba(45,0,8,0.55)", 1);
+    poly(offSym(0.41), "rgba(255,170,170,0.20)", 0.8);
+    poly(offSym(-0.41), "rgba(255,170,170,0.20)", 0.8);
   }
 
-  function straightPts(x0, x1, y, n) {
-    const a = [];
-    for (let i = 0; i < n; i++) a.push({ x: lerp(x0, x1, i / (n - 1)), y });
-    return a;
-  }
-  function bezPts(p0, p1, p2, p3, n) {
-    const a = [];
-    for (let i = 0; i < n; i++) a.push(bez(p0, p1, p2, p3, i / (n - 1)));
-    return a;
-  }
+  // ---------- geometri ----------
+  const HANG = {
+    R: [{ x: 4, y: 6 }, { x: 16, y: 50 }, { x: 34, y: 92 }, { x: 52, y: 140 }],
+    L: [{ x: -4, y: 6 }, { x: -20, y: 48 }, { x: -42, y: 86 }, { x: -62, y: 132 }]
+  };
+  const NT = 30;
 
-  // pita datar yang membungkus amplop
-  const band = makeRibbon(gBand, false);
-  shapeRibbon(band, straightPts(BAND_X0, BAND_X1, CY, 14), BAND_W);
-  // garis halus tepi atas/bawah pita
-  mk("rect", { x: BAND_X0, y: CY - BAND_W / 2, width: BAND_X1 - BAND_X0, height: 1, fill: "rgba(255,200,200,0.35)" }, gBand);
-
-  const tailL = makeRibbon(gTailL, true);
-  const tailR = makeRibbon(gTailR, true);
-
-  // ---------- kelokan (loop) & simpul ----------
-  function loopShape(group, dir) {
-    const s = dir; // -1 = kiri, 1 = kanan
-    const outer = `M0,0 C${22 * s},-44 ${78 * s},-52 ${88 * s},-22 C${96 * s},6 ${44 * s},24 0,2 Z`;
-    const inner = `M${6 * s},-2 C${24 * s},-26 ${64 * s},-32 ${70 * s},-16 C${74 * s},-2 ${40 * s},12 ${6 * s},0 Z`;
-    mk("path", { d: outer, fill: "rgba(40,20,10,0.22)", transform: "translate(2 7)" }, group);
-    mk("path", { d: outer, fill: "url(#rbLoop)" }, group);
-    mk("path", { d: inner, fill: "#5a070f", "fill-opacity": ".72" }, group);
-    mk("path", { d: `M${8 * s},-8 C${28 * s},-34 ${60 * s},-38 ${74 * s},-24`, fill: "none", stroke: "#ffb3b6", "stroke-opacity": ".45", "stroke-width": "2.2", "stroke-linecap": "round" }, group);
-  }
-  loopShape(gLoopL, -1);
-  loopShape(gLoopR, 1);
-
-  mk("rect", { x: -17, y: -14, width: 34, height: 28, rx: 9, fill: "rgba(40,20,10,0.25)", transform: "translate(2 6)" }, gKnot);
-  mk("rect", { x: -17, y: -14, width: 34, height: 28, rx: 9, fill: "url(#rbKnot)" }, gKnot);
-  mk("rect", { x: -17, y: -14, width: 34, height: 28, rx: 9, fill: "url(#rbGloss)" }, gKnot);
-  mk("path", { d: "M-12,-4 Q0,-9 12,-4", fill: "none", stroke: "#ff9ea2", "stroke-opacity": ".5", "stroke-width": "1.6", "stroke-linecap": "round" }, gKnot);
-  mk("path", { d: "M-12,6 Q0,2 12,6", fill: "none", stroke: "#4a050b", "stroke-opacity": ".45", "stroke-width": "1.6", "stroke-linecap": "round" }, gKnot);
-
-  // ---------- pose berdasarkan progres ----------
-  // sway = goyangan halus saat idle; p = progres tarikan 0..1; k = progres simpul lepas 0..1
-  function pose(p, k, sway) {
-    // ekor kanan: dari menjuntai -> ditarik lurus ke kanan sepanjang pita
-    const wig = Math.sin(p * Math.PI * 3) * 12 * (1 - p);
-    const r0 = { x: lerp(CX + 5, CX, p), y: lerp(CY + 8, CY, p) };
-    const r1 = { x: lerp(CX + 20 + sway * 2, CX + 70, p), y: lerp(CY + 52, CY, p) + wig };
-    const r2 = { x: lerp(CX + 32 + sway * 5, CX + 140, p), y: lerp(CY + 108, CY, p) - wig * 0.6 };
-    const r3 = { x: lerp(CX + 46 + sway * 9, CX + 210, p), y: lerp(CY + 150, CY, p) };
-    shapeRibbon(tailR, bezPts(r0, r1, r2, r3, 18), lerp(22, BAND_W, p));
-
-    // ekor kiri: ikut tertarik masuk lalu ikut lurus ke kiri
-    const q = clamp((p - 0.1) / 0.9, 0, 1);
-    const l0 = { x: lerp(CX - 5, CX, q), y: lerp(CY + 8, CY, q) };
-    const l1 = { x: lerp(CX - 20 - sway * 2, CX - 70, q), y: lerp(CY + 52, CY, q) };
-    const l2 = { x: lerp(CX - 32 - sway * 5, CX - 140, q), y: lerp(CY + 108, CY, q) };
-    const l3 = { x: lerp(CX - 46 - sway * 9, CX - 210, q), y: lerp(CY + 150, CY, q) };
-    shapeRibbon(tailL, bezPts(l0, l1, l2, l3, 18), lerp(22, BAND_W, q));
-
-    // kelokan: sempat memanjang karena ditarik, lalu menciut hingga habis
-    const c = clamp((p - 0.18) / 0.62, 0, 1);
-    const stretch = 1 + 0.28 * Math.sin(clamp(p / 0.5, 0, 1) * Math.PI * 0.5) * (1 - c);
-    const collapse = 1 - easeInOut(c);
-    const lx = gLoopL, rx = gLoopR;
-    lx.setAttribute("transform",
-      `translate(${CX - 4 + 16 * c} ${CY - 2}) rotate(${lerp(14, 0, c) + sway * 0.6}) scale(${Math.max(0.001, collapse * (1 + 0.1 * (1 - c)))} ${Math.max(0.001, collapse * 0.9 + 0.1 * (1 - c))})`);
-    rx.setAttribute("transform",
-      `translate(${CX + 4 + 40 * c} ${CY - 2}) rotate(${lerp(-14, 0, c) - sway * 0.6}) scale(${Math.max(0.001, collapse * stretch)} ${Math.max(0.001, collapse * 0.9 + 0.1 * (1 - c))})`);
-    const loopOp = 1 - clamp((c - 0.85) / 0.15, 0, 1);
-    lx.style.opacity = loopOp; rx.style.opacity = loopOp;
-
-    // simpul: mengendur lalu pipih menyatu ke pita
-    const kk = easeInOut(k);
-    const kw = 1 + 0.12 * Math.sin(k * Math.PI);          // sedikit membesar saat mengendur
-    gKnot.setAttribute("transform",
-      `translate(${CX + 14 * kk} ${CY}) rotate(${lerp(0, 8, kk)}) scale(${Math.max(0.001, kw * (1 - 0.55 * kk))} ${Math.max(0.001, 1 - 0.92 * kk)})`);
-    gKnot.style.opacity = 1 - clamp((k - 0.55) / 0.45, 0, 1);
+  // ekor pita: menjuntai -> ditarik lurus; ujung bergerak lebih dulu, bagian dekat simpul menyusul (seperti tali sungguhan)
+  function tailPts(side, u, t, sway) {
+    const pts = [], d = 0.5;
+    const key = side > 0 ? HANG.R : HANG.L;
+    for (let i = 0; i < NT; i++) {
+      const s = i / (NT - 1);
+      const H = bez(key, s);
+      H.x += sway * s * 3;
+      const e = ease(clamp((u - d * (1 - s)) / (1 - d), 0, 1));
+      let x = lerp(H.x, side * REACH * s, e);
+      let y = lerp(H.y, 0, e);
+      y += 17 * Math.sin(Math.PI * e) * Math.sin(Math.PI * s * 1.5);                 // gelombang saat dihentak
+      if (side > 0 && t < 0.22) { x -= 9 * Math.sin(clamp(t / 0.22, 0, 1) * Math.PI) * s * s; y -= 4 * Math.sin(clamp(t / 0.22, 0, 1) * Math.PI) * s * s; } // aba-aba tarik
+      pts.push({ x: KX + x, y: KY + y });
+    }
+    return pts;
   }
 
-  // pose awal (tersimpul)
-  pose(0, 0, 0);
+  // kelokan (loop) pita: kurva tertutup dari simpul
+  const LA = [{ x: 8, y: -2 }, { x: 28, y: -52 }, { x: 88, y: -66 }, { x: 100, y: -30 }];
+  const LB = [{ x: 100, y: -30 }, { x: 112, y: 6 }, { x: 56, y: 24 }, { x: 8, y: 5 }];
+  const NL = 18;
+  function loopPts(side, c, sway) {
+    const lam = 1 - ease(c);
+    if (lam < 0.03) return null;
+    const stretch = side > 0 ? 0.32 * Math.sin(Math.PI * c) : 0.12 * Math.sin(Math.PI * c);
+    const sx = lam * (1 + stretch), sy = lam * (1 - 0.18 * Math.sin(Math.PI * c));
+    const rot = side * (-0.2 * (1 - c)) + sway * 0.012 * side;
+    const cr = Math.cos(rot), sr = Math.sin(rot);
+    const pts = [];
+    for (let i = 0; i < NL * 2 - 1; i++) {
+      const p = i < NL ? bez(LA, i / (NL - 1)) : bez(LB, (i - NL + 1) / (NL - 1));
+      const x = p.x * sx * side, y = p.y * sy;
+      pts.push({ x: KX + x * cr - y * sr, y: KY + x * sr + y * cr });
+    }
+    return pts;
+  }
+
+  // simpul
+  function drawKnot(x, y, sx, sy, rot, hole, alpha) {
+    if (alpha < 0.02 || sx < 0.03 || sy < 0.03) return;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(x, y); ctx.rotate(rot); ctx.scale(sx, sy);
+    const w = 36, h = 31, r = 11;
+    const rr = () => {
+      ctx.beginPath();
+      ctx.moveTo(-w / 2 + r, -h / 2); ctx.lineTo(w / 2 - r, -h / 2); ctx.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + r);
+      ctx.lineTo(w / 2, h / 2 - r); ctx.quadraticCurveTo(w / 2, h / 2, w / 2 - r, h / 2);
+      ctx.lineTo(-w / 2 + r, h / 2); ctx.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - r);
+      ctx.lineTo(-w / 2, -h / 2 + r); ctx.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + r, -h / 2); ctx.closePath();
+    };
+    rr();
+    ctx.save();
+    ctx.shadowColor = "rgba(40,20,8,0.4)"; ctx.shadowBlur = 8 * DPR; ctx.shadowOffsetY = 6 * DPR;
+    ctx.fillStyle = "#6a0812"; ctx.fill();
+    ctx.restore();
+    const g = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
+    g.addColorStop(0, "#ff6168"); g.addColorStop(0.35, "#d11f33"); g.addColorStop(0.7, "#a10f21"); g.addColorStop(1, "#5a0610");
+    rr(); ctx.fillStyle = g; ctx.fill();
+    ctx.save(); rr(); ctx.clip();
+    // lipatan kain di simpul
+    ctx.strokeStyle = "rgba(60,0,10,0.45)"; ctx.lineWidth = 1.6; ctx.lineCap = "round";
+    for (let k = -1; k <= 1; k += 2) {
+      ctx.beginPath(); ctx.moveTo(k * 6, -h / 2); ctx.quadraticCurveTo(k * 11, 0, k * 6, h / 2); ctx.stroke();
+    }
+    ctx.strokeStyle = "rgba(255,190,190,0.45)"; ctx.lineWidth = 1.3;
+    ctx.beginPath(); ctx.moveTo(-w / 2 + 5, -h / 2 + 5); ctx.quadraticCurveTo(0, -h / 2 + 1, w / 2 - 5, -h / 2 + 5); ctx.stroke();
+    if (hole > 0.02) {                                  // simpul mengendur: lubang terlihat
+      ctx.globalAlpha = alpha * hole;
+      const hg = ctx.createRadialGradient(0, 0, 1, 0, 0, 12);
+      hg.addColorStop(0, "#2a0307"); hg.addColorStop(1, "#6a0812");
+      ctx.fillStyle = hg; ctx.beginPath(); ctx.ellipse(0, 1, 11, 8.5, 0, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+    ctx.restore();
+  }
+
+  // ---------- jalur tarik lepas ----------
+  const FX = 440, FR = 80, ARC = Math.PI * FR / 2;
+  function feedPt(sg) {
+    if (sg <= FX) return { x: sg, y: KY };
+    const d = sg - FX;
+    if (d <= ARC) { const th = d / FR; return { x: FX + FR * Math.sin(th), y: KY + FR * (1 - Math.cos(th)) }; }
+    return { x: FX + FR, y: KY + FR + (d - ARC) };
+  }
+  function strapPts(D) {
+    const a = KX - REACH, b = KX + REACH, N = 76, pts = [];
+    for (let i = 0; i < N; i++) pts.push(feedPt(lerp(a, b, i / (N - 1)) + D));
+    return pts;
+  }
+
+  // ---------- gambar satu frame ----------
+  function draw(mode, t, sway) {
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    ctx.setTransform(DPR, 0, 0, DPR, OX * DPR, OY * DPR);
+    ctx.save();
+    ctx.beginPath(); ctx.rect(0, -OY, CW - OX, CH); ctx.clip();   // sisi kiri: pita menembus ke belakang amplop
+
+    let wrapA = 1;
+    if (mode === "release") {
+      const tau = clamp((t - T_PULL - T_HOLD) / T_REL, 0, 1);
+      strip(strapPts(FEED_MAX * Math.pow(tau, FEED_POW)), { nS: true, nE: true, sh: 0.38, ph: 0 });
+      wrapA = 0;
+    } else {
+      const u = mode === "pull" ? clamp((t - 0.12) / (T_PULL - 0.12), 0, 1) : 0;
+      const uHold = mode === "hold" ? 1 : u;
+      const uR = uHold, uL = clamp((uHold - 0.18) / 0.82, 0, 1);
+      wrapA = 1 - clamp((uHold - 0.25) / 0.35, 0, 1);
+
+      // tali yang membungkus amplop (sisi kanan menembus ke belakang di tepi amplop)
+      ctx.save();
+      ctx.beginPath(); ctx.rect(0, -OY, 348, CH); ctx.clip();
+      strip(straightBand(), { nS: true, nE: true, sh: 0.38 });
+      ctx.restore();
+
+      // getar halus saat tali menegang
+      const vib = mode === "hold" ? 2.2 * Math.sin(t * 38) * Math.exp(-(t - T_PULL) * 9) : 0;
+      const tL = tailPts(-1, uL, t, sway), tR = tailPts(1, uR, t, sway);
+      if (vib) { for (let i = 0; i < NT; i++) { const s = i / (NT - 1); tL[i].y += vib * Math.sin(Math.PI * s); tR[i].y += vib * Math.sin(Math.PI * s); } }
+      const shL = 0.38 * (1 - clamp((uL - 0.7) / 0.3, 0, 1)), shR = 0.38 * (1 - clamp((uR - 0.7) / 0.3, 0, 1));
+      strip(tL, { nE: true, sh: shL, ph: 1.3 });
+      strip(tR, { nE: true, sh: shR, ph: 2.1 });
+
+      // kelokan menciut saat tali ditarik
+      const cR = clamp((uHold - 0.08) / 0.55, 0, 1), cL = clamp((uHold - 0.3) / 0.55, 0, 1);
+      const lpL = loopPts(-1, cL, sway), lpR = loopPts(1, cR, sway);
+      const tw = n => i => Math.cos(1.0 * Math.sin(Math.PI * i / (n - 1)));
+      if (lpL) strip(lpL, { tw: tw(lpL.length), sh: 0.34, ph: 3.2 });
+      if (lpR) strip(lpR, { tw: tw(lpR.length), sh: 0.34, ph: 4.0 });
+
+      // simpul mengendur, berlubang, lalu mengempis jadi tali lurus
+      const k = clamp((uHold - 0.35) / 0.65, 0, 1);
+      const grow = Math.sin(clamp(k / 0.55, 0, 1) * Math.PI / 2);
+      const collapse = ease(clamp((k - 0.5) / 0.5, 0, 1));
+      const kx = 1 + 0.28 * grow - 0.95 * collapse, ky = 1 + 0.22 * grow - 0.97 * collapse;
+      drawKnot(KX + 10 * collapse, KY, kx, ky, 0.14 * grow * (1 - collapse), clamp(grow * 1.2, 0, 1) * (1 - collapse), 1 - clamp((collapse - 0.7) / 0.3, 0, 1));
+    }
+
+    // lengkung tepi amplop: pita menggelap saat membungkus ke belakang
+    ctx.globalCompositeOperation = "source-atop";
+    let g = ctx.createLinearGradient(0, 0, 26, 0);
+    g.addColorStop(0, "rgba(25,0,5,0.62)"); g.addColorStop(1, "rgba(25,0,5,0)");
+    ctx.fillStyle = g; ctx.fillRect(0, KY - 40, 26, 80);
+    if (wrapA > 0.01) {
+      g = ctx.createLinearGradient(322, 0, 348, 0);
+      g.addColorStop(0, "rgba(25,0,5,0)"); g.addColorStop(1, "rgba(25,0,5," + (0.6 * wrapA).toFixed(3) + ")");
+      ctx.fillStyle = g; ctx.fillRect(322, KY - 40, 26, 80);
+    }
+    ctx.globalCompositeOperation = "source-over";
+    ctx.restore();
+  }
+  function straightBand() {
+    const pts = [], N = 40;
+    for (let i = 0; i < N; i++) pts.push({ x: lerp(KX - REACH, KX + REACH, i / (N - 1)), y: KY });
+    return pts;
+  }
 
   // ---------- idle: ekor bergoyang halus sebelum diketuk ----------
-  let started = false, idleRaf = 0, idleT0 = performance.now();
+  let started = false, idleRaf = 0, idleT0 = performance.now(), idleFrame = 0;
   function idle(now) {
     if (started) return;
-    const s = Math.sin((now - idleT0) / 900) * 1.2;
-    pose(0, 0, s);
+    if ((idleFrame++ & 1) === 0) draw("idle", 0, Math.sin((now - idleT0) / 900) * 1.2);
     idleRaf = requestAnimationFrame(idle);
   }
+  draw("idle", 0, 0);
   idleRaf = requestAnimationFrame(idle);
 
-  // ---------- urutan animasi saat diketuk ----------
-  // 0.00–0.95s  ekor kanan ditarik, kelokan menciut, simpul mengendur
-  // 0.95–1.07s  tali sudah lurus (jeda singkat)
-  // 1.07–1.45s  tali ditarik lepas ke kanan, undangan langsung terbuka
-  const T_PULL = 0.95, T_HOLD = 0.12, T_SLIDE = 0.38;
+  // ---------- urutan saat diketuk ----------
+  // 0 – 1.15s   ekor kanan ditarik, kelokan menciut, simpul mengendur lalu terbuka jadi tali lurus
+  // 1.15 – 1.33 tali lurus menegang
+  // 1.33 – 2.28 tali ditarik lepas ke kanan (lepas dari amplop di ±1.95s), baru undangan terbuka
   function start() {
     if (started) return;
     started = true;
     cancelAnimationFrame(idleRaf);
+    const hint = env.querySelector(".tap-hint");
+    if (hint) { hint.style.animation = "none"; hint.style.transition = "opacity .4s"; hint.style.opacity = "0"; }
     const t0 = performance.now();
-
-    function frame(now) {
-      const t = (now - t0) / 1000;
-      if (t < T_PULL) {
-        const u = t / T_PULL;
-        const p = clamp(easeInOutBack(u), -0.08, 1);
-        const pp = Math.max(0, p);
-        const k = clamp((u - 0.5) / 0.5, 0, 1);
-        pose(pp, k, 0);
-        // tarikan kecil ke arah kanan saat ditarik
-        gRoot.setAttribute("transform", `translate(${(pp * 6).toFixed(2)} 0)`);
-      } else if (t < T_PULL + T_HOLD) {
-        pose(1, 1, 0);
-        gRoot.setAttribute("transform", "translate(6 0)");
-      } else if (t < T_PULL + T_HOLD + T_SLIDE) {
-        const u = (t - T_PULL - T_HOLD) / T_SLIDE;
-        const e = easeIn(u);
-        gRoot.setAttribute("transform", `translate(${(6 + e * 520).toFixed(2)} ${(-e * 14).toFixed(2)}) rotate(${(-e * 2.5).toFixed(2)} ${CX} ${CY})`);
-      } else {
-        wrap.style.display = "none";
-        const live = document.getElementById("ribbonBow");
-        if (live) live.style.display = "none";
-        return;
-      }
+    (function frame() {
+      const t = (performance.now() - t0) / 1000;
+      if (t < T_PULL) draw("pull", t, 0);
+      else if (t < T_PULL + T_HOLD) draw("hold", t, 0);
+      else if (t < T_PULL + T_HOLD + T_REL) draw("release", t, 0);
+      else { wrap.style.display = "none"; return; }
       requestAnimationFrame(frame);
-    }
-    requestAnimationFrame(frame);
+    })();
   }
 
   function untie() { env.classList.add("ribbon-off"); start(); }
