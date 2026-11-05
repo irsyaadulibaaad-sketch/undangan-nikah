@@ -53,7 +53,7 @@
     bottom.className = 'gc-band gc-bottom';
     var msg = document.createElement('span');
     msg.className = 'gc-msg';
-    msg.textContent = 'Dengan penuh suka cita, kami mengundang Anda untuk hadir dan berbagi kebahagiaan di hari pernikahan kami';
+    msg.textContent = 'Hadirilah dan rayakan kebahagiaan di hari pernikahan kami';
     bottom.appendChild(msg);
 
     span.appendChild(top);

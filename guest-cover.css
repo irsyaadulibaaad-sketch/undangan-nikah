@@ -1,41 +1,61 @@
 /* ==========================================================================
-   NAMA TAMU DI AMPLOP — guest-cover.css
-   File TAMBAHAN. Tidak mengubah aturan apa pun di style.css / index.html.
-   Teks ditaruh DI DALAM kedua daun amplop (paper-front), sehingga ikut
-   miring mengikuti lipatan dan ikut terbuka saat amplop dibuka.
+   AMPLOP: LIPATAN VERTIKAL SAJA + NAMA TAMU — guest-cover.css  (v2)
+   File TAMBAHAN. Tidak mengubah style.css / index.html / file lain.
+   Muat SETELAH style.css (dan decor.css).
    ========================================================================== */
 
-/* Kotak nama lama (yang ada di kertas belakang) disembunyikan,
-   karena tertutup daun amplop dan sebelumnya menampilkan teks "Tes". */
+/* ---------- 1) Hapus lipatan horizontal, sisakan lipatan tengah vertikal ---------- */
+/* Garis emas + titik di 33% / 67% */
+.paper-front .emboss-pattern { display: none !important; }
+
+/* Latar daun amplop: tekstur linen + gradasi searah horizontal saja
+   (tidak ada bayangan/pita horizontal). */
+.paper-front {
+  background:
+    repeating-linear-gradient(0deg, rgba(120,100,60,0.024) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(120,100,60,0.024) 0 1px, transparent 1px 3px),
+    linear-gradient(90deg, #FEFDFA 0%, #F6F1E6 60%, #EEE6D4 100%) !important;
+}
+.paper-front.right {
+  background:
+    repeating-linear-gradient(0deg, rgba(120,100,60,0.024) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(120,100,60,0.024) 0 1px, transparent 1px 3px),
+    linear-gradient(90deg, #FEFDFA 0%, #F6F1E6 60%, #EEE6D4 100%) !important;
+}
+/* Bayangan hanya mendekati garis lipat tengah (vertikal) */
+.paper-front.left  .emboss-shadow {
+  background: linear-gradient(to right, rgba(60,50,30,0.03) 0, transparent 18%, transparent 62%, rgba(60,50,30,0.11) 100%) !important;
+}
+.paper-front.right .emboss-shadow {
+  background: linear-gradient(to left,  rgba(60,50,30,0.03) 0, transparent 18%, transparent 62%, rgba(60,50,30,0.11) 100%) !important;
+}
+
+/* ---------- 2) Nama tamu — mengikuti perspektif lipatan tengah ---------- */
+/* Kotak nama lama (di kertas belakang) disembunyikan */
 #guestGreeting { display: none !important; }
 
 .paper-front { --ew: 340px; }
 @media (max-width: 480px) { .paper-front { --ew: 300px; } }
 
 /* Satu teks utuh selebar amplop; tiap daun hanya menampilkan separuhnya
-   (daun sudah overflow:hidden), jadi teks tampak menyatu di tengah. */
+   (daun overflow:hidden), jadi teks tampak menyatu di tengah.
+   Tiap separuh dimiringkan terhadap garis lipat tengah (lipatan "lembah"):
+   sisi luar sedikit lebih dekat -> sedikit lebih besar, sisi lipatan tetap. */
 .gc-span {
   position: absolute; top: 0; bottom: 0; width: var(--ew);
   pointer-events: none; z-index: 3;
+  transform-origin: 50% 50%;
 }
-.paper-front.left  .gc-span { left: 0; }
-.paper-front.right .gc-span { right: 0; }
+.paper-front.left  .gc-span { left: 0;  transform: perspective(520px) rotateY(16deg); }
+.paper-front.right .gc-span { right: 0; transform: perspective(520px) rotateY(-16deg); }
 
-/* Dua pita area, dibatasi garis lipatan emas (33% dan 67%) */
 .gc-band {
   position: absolute; left: 0; width: 100%;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  text-align: center; box-sizing: border-box; padding: 0 34px;
+  text-align: center; box-sizing: border-box; padding: 0 30px;
 }
-.gc-top    { top: 3%;    height: 28%; transform-origin: 50% 100%; transform: perspective(420px) rotateX(11deg); }
-.gc-bottom { top: 70%;   height: 27%; transform-origin: 50% 0;    transform: perspective(420px) rotateX(-11deg); }
-
-/* Bayangan lembut mendekati garis lipatan agar terasa menempel di kertas */
-.gc-band::after {
-  content: ''; position: absolute; left: 0; right: 0; height: 22%; pointer-events: none;
-}
-.gc-top::after    { bottom: 0; background: linear-gradient(to top, rgba(122,94,48,0.10), transparent); }
-.gc-bottom::after { top: 0;    background: linear-gradient(to bottom, rgba(122,94,48,0.10), transparent); }
+.gc-top    { top: 6%;  height: 27%; }
+.gc-bottom { top: 85%; height: 13%; }
 
 .gc-label {
   font-family: var(--font-sans); font-size: 0.56rem; letter-spacing: 4px;
@@ -49,11 +69,11 @@
   text-shadow: 1px 1px 0 rgba(255,255,255,0.9), -1px -1px 1px rgba(122,94,48,0.18);
 }
 .gc-msg {
-  font-family: var(--font-serif); font-style: italic; font-size: 0.98rem;
-  line-height: 1.5; color: var(--gold-deep); font-weight: 500;
+  font-family: var(--font-serif); font-style: italic; font-size: 0.95rem;
+  line-height: 1.4; color: var(--gold-deep); font-weight: 500;
   text-shadow: 1px 1px 0 rgba(255,255,255,0.9), -1px -1px 1px rgba(122,94,48,0.15);
 }
 @media (max-width: 480px) {
-  .gc-band { padding: 0 28px; }
-  .gc-msg { font-size: 0.9rem; }
+  .gc-band { padding: 0 24px; }
+  .gc-msg { font-size: 0.88rem; }
 }
