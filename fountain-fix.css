@@ -1,0 +1,30 @@
+/* ==========================================================================
+   PERBAIKAN AIR MANCUR — Garden of Prayers
+   File TAMBAHAN: tidak mengubah/menghapus aturan apa pun di style.css.
+   Muat SETELAH style.css.
+
+   1) Tiang air mancur dipindah ke TITIK TENGAH kolam.
+      Pusat kolam ada di 29px dari bawah (kolam tinggi 58px). Sebelumnya
+      alas tiang berada di ~18px, jadi tampak maju ke depan kolam.
+      Seluruh tumpukan (tiang, tier-2, tier-3, bola emas) digeser naik
+      11px sama rata, sehingga bentuknya persis sama, hanya posisinya tepat.
+   ========================================================================== */
+.fountain .water-spout { bottom: 31px; }    /* was 20px */
+.fountain .tier-2      { bottom: 115px; }   /* was 104px */
+.fountain .tier-3      { bottom: 155px; }   /* was 144px */
+.fountain::after       { bottom: 180px; }   /* was 169px (bola emas puncak) */
+
+/* 2) Animasi air baru digambar oleh fountain-fx.js lewat <canvas>.
+      Kelas .fx-on hanya ditambahkan JS jika canvas berhasil dibuat,
+      jadi kalau JS gagal / reduced-motion, animasi CSS lama tetap jalan. */
+.fountain.fx-on .tier-2::after,
+.fountain.fx-on .tier-3::before,
+.fountain.fx-on .water-drop { display: none; }
+
+.fountain-fx {
+  position: absolute;
+  left: -40px; bottom: -10px;
+  width: 340px; height: 280px;
+  pointer-events: none;
+  z-index: 3;
+}
