@@ -13,7 +13,6 @@
     font-weight: 600; letter-spacing: 2px; pointer-events: none;
     text-transform: uppercase; opacity: 0.8; z-index: 10;
   }
-  /* Tombol izin sensor (khusus iOS) dipindah ke pojok bawah agar tidak menutupi layar */
   #gyroBtn {
     position: fixed; bottom: 20px; left: 20px; z-index: 99;
     background: #FFF; color: #9E7A3E; border: 1px solid #C5A059;
@@ -29,7 +28,7 @@
 <button id="gyroBtn">Aktifkan Sensor</button>
 <canvas id="gameCanvas"></canvas>
 <script>
-  // === TAMBAHAN FITUR LEADERBOARD (SUPABASE) ===
+  // === TAMBAHAN: SUPABASE UNTUK LEADERBOARD ===
   const SUPABASE_URL = "https://pamuhftcixcyinvajsej.supabase.co";
   const SUPABASE_ANON_KEY = "sb_publishable_njAPpdJQozdbRHvYC8dsIQ_eRq2fX28";
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -50,7 +49,8 @@
     hasSubmitted = true;
     fetchLeaderboard();
   };
-  // === AKHIR TAMBAHAN FITUR LEADERBOARD ===
+  // === AKHIR TAMBAHAN SUPABASE ===
+
 
   const canvas = document.getElementById("gameCanvas");
   const ctx = canvas.getContext("2d");
@@ -99,9 +99,6 @@
     { top: "#FFDAB9", bottom: "#F9F7F2", name: "Fajar" }        
   ];
 
-  // ===================================================================
-  // DATA TAMBAHAN: LATAR TEMPAT, UKURAN PIJAKAN, EKSPRESI & EFEK (KODE ASLI)
-  // ===================================================================
   const PLACES = [
     { min: 0,   name: "Taman Bunga",  scene: "garden",   skin: "flower",  moveChance: 0,    vmoveChance: 0,    fragileChance: 0,    springChance: 0.07, speed: 1.0 },
     { min: 35,  name: "Perbukitan",   scene: "hills",    skin: "grass",   moveChance: 0.10, vmoveChance: 0.05, fragileChance: 0.05, springChance: 0.07, speed: 1.1 },
@@ -119,12 +116,12 @@
     { name: "lebar",  w: [140, 168], h: 18 }
   ];
 
-  let expression = "happy";
+  let expression = "happy";      
   let surpriseTimer = 0;
   let jumpAnimT = 0;
   let jumpAnimTotal = 18;
-  let rings = [];
-  let sparkles = [];
+  let rings = [];                
+  let sparkles = [];             
   let frameCount = 0;
   let lastCameraY = 0;
 
@@ -186,6 +183,7 @@
     function onTilt(e) {
       if (e.beta === null || e.gamma === null || e.beta === undefined || e.gamma === undefined) return;
       const br = e.beta * DEG, gr = e.gamma * DEG;
+
       const ux = -Math.cos(br) * Math.sin(gr);
       const uy = Math.sin(br);
 
@@ -292,9 +290,9 @@
     tiltX = 0;
     targetTiltX = 0;
 
-    resetExtras(); 
-    hasSubmitted = false; // TAMBAHAN: Reset status submit
-    fetchLeaderboard();   // TAMBAHAN: Ambil data terbaru
+    resetExtras();
+    hasSubmitted = false; // TAMBAHAN
+    fetchLeaderboard();   // TAMBAHAN
 
     for (let i = 1; i <= 12; i++) {
       createPlatform(H - 50 - i * 95);
@@ -436,7 +434,7 @@
         highScore = score;
         localStorage.setItem("jumpHi", highScore);
       }
-      // TAMBAHAN: Kirim pesan ke parent (index.html) untuk input nama
+      // TAMBAHAN: Kirim pesan ke parent
       window.parent.postMessage({ type: 'GAME_OVER', game: GAME_ID, score: score }, '*');
     }
   }
