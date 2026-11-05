@@ -113,6 +113,7 @@
     if (o.glow) h += '<div class="dc-glow g1"></div><div class="dc-glow g2"></div>';
     if (o.beam) h += '<div class="dc-beam b1"></div><div class="dc-beam b2"></div>';
     if (o.vine !== false) h += '<div class="dc-vine vl"></div><div class="dc-vine vr"></div>';
+    if (o.fade !== false) h += '<div class="dc-fade"></div>';
     if (o.corners !== false) h += corners();
     h += sparkles(Math.max(2, Math.round((o.sparks || 6) * half)));
     if (o.petals) h += petals(Math.max(2, Math.round(o.petals * half)));
@@ -165,7 +166,7 @@
   body.insertBefore(defsBox.firstChild, body.firstChild);
 
   var cover = document.getElementById('cover');
-  reg(cover, attach(cover, { glow: true, vine: false, sparks: 9, petals: 7, grain: false }));
+  reg(cover, attach(cover, { glow: true, vine: false, sparks: 9, petals: 7, grain: false, fade: false }));
 
   var map = [
     ['.hero-section',        { glow: true, beam: true, sparks: 9, petals: 9 }],
