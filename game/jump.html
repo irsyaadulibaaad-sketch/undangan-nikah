@@ -75,6 +75,50 @@
     { top: "#FFDAB9", bottom: "#F9F7F2", name: "Fajar" }        
   ];
 
+  // ===================================================================
+  // [BARU] DATA TAMBAHAN: LATAR TEMPAT, UKURAN PIJAKAN, EKSPRESI & EFEK
+  // ===================================================================
+
+  // Latar tempat berganti sesuai skor. Makin tinggi level: pijakan bergerak
+  // makin sering & makin cepat, pijakan rapuh makin banyak.
+  const PLACES = [
+    { min: 0,   name: "Taman Bunga",  scene: "garden",   skin: "flower",  moveChance: 0,    vmoveChance: 0,    fragileChance: 0,    springChance: 0.07, speed: 1.0 },
+    { min: 35,  name: "Perbukitan",   scene: "hills",    skin: "grass",   moveChance: 0.10, vmoveChance: 0.05, fragileChance: 0.05, springChance: 0.07, speed: 1.1 },
+    { min: 80,  name: "Kota Cahaya",  scene: "city",     skin: "lamp",    moveChance: 0.14, vmoveChance: 0.10, fragileChance: 0.08, springChance: 0.06, speed: 1.25 },
+    { min: 130, name: "Gunung Salju", scene: "mountain", skin: "snow",    moveChance: 0.16, vmoveChance: 0.14, fragileChance: 0.10, springChance: 0.06, speed: 1.4 },
+    { min: 190, name: "Negeri Awan",  scene: "clouds",   skin: "cloud",   moveChance: 0.18, vmoveChance: 0.16, fragileChance: 0.12, springChance: 0.05, speed: 1.6 },
+    { min: 260, name: "Luar Angkasa", scene: "space",    skin: "crystal", moveChance: 0.20, vmoveChance: 0.18, fragileChance: 0.14, springChance: 0.05, speed: 1.8, dark: true }
+  ];
+
+  // Ukuran pijakan beragam (lebar min-maks, tebal)
+  const SIZE_CLASSES = [
+    { name: "mini",   w: [38, 52],   h: 10 },
+    { name: "kecil",  w: [56, 76],   h: 12 },
+    { name: "sedang", w: [80, 104],  h: 14 },
+    { name: "besar",  w: [108, 136], h: 16 },
+    { name: "lebar",  w: [140, 168], h: 18 }
+  ];
+
+  // Ekspresi & animasi lompat
+  let expression = "happy";      // "happy" | "surprised"
+  let surpriseTimer = 0;
+  let jumpAnimT = 0;
+  let jumpAnimTotal = 18;
+  let rings = [];                // cincin gelombang saat melompat
+  let sparkles = [];             // bintang kecil saat melompat
+  let frameCount = 0;
+  let lastCameraY = 0;
+
+  // Latar tempat
+  let currentPlaceIndex = 0;
+  let prevPlaceIndex = 0;
+  let placeFade = 1;
+  let placeToast = 0;
+
+  // Kontrol goyang presisi
+  let preciseTilt = 0;
+  let preciseActive = false;
+
   // --- SETUP SENSOR & IZIN ---
   function requestGyroPermission() {
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
@@ -114,6 +158,80 @@
   }
 
   requestGyroPermission();
+
+  // ===================================================================
+  // [BARU] KONTROL GOYANG PRESISI (tanpa delay, langsung aktif)
+  // Memakai arah gravitasi dari beta+gamma (bukan gamma saja), sehingga
+  // akurat saat HP dipegang tegak, miring, maupun rebah, dan mengikuti
+  // rotasi layar. Nilai dipakai langsung tanpa filter lambat.
+  // ===================================================================
+  (function () {
+    const DEG = Math.PI / 180;
+    const FULL_TILT = 0.42;    // kemiringan ±25 derajat = kecepatan penuh
+    const DEAD_ZONE = 0.035;   // ±2 derajat diabaikan agar tidak bergetar
+    let smooth = 0;
+
+    function screenAngle() {
+      let a = 0;
+      if (screen.orientation && typeof screen.orientation.angle === "number") a = screen.orientation.angle;
+      else if (typeof window.orientation === "number") a = window.orientation;
+      return ((Math.round(a) % 360) + 360) % 360;
+    }
+
+    function onTilt(e) {
+      if (e.beta === null || e.gamma === null || e.beta === undefined || e.gamma === undefined) return;
+      const br = e.beta * DEG, gr = e.gamma * DEG;
+
+      // Vektor "atas" (berlawanan gravitasi) pada sumbu perangkat
+      const ux = -Math.cos(br) * Math.sin(gr);
+      const uy = Math.sin(br);
+
+      // Miring ke kanan layar => nilai positif
+      let side;
+      switch (screenAngle()) {
+        case 90:  side = uy;  break;
+        case 180: side = ux;  break;
+        case 270: side = -uy; break;
+        default:  side = -ux;
+      }
+
+      const mag = Math.abs(side);
+      let v = mag < DEAD_ZONE ? 0 : Math.min(1, (mag - DEAD_ZONE) / (FULL_TILT - DEAD_ZONE));
+      if (side < 0) v = -v;
+
+      // Filter adaptif: perubahan besar langsung lewat, hanya getaran kecil diredam
+      const alpha = Math.min(1, 0.65 + Math.abs(v - smooth) * 2);
+      smooth += (v - smooth) * alpha;
+      if (Math.abs(smooth) < 0.01) smooth = 0;
+
+      preciseTilt = smooth;
+      preciseActive = true;
+      gyroSupported = true;
+
+      const btn = document.getElementById("gyroBtn");
+      if (btn && btn.style.display !== "none") btn.style.display = "none";
+    }
+    window.addEventListener("deviceorientation", onTilt);
+
+    // iOS 13+: izin sensor wajib lewat sentuhan. Minta otomatis pada sentuhan
+    // pertama di game supaya sensor langsung aktif tanpa menekan tombol.
+    if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
+      let asked = false;
+      const ask = function (ev) {
+        if (asked) return;
+        if (ev && ev.target && ev.target.id === "gyroBtn") return;
+        asked = true;
+        DeviceOrientationEvent.requestPermission().then(function (res) {
+          if (res === "granted") {
+            const b = document.getElementById("gyroBtn");
+            if (b) b.style.display = "none";
+          }
+        }).catch(function () { asked = false; });
+      };
+      window.addEventListener("touchend", ask, { passive: true });
+      window.addEventListener("click", ask);
+    }
+  })();
 
   // --- TOUCH FALLBACK ---
   function handleTouch(e) {
@@ -159,6 +277,7 @@
     }
 
     platforms.push({ x: x, y: y, w: w, h: 12, type: type, vx: vx, id: Math.random() });
+    diversifyPlatform(platforms[platforms.length - 1]); // [BARU] ukuran, jenis, dan jarak pijakan beragam
   }
 
   function initGame() {
@@ -173,6 +292,8 @@
     currentBgIndex = 0;
     tiltX = 0;
     targetTiltX = 0;
+
+    resetExtras(); // [BARU]
 
     for (let i = 1; i <= 12; i++) {
       createPlatform(H - 50 - i * 95);
@@ -213,6 +334,7 @@
   }
 
   function update() {
+    updateExtras(); // [BARU] latar tempat, ekspresi, efek, kontrol goyang
     if (gameOver) return;
 
     currentGravity = BASE_GRAVITY + (score * 0.002);
@@ -282,6 +404,7 @@
           
           player.vy = BASE_JUMP - (score * 0.005); 
           player.isJumping = true;
+          onBounce(p); // [BARU] ekspresi kaget + efek lompat
           
           for(let j=0; j<4; j++) {
             particles.push({
@@ -334,6 +457,8 @@
       ctx.beginPath(); ctx.arc(W*0.2 + i*60, cy, currentBgIndex === 3 ? 1.5 : 30, 0, Math.PI*2); ctx.fill();
     }
 
+    drawPlaceScenery(); // [BARU] latar tempat
+
     platforms.forEach(p => {
       ctx.shadowColor = "rgba(0,0,0,0.15)";
       ctx.shadowBlur = 8;
@@ -359,6 +484,8 @@
       ctx.beginPath(); ctx.moveTo(p.x + 4, p.y + 2); ctx.lineTo(p.x + p.w - 4, p.y + 2); ctx.stroke();
     });
 
+    drawPlatformDeco(); // [BARU] jenis & hiasan pijakan
+
     particles.forEach(pt => {
       ctx.globalAlpha = pt.life;
       ctx.fillStyle = pt.color;
@@ -367,7 +494,13 @@
     ctx.globalAlpha = 1;
 
     if (!gameOver) {
+      drawJumpEffects(); // [BARU]
+      ctx.save();
+      applyPlayerSquash(); // [BARU] animasi peregangan saat lompat
       drawCouple(player.x, player.y, player.facing, player.isJumping);
+      drawFaces(player.x, player.y, player.facing, expression); // [BARU] ekspresi wajah
+      ctx.restore();
+      drawSurpriseMark(); // [BARU]
     }
 
     ctx.fillStyle = currentBgIndex === 3 ? "#FFF" : "#8A6A2E";
@@ -378,6 +511,7 @@
     ctx.fillStyle = currentBgIndex === 3 ? "#CCC" : "#9E7A3E";
     ctx.font = "12px 'Montserrat', sans-serif";
     ctx.fillText("Tertinggi: " + highScore + " | Cuaca: " + BACKGROUNDS[currentBgIndex].name, 20, 60);
+    drawExtraHUD(); // [BARU] nama tempat & level
 
     if (gameOver) {
       ctx.fillStyle = "rgba(255,255,255,0.9)";
@@ -402,6 +536,548 @@
       this.arcTo(x + w, y, x + w, y + h, r); this.arcTo(x + w, y + h, x, y + h, r);
       this.arcTo(x, y + h, x, y, r); this.arcTo(x, y, x + w, y, r); this.closePath(); return this;
     };
+  }
+
+  // ===================================================================
+  // [BARU] FUNGSI TAMBAHAN
+  // ===================================================================
+  function hash(n) { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); }
+  function wrapVal(v, span) { return ((v % span) + span) % span; }
+  function circ(x, y, r) { ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, Math.PI * 2); }
+
+  // ---------- Reset & update tambahan ----------
+  function resetExtras() {
+    expression = "happy";
+    surpriseTimer = 0;
+    jumpAnimT = 0;
+    rings = [];
+    sparkles = [];
+    lastCameraY = 0;
+    currentPlaceIndex = 0;
+    prevPlaceIndex = 0;
+    placeFade = 1;
+    placeToast = 0;
+  }
+
+  function updateExtras() {
+    frameCount++;
+
+    // Kontrol goyang: pakai nilai terbaru langsung (tanpa smoothing lambat)
+    if (preciseActive) { tiltX = preciseTilt; targetTiltX = preciseTilt; }
+
+    // Latar tempat mengikuti skor
+    let idx = 0;
+    for (let i = 0; i < PLACES.length; i++) { if (score >= PLACES[i].min) idx = i; }
+    if (idx !== currentPlaceIndex) {
+      prevPlaceIndex = currentPlaceIndex;
+      currentPlaceIndex = idx;
+      placeFade = 0;
+      placeToast = 160;
+    }
+    if (placeFade < 1) placeFade = Math.min(1, placeFade + 0.02);
+    if (placeToast > 0) placeToast--;
+
+    // Ekspresi kembali bahagia setelah kaget
+    if (surpriseTimer > 0) {
+      surpriseTimer--;
+      if (surpriseTimer === 0) expression = "happy";
+    }
+    if (jumpAnimT > 0) jumpAnimT--;
+
+    // Pijakan naik-turun
+    platforms.forEach(p => {
+      if (p.type === "vmoving") {
+        p.y += p.dy;
+        p.off += p.dy;
+        if (Math.abs(p.off) >= p.range) p.dy *= -1;
+      }
+    });
+
+    // Efek lompat ikut bergeser bersama kamera
+    const camDelta = cameraY - lastCameraY;
+    lastCameraY = cameraY;
+    for (let i = rings.length - 1; i >= 0; i--) {
+      const r = rings[i];
+      r.r += r.grow; r.grow *= 0.94; r.y += camDelta; r.life -= 0.045;
+      if (r.life <= 0) rings.splice(i, 1);
+    }
+    for (let i = sparkles.length - 1; i >= 0; i--) {
+      const s = sparkles[i];
+      s.x += s.vx; s.y += s.vy + camDelta * 0.6; s.vy += 0.1; s.rot += s.vr; s.life -= 0.03;
+      if (s.life <= 0) sparkles.splice(i, 1);
+    }
+  }
+
+  // ---------- Saat melompati pijakan ----------
+  function onBounce(p) {
+    expression = "surprised";
+    surpriseTimer = 30;
+
+    const spring = p.type === "spring";
+    if (spring) player.vy *= 1.35;   // pijakan pegas: lompat lebih tinggi
+
+    jumpAnimTotal = spring ? 24 : 18;
+    jumpAnimT = jumpAnimTotal;
+
+    const gy = p.y;
+    rings.push({ x: player.x, y: gy, r: 4, grow: 3.0, life: 1,   color: "#C5A059" });
+    rings.push({ x: player.x, y: gy, r: 0, grow: 2.0, life: 1.1, color: "#F4B8C9" });
+    if (spring) rings.push({ x: player.x, y: gy, r: 2, grow: 4.2, life: 1, color: "#E5484D" });
+
+    const cols = ["#FFD97A", "#FFFFFF", "#F4B8C9", "#C5A059"];
+    const n = spring ? 16 : 9;
+    for (let i = 0; i < n; i++) {
+      sparkles.push({
+        x: player.x + (Math.random() - 0.5) * 20, y: gy,
+        vx: (Math.random() - 0.5) * (spring ? 7 : 5),
+        vy: -(Math.random() * (spring ? 5 : 3.5) + 0.8),
+        rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * 0.3,
+        s: 3 + Math.random() * 3, life: 1, color: cols[i % cols.length]
+      });
+    }
+  }
+
+  // ---------- Variasi ukuran, jenis, dan jarak pijakan ----------
+  function pickSizeClass(placeIdx) {
+    const w = [1 + placeIdx * 0.8, 3 + placeIdx * 0.3, 4, Math.max(0.5, 3 - placeIdx * 0.4), Math.max(0.2, 1.2 - placeIdx * 0.2)];
+    let total = 0;
+    for (let i = 0; i < w.length; i++) total += w[i];
+    let r = Math.random() * total;
+    for (let i = 0; i < w.length; i++) { r -= w[i]; if (r <= 0) return SIZE_CLASSES[i]; }
+    return SIZE_CLASSES[2];
+  }
+
+  function diversifyPlatform(p) {
+    const place = PLACES[currentPlaceIndex];
+    const ws = Math.max(0.75, Math.min(1.15, W / 400));
+
+    // Ukuran
+    const sc = pickSizeClass(currentPlaceIndex);
+    const center = p.x + p.w / 2;
+    p.w = (sc.w[0] + Math.random() * (sc.w[1] - sc.w[0])) * ws;
+    p.h = sc.h;
+    p.sizeName = sc.name;
+    p.seed = Math.random();
+
+    // Jenis baru (hanya mengubah pijakan biasa)
+    if (p.type === "normal") {
+      const r = Math.random();
+      let c = place.moveChance;
+      if (r < c) {
+        p.type = "moving";
+        p.vx = (Math.random() > 0.5 ? 1 : -1) * (1 + score / 100);
+      } else if (r < (c += place.vmoveChance)) {
+        p.type = "vmoving";
+        p.dy = (Math.random() > 0.5 ? 1 : -1) * (0.5 + Math.random() * 0.5) * place.speed;
+        p.range = 14 + Math.random() * 8;
+        p.off = 0;
+      } else if (r < (c += place.fragileChance)) {
+        p.type = "fragile";
+      } else if (r < (c += place.springChance)) {
+        p.type = "spring";
+        p.w = (44 + Math.random() * 16) * ws;
+        p.h = 12;
+      }
+    }
+
+    // Pijakan bergerak: makin tinggi level makin cepat
+    if (p.type === "moving") {
+      p.w = Math.min(p.w, W - 80);
+      p.vx *= place.speed;
+      if (Math.abs(p.vx) > 5.5) p.vx = p.vx > 0 ? 5.5 : -5.5;
+    }
+
+    // Posisi tetap di dalam layar
+    let nx = center - p.w / 2;
+    if (p.type === "moving") nx = Math.max(20, Math.min(W - p.w - 20, nx));
+    else nx = Math.max(0, Math.min(W - p.w, nx));
+    p.x = nx;
+
+    // Jarak vertikal dijaga agar selalu masih terjangkau lompatan
+    const prev = platforms[platforms.length - 2];
+    if (prev) {
+      const vyJ = Math.abs(BASE_JUMP - score * 0.005);
+      const g = BASE_GRAVITY + score * 0.002;
+      const maxGap = (vyJ * vyJ) / (2 * g) * 0.72;
+      if (prev.y - p.y > maxGap) p.y = prev.y - maxGap;
+    }
+  }
+
+  // ---------- Wajah (ekspresi) ----------
+  function drawFace(cx, hy, r, expr) {
+    const eyeY = hy + r * 0.22, mouthY = hy + r * 0.62;
+    const dx = r * 0.38, sh = r * 0.12;
+    const lw = Math.max(1.2, r * 0.13);
+    ctx.save();
+    ctx.lineCap = "round"; ctx.lineJoin = "round";
+
+    if (expr === "surprised") {
+      // Mata membesar
+      [-1, 1].forEach(function (s) {
+        const ex = cx + s * dx + sh;
+        ctx.fillStyle = "#FFFFFF"; ctx.strokeStyle = "#3B2F26"; ctx.lineWidth = lw * 0.6;
+        ctx.beginPath(); ctx.arc(ex, eyeY, r * 0.27, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = "#3B2F26";
+        ctx.beginPath(); ctx.arc(ex + sh * 0.4, eyeY, r * 0.11, 0, Math.PI * 2); ctx.fill();
+      });
+      // Mulut "O"
+      ctx.fillStyle = "#8E2F3A";
+      ctx.beginPath(); ctx.ellipse(cx + sh, mouthY + r * 0.04, r * 0.13, r * 0.18, 0, 0, Math.PI * 2); ctx.fill();
+    } else {
+      // Mata bahagia (melengkung ke atas)
+      ctx.strokeStyle = "#3B2F26"; ctx.lineWidth = lw;
+      [-1, 1].forEach(function (s) {
+        const ex = cx + s * dx + sh;
+        ctx.beginPath(); ctx.arc(ex, eyeY + r * 0.1, r * 0.16, Math.PI, Math.PI * 2); ctx.stroke();
+      });
+      // Pipi merona
+      ctx.fillStyle = "rgba(240,120,130,0.45)";
+      [-1, 1].forEach(function (s) {
+        ctx.beginPath(); ctx.arc(cx + s * r * 0.62 + sh, mouthY - r * 0.12, r * 0.17, 0, Math.PI * 2); ctx.fill();
+      });
+      // Senyum lebar
+      ctx.fillStyle = "#B8434B";
+      ctx.beginPath();
+      ctx.moveTo(cx + sh - r * 0.3, mouthY - r * 0.1);
+      ctx.quadraticCurveTo(cx + sh, mouthY + r * 0.5, cx + sh + r * 0.3, mouthY - r * 0.1);
+      ctx.closePath(); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // Posisi kepala sama persis dengan drawCouple (pangeran & putri)
+  function drawFaces(x, y, facing, expr) {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(facing, 1);
+    drawFace(0, -38, 11, expr);
+    ctx.translate(18, -10);
+    drawFace(0, -15, 9, expr);
+    ctx.restore();
+  }
+
+  // Animasi peregangan / penyok badan saat melompat
+  function applyPlayerSquash() {
+    let sx = 1, sy = 1;
+    if (jumpAnimT > 0) {
+      const k = 1 - jumpAnimT / jumpAnimTotal;
+      if (k < 0.25) sy = 1 - 0.28 * (k / 0.25);
+      else if (k < 0.55) sy = 0.72 + 0.56 * ((k - 0.25) / 0.30);
+      else sy = 1.28 - 0.28 * ((k - 0.55) / 0.45);
+      sx = 1 + (1 - sy) * 0.65;
+    }
+    const fy = player.y + 32;
+    ctx.translate(player.x, fy);
+    ctx.scale(sx, sy);
+    ctx.translate(-player.x, -fy);
+  }
+
+  function drawStar(x, y, r, rot) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+    ctx.beginPath();
+    for (let i = 0; i < 8; i++) {
+      const rr = i % 2 === 0 ? r : r * 0.35, ang = i * Math.PI / 4;
+      ctx.lineTo(Math.cos(ang) * rr, Math.sin(ang) * rr);
+    }
+    ctx.closePath(); ctx.fill(); ctx.restore();
+  }
+
+  // Cincin gelombang, bintang, dan garis kecepatan
+  function drawJumpEffects() {
+    ctx.save();
+    rings.forEach(function (rg) {
+      ctx.globalAlpha = Math.max(0, Math.min(1, rg.life));
+      ctx.strokeStyle = rg.color; ctx.lineWidth = 1 + 2.5 * Math.min(1, rg.life);
+      ctx.beginPath(); ctx.ellipse(rg.x, rg.y, rg.r, rg.r * 0.3, 0, 0, Math.PI * 2); ctx.stroke();
+    });
+    sparkles.forEach(function (sp) {
+      ctx.globalAlpha = Math.max(0, sp.life);
+      ctx.fillStyle = sp.color;
+      drawStar(sp.x, sp.y, sp.s * (0.5 + sp.life * 0.5), sp.rot);
+    });
+    if (surpriseTimer > 12 && !gameOver) {
+      ctx.globalAlpha = (surpriseTimer - 12) / 18 * 0.8;
+      ctx.strokeStyle = "#C5A059"; ctx.lineWidth = 2; ctx.lineCap = "round";
+      const off = (30 - surpriseTimer) * 1.5;
+      for (let i = -1; i <= 1; i++) {
+        const lx = player.x + i * 9, y0 = player.y + 40 + off + (i === 0 ? 4 : 0);
+        ctx.beginPath(); ctx.moveTo(lx, y0); ctx.lineTo(lx, y0 + 12); ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
+  // Tanda seru kecil di atas kepala saat kaget
+  function drawSurpriseMark() {
+    if (expression !== "surprised" || surpriseTimer <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = Math.min(1, surpriseTimer / 10);
+    ctx.textAlign = "center";
+    ctx.font = "bold 18px 'Montserrat', sans-serif";
+    ctx.fillStyle = "#E5484D";
+    ctx.fillText("!", player.x + 9 * player.facing, player.y - 62 - (30 - surpriseTimer) * 0.3);
+    ctx.restore();
+  }
+
+  // ---------- Latar tempat ----------
+  function hillY(x, base, amp, freq, phase) { return base - amp * Math.sin(x * freq + phase); }
+  function drawHills(base, amp, freq, phase, color) {
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.moveTo(0, H);
+    for (let x = 0; x <= W + 10; x += 10) ctx.lineTo(x, hillY(x, base, amp, freq, phase));
+    ctx.lineTo(W + 10, H); ctx.closePath(); ctx.fill();
+  }
+
+  function drawSkyline(base, minH, maxH, color, seed, winColor) {
+    let x = -10, i = 0;
+    while (x < W) {
+      const bw = 30 + hash(seed + i) * 26;
+      const bh = minH + hash(seed + i + 50) * (maxH - minH);
+      const top = base - bh;
+      ctx.fillStyle = color;
+      ctx.fillRect(x, top, bw, Math.max(0, H - top));
+      ctx.fillStyle = winColor;
+      for (let wy = top + 8; wy < base - 6; wy += 12) {
+        for (let wx = x + 5; wx < x + bw - 6; wx += 9) {
+          if (hash(seed + i * 31 + Math.floor(wx) * 0.37 + Math.floor(wy) * 0.11) > 0.55) ctx.fillRect(wx, wy, 4, 5);
+        }
+      }
+      x += bw + 2; i++;
+    }
+  }
+
+  function drawPeaks(base, hMin, hMax, color, seed, snow) {
+    const step = Math.max(70, W / 4);
+    ctx.fillStyle = color;
+    ctx.fillRect(0, base - 1, W, Math.max(0, H - base + 2));
+    for (let i = -1; i * step < W + step; i++) {
+      const px = i * step + step * 0.5 + hash(seed + i) * 30;
+      const ph = hMin + hash(seed + i + 20) * (hMax - hMin);
+      const half = step * 0.75;
+      ctx.fillStyle = color;
+      ctx.beginPath(); ctx.moveTo(px - half, base); ctx.lineTo(px, base - ph); ctx.lineTo(px + half, base); ctx.closePath(); ctx.fill();
+      if (snow) {
+        ctx.fillStyle = "#FFFFFF";
+        ctx.beginPath(); ctx.moveTo(px - half * 0.28, base - ph * 0.72); ctx.lineTo(px, base - ph); ctx.lineTo(px + half * 0.28, base - ph * 0.72);
+        ctx.lineTo(px + half * 0.1, base - ph * 0.78); ctx.lineTo(px - half * 0.05, base - ph * 0.7); ctx.closePath(); ctx.fill();
+      }
+    }
+  }
+
+  function drawScene(place, a) {
+    if (a <= 0.01) return;
+    const t = frameCount;
+    const sF = Math.min(cameraY * 0.04, H * 0.06);
+    const sN = Math.min(cameraY * 0.08, H * 0.12);
+    ctx.save();
+    ctx.globalAlpha = a;
+
+    if (place.scene === "garden") {
+      const bF = H * 0.80 + sF, bN = H * 0.88 + sN;
+      drawHills(bF, 16, 0.018, 1.0, "#C9E0B5");
+      drawHills(bN, 14, 0.026, 3.0, "#A9CF8F");
+      [0.12, 0.47, 0.86].forEach(function (fx) {
+        const x = W * fx, gy = hillY(x, bN, 14, 0.026, 3.0) + 4;
+        ctx.fillStyle = "#8B6B4A"; ctx.fillRect(x - 2, gy - 20, 4, 20);
+        ctx.fillStyle = "#7FB069";
+        ctx.beginPath(); circ(x, gy - 28, 13); circ(x - 9, gy - 21, 9); circ(x + 9, gy - 21, 9); ctx.fill();
+      });
+      const fc = ["#F4B8C9", "#FFD97A", "#FFFFFF"];
+      for (let i = 0; i < 16; i++) {
+        const x = (i + 0.5) * W / 16, y = hillY(x, bN, 14, 0.026, 3.0) + 10 + hash(i) * 8;
+        ctx.fillStyle = fc[i % 3]; ctx.beginPath(); circ(x, y, 2.4); ctx.fill();
+      }
+      ctx.fillStyle = "rgba(244,184,201,0.85)";
+      for (let i = 0; i < 7; i++) {
+        const px = wrapVal(hash(i) * W + Math.sin(t * 0.02 + i) * 18, W);
+        const py = wrapVal(hash(i + 9) * (H + 40) + cameraY * 0.35 + t * 0.4, H + 40) - 20;
+        ctx.beginPath(); ctx.ellipse(px, py, 3.2, 1.8, t * 0.03 + i, 0, Math.PI * 2); ctx.fill();
+      }
+
+    } else if (place.scene === "hills") {
+      ctx.fillStyle = "rgba(255,244,200,0.35)"; ctx.beginPath(); circ(W * 0.78, H * 0.2 + sF, 40); ctx.fill();
+      ctx.fillStyle = "rgba(255,244,200,0.75)"; ctx.beginPath(); circ(W * 0.78, H * 0.2 + sF, 24); ctx.fill();
+      drawHills(H * 0.76 + sF, 24, 0.012, 0.0, "#A9CDBE");
+      drawHills(H * 0.85 + sF, 20, 0.019, 2.0, "#86BBA0");
+      drawHills(H * 0.93 + sN, 12, 0.030, 4.0, "#6FA88A");
+      ctx.strokeStyle = "#5A6B6A"; ctx.lineWidth = 1.5; ctx.lineCap = "round";
+      for (let i = 0; i < 3; i++) {
+        const bx = wrapVal(hash(i) * W + t * (0.6 + 0.2 * i), W + 40) - 20;
+        const by = wrapVal(hash(i + 3) * H * 0.6 + cameraY * 0.25, H * 0.7) + 10;
+        const wing = 4 + 2 * Math.sin(t * 0.2 + i);
+        ctx.beginPath();
+        ctx.moveTo(bx - 6, by - wing); ctx.quadraticCurveTo(bx - 3, by, bx, by);
+        ctx.quadraticCurveTo(bx + 3, by, bx + 6, by - wing); ctx.stroke();
+      }
+
+    } else if (place.scene === "city") {
+      drawSkyline(H * 0.85 + sF, 50, 110, "#9AA7C0", 3, "rgba(255,233,168,0.55)");
+      drawSkyline(H * 0.95 + sN, 40, 80, "#6E7B9C", 11, "rgba(255,233,168,0.9)");
+
+    } else if (place.scene === "mountain") {
+      drawPeaks(H * 0.86 + sF, 70, 120, "#A4B6D0", 5, true);
+      drawPeaks(H * 0.95 + sN, 40, 80, "#7F96B8", 9, true);
+      ctx.fillStyle = "rgba(255,255,255,0.9)";
+      for (let i = 0; i < 18; i++) {
+        const sx = wrapVal(hash(i) * W + Math.sin(t * 0.03 + i) * 10, W);
+        const sy = wrapVal(hash(i + 7) * (H + 20) + t * 0.8 + cameraY * 0.4, H + 20) - 10;
+        ctx.beginPath(); circ(sx, sy, 1.6); ctx.fill();
+      }
+
+    } else if (place.scene === "clouds") {
+      const rc = ["#FF9AA2", "#FFD59A", "#FFF3A0", "#B5EAD7", "#A0D8F1", "#C7B8F5"];
+      ctx.globalAlpha = a * 0.35; ctx.lineWidth = 7;
+      for (let k = 0; k < rc.length; k++) {
+        ctx.strokeStyle = rc[k];
+        ctx.beginPath(); ctx.arc(W * 0.5, H * 1.08, H * 0.78 - k * 7, Math.PI, Math.PI * 2); ctx.stroke();
+      }
+      ctx.globalAlpha = a;
+      ctx.fillStyle = "rgba(255,255,255,0.75)";
+      const lp = [0.15, 0.25, 0.4];
+      for (let i = 0; i < 8; i++) {
+        const layer = i % 3, s = 0.7 + layer * 0.35;
+        const cx = wrapVal(hash(i) * (W + 120) + t * 0.15 * (layer + 1), W + 120) - 60;
+        const cy = wrapVal(hash(i + 11) * (H + 80) + cameraY * lp[layer], H + 80) - 40;
+        ctx.beginPath();
+        circ(cx, cy, 12 * s); circ(cx + 14 * s, cy - 8 * s, 15 * s); circ(cx + 30 * s, cy - 2 * s, 13 * s); circ(cx + 15 * s, cy + 4 * s, 13 * s);
+        ctx.fill();
+      }
+
+    } else if (place.scene === "space") {
+      ctx.fillStyle = "rgba(10,8,38,0.85)"; ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "#FFFFFF";
+      for (let i = 0; i < 46; i++) {
+        const layer = i % 3;
+        const sx = hash(i) * W, sy = wrapVal(hash(i + 5) * H + cameraY * (0.05 + 0.06 * layer), H);
+        ctx.globalAlpha = a * (0.5 + 0.5 * Math.sin(t * 0.06 + i));
+        ctx.beginPath(); circ(sx, sy, 0.6 + layer * 0.5); ctx.fill();
+      }
+      ctx.globalAlpha = a;
+      const py = wrapVal(H * 0.25 + cameraY * 0.08, H + 160) - 80;
+      ctx.fillStyle = "#B58CF0"; ctx.beginPath(); circ(W * 0.78, py, 22); ctx.fill();
+      ctx.strokeStyle = "#E9D7FF"; ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.ellipse(W * 0.78, py, 34, 8, -0.4, 0, Math.PI * 2); ctx.stroke();
+      const my = wrapVal(H * 0.6 + cameraY * 0.12, H + 120) - 60;
+      ctx.fillStyle = "#EDEBFF"; ctx.beginPath(); circ(W * 0.18, my, 14); ctx.fill();
+      ctx.fillStyle = "#D7D3F3"; ctx.beginPath(); circ(W * 0.18 - 4, my - 3, 3); circ(W * 0.18 + 4, my + 4, 2.4); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  function drawPlaceScenery() {
+    ctx.save();
+    if (placeFade < 1) drawScene(PLACES[prevPlaceIndex], 1 - placeFade);
+    drawScene(PLACES[currentPlaceIndex], placeFade);
+
+    // Panel di belakang teks skor agar tetap terbaca di latar gelap
+    let dark = 0;
+    if (PLACES[currentPlaceIndex].dark) dark += placeFade;
+    if (placeFade < 1 && PLACES[prevPlaceIndex].dark) dark += 1 - placeFade;
+    if (dark > 0) {
+      ctx.globalAlpha = Math.min(1, dark) * 0.7;
+      ctx.fillStyle = currentBgIndex === 3 ? "#14142D" : "#FFFFFF";
+      ctx.beginPath(); ctx.roundRect(10, 14, 236, 82, 10); ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  // ---------- Hiasan & jenis pijakan ----------
+  function drawPlatformDeco() {
+    const skin = PLACES[currentPlaceIndex].skin;
+    ctx.save();
+    ctx.shadowColor = "transparent";
+    platforms.forEach(function (p) {
+      if (p.type === "ground") return;
+      const sd = p.seed === undefined ? 0.5 : p.seed;
+      const cx = p.x + p.w * (0.2 + 0.6 * sd);
+
+      // Jenis: pijakan naik-turun (hijau mint, ada tanda panah)
+      if (p.type === "vmoving") {
+        ctx.fillStyle = "#CDEFE0"; ctx.beginPath(); ctx.roundRect(p.x, p.y, p.w, p.h, 6); ctx.fill();
+        ctx.strokeStyle = "#5DA88A"; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(p.x + 4, p.y + 2); ctx.lineTo(p.x + p.w - 4, p.y + 2); ctx.stroke();
+        const mx = p.x + p.w / 2, my = p.y + p.h / 2 + 1;
+        ctx.fillStyle = "#5DA88A";
+        ctx.beginPath(); ctx.moveTo(mx - 6, my - 3); ctx.lineTo(mx - 9, my + 1); ctx.lineTo(mx - 3, my + 1); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(mx + 6, my + 3); ctx.lineTo(mx + 3, my - 1); ctx.lineTo(mx + 9, my - 1); ctx.closePath(); ctx.fill();
+      }
+
+      // Jenis: pijakan pegas (lompat lebih tinggi)
+      if (p.type === "spring") {
+        ctx.fillStyle = "#FFD6E0"; ctx.beginPath(); ctx.roundRect(p.x, p.y, p.w, p.h, 6); ctx.fill();
+        ctx.strokeStyle = "#E58BA6"; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(p.x + 4, p.y + 2); ctx.lineTo(p.x + p.w - 4, p.y + 2); ctx.stroke();
+        const sx = p.x + p.w / 2;
+        ctx.strokeStyle = "#B03A48"; ctx.lineWidth = 1.8; ctx.lineJoin = "round";
+        ctx.beginPath(); ctx.moveTo(sx - 6, p.y); ctx.lineTo(sx + 6, p.y - 3); ctx.lineTo(sx - 6, p.y - 6); ctx.lineTo(sx + 6, p.y - 9); ctx.lineTo(sx, p.y - 11); ctx.stroke();
+        ctx.fillStyle = "#E5484D"; ctx.beginPath(); ctx.roundRect(sx - 9, p.y - 14, 18, 3.5, 2); ctx.fill();
+      }
+
+      // Hiasan sesuai tempat
+      if (skin === "flower") {
+        ctx.strokeStyle = "#6FA56B"; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(cx, p.y); ctx.lineTo(cx, p.y - 6); ctx.stroke();
+        ctx.fillStyle = sd > 0.5 ? "#F4B8C9" : "#FFD97A";
+        for (let k = 0; k < 5; k++) {
+          ctx.beginPath(); circ(cx + Math.cos(k * 1.2566) * 2.4, p.y - 7 + Math.sin(k * 1.2566) * 2.4, 1.8); ctx.fill();
+        }
+        ctx.fillStyle = "#FFF3B0"; ctx.beginPath(); circ(cx, p.y - 7, 1.4); ctx.fill();
+      } else if (skin === "grass") {
+        ctx.strokeStyle = "#7FB069"; ctx.lineWidth = 1.6; ctx.lineCap = "round";
+        for (let k = 0; k < 4; k++) {
+          const bx = p.x + p.w * (0.15 + 0.23 * k);
+          ctx.beginPath(); ctx.moveTo(bx, p.y); ctx.lineTo(bx + (k % 2 ? 2 : -2), p.y - 5); ctx.stroke();
+        }
+      } else if (skin === "lamp") {
+        ctx.strokeStyle = "#8D8D99"; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(cx, p.y); ctx.lineTo(cx, p.y - 9); ctx.stroke();
+        ctx.fillStyle = "rgba(255,224,138,0.35)"; ctx.beginPath(); circ(cx, p.y - 10, 6); ctx.fill();
+        ctx.fillStyle = "#FFE08A"; ctx.beginPath(); circ(cx, p.y - 10, 2.6); ctx.fill();
+      } else if (skin === "snow") {
+        ctx.fillStyle = "#FFFFFF"; ctx.beginPath(); ctx.roundRect(p.x - 1, p.y - 3, p.w + 2, 5, 3); ctx.fill();
+        ctx.fillStyle = "#DDEBFA";
+        for (let k = 0; k < 3; k++) {
+          const ix = p.x + p.w * (0.2 + 0.3 * k);
+          ctx.beginPath(); ctx.moveTo(ix - 2, p.y + p.h); ctx.lineTo(ix + 2, p.y + p.h); ctx.lineTo(ix, p.y + p.h + 5); ctx.closePath(); ctx.fill();
+        }
+      } else if (skin === "cloud") {
+        ctx.fillStyle = "rgba(255,255,255,0.92)";
+        ctx.beginPath(); circ(p.x + 6, p.y - 1, 5); circ(p.x + p.w * 0.5, p.y - 3, 6.5); circ(p.x + p.w - 6, p.y - 1, 5); ctx.fill();
+      } else if (skin === "crystal") {
+        ctx.strokeStyle = "rgba(120,210,255,0.85)"; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(p.x + 4, p.y + p.h + 1); ctx.lineTo(p.x + p.w - 4, p.y + p.h + 1); ctx.stroke();
+        ctx.fillStyle = sd > 0.5 ? "#7FE3FF" : "#C9A7FF";
+        ctx.beginPath(); ctx.moveTo(cx - 3, p.y); ctx.lineTo(cx, p.y - 9); ctx.lineTo(cx + 3, p.y); ctx.closePath(); ctx.fill();
+      }
+    });
+    ctx.restore();
+  }
+
+  // ---------- Teks tambahan (tempat & level) ----------
+  function drawExtraHUD() {
+    const place = PLACES[currentPlaceIndex];
+    ctx.save();
+    ctx.textAlign = "left";
+    ctx.fillStyle = currentBgIndex === 3 ? "#CCC" : "#9E7A3E";
+    ctx.font = "12px 'Montserrat', sans-serif";
+    ctx.fillText("Tempat: " + place.name + " | Level " + (currentPlaceIndex + 1), 20, 78);
+
+    if (placeToast > 0 && !gameOver) {
+      const a = Math.max(0, Math.min(1, placeToast / 30, (160 - placeToast) / 15));
+      ctx.globalAlpha = a;
+      ctx.font = "bold 14px 'Montserrat', sans-serif";
+      ctx.textAlign = "center";
+      const tw = Math.max(ctx.measureText(place.name).width, 120) + 36;
+      ctx.fillStyle = "rgba(255,255,255,0.92)";
+      ctx.beginPath(); ctx.roundRect(W / 2 - tw / 2, 100, tw, 44, 12); ctx.fill();
+      ctx.strokeStyle = "#C5A059"; ctx.lineWidth = 1.2; ctx.stroke();
+      ctx.fillStyle = "#8A6A2E";
+      ctx.fillText(place.name, W / 2, 120);
+      ctx.font = "10px 'Montserrat', sans-serif";
+      ctx.fillStyle = "#9E7A3E";
+      ctx.fillText("Tantangan meningkat!", W / 2, 135);
+    }
+    ctx.restore();
   }
 
   function loop() { update(); draw(); requestAnimationFrame(loop); }
