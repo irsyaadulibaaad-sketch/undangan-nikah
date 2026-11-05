@@ -9,7 +9,16 @@
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  body { background-color: var(--bg-cream); overflow-x: hidden; }
+  /* CSS Tekstur Kertas Linen (Sama seperti amplop) */
+  body { 
+    background-color: var(--bg-cream); 
+    background-image: 
+      repeating-linear-gradient(0deg, rgba(120,100,60,0.024) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(90deg, rgba(120,100,60,0.024) 0 1px, transparent 1px 3px);
+    background-attachment: fixed;
+    overflow-x: hidden; 
+  }
+  
   .cover { display: none !important; }
   .page-header { text-align: center; padding: 40px 20px 20px; }
   .page-title { font-family: var(--font-serif); font-size: 2.5rem; color: var(--gold-dark); margin-bottom: 10px; }

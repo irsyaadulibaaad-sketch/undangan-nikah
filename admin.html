@@ -10,7 +10,15 @@
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  body { background-color: var(--bg-cream); }
+  /* CSS Tekstur Kertas Linen (Sama seperti amplop) */
+  body { 
+    background-color: var(--bg-cream); 
+    background-image: 
+      repeating-linear-gradient(0deg, rgba(120,100,60,0.024) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(90deg, rgba(120,100,60,0.024) 0 1px, transparent 1px 3px);
+    background-attachment: fixed;
+  }
+  
   .cover { display: none !important; }
   .admin-container { max-width: 1000px; margin: 0 auto; padding: 40px 20px; position: relative; z-index: 10; }
   .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
