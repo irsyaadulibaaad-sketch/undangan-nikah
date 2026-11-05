@@ -358,12 +358,12 @@
       var btn = document.getElementById("autoScrollToggle");
       if (btn) btn.classList.add("show");
       
-      // MULAI AUTOSCROLL SETELAH 3 DETIK (saat tombol muncul)
+      // MULAI AUTOSCROLL SETELAH 1 DETIK (saat tombol muncul)
       setTimeout(function() {
         if (typeof startAutoScroll === "function") {
           startAutoScroll();
         }
-      }, 3000);
+      }, 1000);
 
     }, 2000);
   }
