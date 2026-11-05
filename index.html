@@ -327,11 +327,11 @@
     opened = true;
     if (!window.gsap) { revealMain(); return; }
 
-    // 1. Animasi Pita Lepas (CSS Transition)
+    // 1. Animasi Tarik Pita Lepas (CSS)
     if (envelope) envelope.classList.add("ribbon-off");
 
-    // 2. Animasi Surat Terbuka (Delay 1.2s agar pita sempat lepas)
-    var tl = gsap.timeline({ defaults: { ease: "power3.inOut" }, delay: 1.2 });
+    // 2. Animasi Amplop Terbuka
+    var tl = gsap.timeline({ defaults: { ease: "power3.inOut" }, delay: 0.6 }); // Delay 0.6s agar pita sempat lepas
     tl.to(openBtn, { scale: 1.15, duration: 0.35, ease: "power2.out" })
       .to(openBtn, { scale: 0.9, duration: 0.2, ease: "power2.in" })
       .to(openBtn, { scale: 1.6, opacity: 0, filter: "blur(6px)", duration: 0.7, ease: "power2.in" })
@@ -347,7 +347,7 @@
 
     setTimeout(function () {
       gsap.to(cover, { opacity: 0, filter: "blur(14px)", scale: 1.08, duration: 1.2, ease: "power2.inOut", onComplete: revealMain });
-    }, 4600); // Total waktu diperpanjang karena ada delay 1.2s di awal
+    }, 4000); // Diperpanjang jadi 4 detik karena ada delay pita
   }
 
   if (openBtn) {
