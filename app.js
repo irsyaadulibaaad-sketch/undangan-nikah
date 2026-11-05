@@ -224,9 +224,10 @@ supabaseClient.channel("doa-rt")
 
   // ---------- konstanta ----------
   const DPR = Math.min(window.devicePixelRatio || 1, 2);
-  const CW = 720, CH = 600;                       // ukuran kanvas (px CSS), lebih besar dari amplop agar pita bisa keluar
-  const OX = (CW - 340) / 2, OY = (CH - 460) / 2; // posisi amplop di dalam kanvas
-  const KX = 170, KY = 230;                       // pusat simpul = tengah amplop
+  const EW = env.offsetWidth || 340, EH = env.offsetHeight || 460; // ukuran amplop sebenarnya (HP = 300 x 420)
+  const CW = EW + 380, CH = EH + 140;             // ukuran kanvas (px CSS), lebih besar dari amplop agar pita bisa keluar
+  const OX = (CW - EW) / 2, OY = (CH - EH) / 2;   // posisi amplop di dalam kanvas
+  const KX = EW / 2, KY = EH / 2;                 // pusat simpul = tengah amplop
   const W = 24;                                   // lebar pita
   const REACH = 250;                              // panjang tali lurus ke kiri/kanan dari simpul
 
@@ -236,7 +237,7 @@ supabaseClient.channel("doa-rt")
   const T_REL = 0.95;    // tali ditarik lepas
   const FEED_MAX = 900;  // total panjang tali yang ditarik keluar
   const FEED_POW = 1.6;
-  const FEED_READY = 450; // tali sudah lepas dari amplop saat ini
+  const FEED_READY = EW / 2 + REACH + 10; // tali sudah lepas dari amplop saat ini
   const T_READY = T_PULL + T_HOLD + T_REL * Math.pow(FEED_READY / FEED_MAX, 1 / FEED_POW);
   window.ribbonUntieDuration = T_READY;           // dibaca oleh fungsi buka undangan (index.html)
 
@@ -451,7 +452,7 @@ supabaseClient.channel("doa-rt")
   }
 
   // ---------- jalur tarik lepas ----------
-  const FX = 440, FR = 80, ARC = Math.PI * FR / 2;
+  const FX = EW + 100, FR = 80, ARC = Math.PI * FR / 2;
   function feedPt(sg) {
     if (sg <= FX) return { x: sg, y: KY };
     const d = sg - FX;
@@ -485,7 +486,7 @@ supabaseClient.channel("doa-rt")
 
       // tali yang membungkus amplop (sisi kanan menembus ke belakang di tepi amplop)
       ctx.save();
-      ctx.beginPath(); ctx.rect(0, -OY, 348, CH); ctx.clip();
+      ctx.beginPath(); ctx.rect(0, -OY, EW + 6, CH); ctx.clip();
       strip(straightBand(), { nS: true, nE: true, sh: 0.38 });
       ctx.restore();
 
@@ -518,9 +519,9 @@ supabaseClient.channel("doa-rt")
     g.addColorStop(0, "rgba(25,0,5,0.62)"); g.addColorStop(1, "rgba(25,0,5,0)");
     ctx.fillStyle = g; ctx.fillRect(0, KY - 40, 26, 80);
     if (wrapA > 0.01) {
-      g = ctx.createLinearGradient(322, 0, 348, 0);
+      g = ctx.createLinearGradient(EW - 20, 0, EW + 6, 0);
       g.addColorStop(0, "rgba(25,0,5,0)"); g.addColorStop(1, "rgba(25,0,5," + (0.6 * wrapA).toFixed(3) + ")");
-      ctx.fillStyle = g; ctx.fillRect(322, KY - 40, 26, 80);
+      ctx.fillStyle = g; ctx.fillRect(EW - 20, KY - 40, 26, 80);
     }
     ctx.globalCompositeOperation = "source-over";
     ctx.restore();
