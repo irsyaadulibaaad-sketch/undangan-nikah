@@ -30,6 +30,10 @@
   background: linear-gradient(to left,  rgba(60,50,30,0.03) 0, transparent 18%, transparent 62%, rgba(60,50,30,0.11) 100%) !important;
 }
 
+/* Daun saling menimpa 1px agar tidak ada celah di garis lipat
+   (tanpa ini huruf yang melintasi lipatan tampak terpotong). */
+.paper-front { width: calc(50% + 1px) !important; }
+
 /* ---------- 2) Nama tamu — mengikuti perspektif lipatan tengah ---------- */
 /* Kotak nama lama (di kertas belakang) disembunyikan */
 #guestGreeting { display: none !important; }
@@ -46,8 +50,8 @@
   pointer-events: none; z-index: 3;
   transform-origin: 50% 50%;
 }
-.paper-front.left  .gc-span { left: 0;  transform: perspective(520px) rotateY(16deg); }
-.paper-front.right .gc-span { right: 0; transform: perspective(520px) rotateY(-16deg); }
+.paper-front.left  .gc-span { left: 0;  transform: perspective(520px) rotateY(9deg); }
+.paper-front.right .gc-span { right: 0; transform: perspective(520px) rotateY(-9deg); }
 
 .gc-band {
   position: absolute; left: 0; width: 100%;
@@ -76,4 +80,17 @@
 @media (max-width: 480px) {
   .gc-band { padding: 0 24px; }
   .gc-msg { font-size: 0.88rem; }
+}
+
+/* Nuansa kertas ikut menyentuh tulisan: sisi kiri lipatan sedikit lebih gelap,
+   sisi kanan sedikit lebih terang — selaras dengan warna daun amplop, sehingga
+   tulisan tampak tercetak di permukaan yang terlipat, bukan tempelan datar. */
+.gc-span::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+}
+.paper-front.left .gc-span::after {
+  background: linear-gradient(90deg, transparent 30%, rgba(110,84,40,0.13) 50%, transparent 50.2%);
+}
+.paper-front.right .gc-span::after {
+  background: linear-gradient(90deg, transparent 49.8%, rgba(255,255,255,0.30) 50%, transparent 68%);
 }
