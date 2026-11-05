@@ -22,12 +22,36 @@
     cursor: pointer; display: none;
   }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div id="hint">Miringkan HP atau Sentuh Layar</div>
 <button id="gyroBtn">Aktifkan Sensor</button>
 <canvas id="gameCanvas"></canvas>
 <script>
+  // === TAMBAHAN FITUR LEADERBOARD (SUPABASE) ===
+  const SUPABASE_URL = "https://pamuhftcixcyinvajsej.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_njAPpdJQozdbRHvYC8dsIQ_eRq2fX28";
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const GAME_ID = "jump_sky";
+
+  let leaderboardData = [];
+  let hasSubmitted = false;
+
+  async function fetchLeaderboard() {
+    const { data, error } = await supabaseClient.from('leaderboard').select('nama, skor').eq('game', GAME_ID).order('skor', { ascending: false }).limit(5);
+    if (!error && data) leaderboardData = data;
+  }
+  fetchLeaderboard();
+
+  window.submitScore = async function(nama) {
+    if (!nama || nama.trim() === "") return;
+    await supabaseClient.from('leaderboard').insert([{ game: GAME_ID, nama: nama.trim(), skor: score }]);
+    hasSubmitted = true;
+    fetchLeaderboard();
+  };
+  // === AKHIR TAMBAHAN FITUR LEADERBOARD ===
+
   const canvas = document.getElementById("gameCanvas");
   const ctx = canvas.getContext("2d");
   let W, H;
@@ -76,11 +100,8 @@
   ];
 
   // ===================================================================
-  // [BARU] DATA TAMBAHAN: LATAR TEMPAT, UKURAN PIJAKAN, EKSPRESI & EFEK
+  // DATA TAMBAHAN: LATAR TEMPAT, UKURAN PIJAKAN, EKSPRESI & EFEK (KODE ASLI)
   // ===================================================================
-
-  // Latar tempat berganti sesuai skor. Makin tinggi level: pijakan bergerak
-  // makin sering & makin cepat, pijakan rapuh makin banyak.
   const PLACES = [
     { min: 0,   name: "Taman Bunga",  scene: "garden",   skin: "flower",  moveChance: 0,    vmoveChance: 0,    fragileChance: 0,    springChance: 0.07, speed: 1.0 },
     { min: 35,  name: "Perbukitan",   scene: "hills",    skin: "grass",   moveChance: 0.10, vmoveChance: 0.05, fragileChance: 0.05, springChance: 0.07, speed: 1.1 },
@@ -90,7 +111,6 @@
     { min: 260, name: "Luar Angkasa", scene: "space",    skin: "crystal", moveChance: 0.20, vmoveChance: 0.18, fragileChance: 0.14, springChance: 0.05, speed: 1.8, dark: true }
   ];
 
-  // Ukuran pijakan beragam (lebar min-maks, tebal)
   const SIZE_CLASSES = [
     { name: "mini",   w: [38, 52],   h: 10 },
     { name: "kecil",  w: [56, 76],   h: 12 },
@@ -99,44 +119,39 @@
     { name: "lebar",  w: [140, 168], h: 18 }
   ];
 
-  // Ekspresi & animasi lompat
-  let expression = "happy";      // "happy" | "surprised"
+  let expression = "happy";
   let surpriseTimer = 0;
   let jumpAnimT = 0;
   let jumpAnimTotal = 18;
-  let rings = [];                // cincin gelombang saat melompat
-  let sparkles = [];             // bintang kecil saat melompat
+  let rings = [];
+  let sparkles = [];
   let frameCount = 0;
   let lastCameraY = 0;
 
-  // Latar tempat
   let currentPlaceIndex = 0;
   let prevPlaceIndex = 0;
   let placeFade = 1;
   let placeToast = 0;
 
-  // Kontrol goyang presisi
   let preciseTilt = 0;
   let preciseActive = false;
 
   // --- SETUP SENSOR & IZIN ---
   function requestGyroPermission() {
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-      // Khusus iOS 13+ yang butuh izin
       const btn = document.getElementById("gyroBtn");
-      btn.style.display = "block"; // Tampilkan tombol
+      btn.style.display = "block"; 
       btn.onclick = function() {
         DeviceOrientationEvent.requestPermission()
           .then(response => {
             if (response == 'granted') {
-              btn.style.display = "none"; // Sembunyikan setelah diizinkan
+              btn.style.display = "none"; 
               attachGyroListener();
             }
           })
           .catch(console.error);
       };
     } else {
-      // Android / PC langsung pasang listener
       attachGyroListener();
     }
   }
@@ -145,13 +160,9 @@
     window.addEventListener('deviceorientation', function(e) {
       if (e.gamma !== null) {
         gyroSupported = true;
-        // Ambil nilai kemiringan (dibalik agar intuitif: miring kanan = kanan)
-        let rawTilt = (e.gamma * -1) / 20; // Sensitivitas disesuaikan (20 derajat)
-        
-        // Batasi nilai antara -1 dan 1
+        let rawTilt = (e.gamma * -1) / 20; 
         if (rawTilt > 1) rawTilt = 1;
         if (rawTilt < -1) rawTilt = -1;
-        
         targetTiltX = rawTilt;
       }
     });
@@ -159,16 +170,10 @@
 
   requestGyroPermission();
 
-  // ===================================================================
-  // [BARU] KONTROL GOYANG PRESISI (tanpa delay, langsung aktif)
-  // Memakai arah gravitasi dari beta+gamma (bukan gamma saja), sehingga
-  // akurat saat HP dipegang tegak, miring, maupun rebah, dan mengikuti
-  // rotasi layar. Nilai dipakai langsung tanpa filter lambat.
-  // ===================================================================
   (function () {
     const DEG = Math.PI / 180;
-    const FULL_TILT = 0.42;    // kemiringan ±25 derajat = kecepatan penuh
-    const DEAD_ZONE = 0.035;   // ±2 derajat diabaikan agar tidak bergetar
+    const FULL_TILT = 0.42;    
+    const DEAD_ZONE = 0.035;   
     let smooth = 0;
 
     function screenAngle() {
@@ -181,12 +186,9 @@
     function onTilt(e) {
       if (e.beta === null || e.gamma === null || e.beta === undefined || e.gamma === undefined) return;
       const br = e.beta * DEG, gr = e.gamma * DEG;
-
-      // Vektor "atas" (berlawanan gravitasi) pada sumbu perangkat
       const ux = -Math.cos(br) * Math.sin(gr);
       const uy = Math.sin(br);
 
-      // Miring ke kanan layar => nilai positif
       let side;
       switch (screenAngle()) {
         case 90:  side = uy;  break;
@@ -199,7 +201,6 @@
       let v = mag < DEAD_ZONE ? 0 : Math.min(1, (mag - DEAD_ZONE) / (FULL_TILT - DEAD_ZONE));
       if (side < 0) v = -v;
 
-      // Filter adaptif: perubahan besar langsung lewat, hanya getaran kecil diredam
       const alpha = Math.min(1, 0.65 + Math.abs(v - smooth) * 2);
       smooth += (v - smooth) * alpha;
       if (Math.abs(smooth) < 0.01) smooth = 0;
@@ -213,8 +214,6 @@
     }
     window.addEventListener("deviceorientation", onTilt);
 
-    // iOS 13+: izin sensor wajib lewat sentuhan. Minta otomatis pada sentuhan
-    // pertama di game supaya sensor langsung aktif tanpa menekan tombol.
     if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
       let asked = false;
       const ask = function (ev) {
@@ -277,7 +276,7 @@
     }
 
     platforms.push({ x: x, y: y, w: w, h: 12, type: type, vx: vx, id: Math.random() });
-    diversifyPlatform(platforms[platforms.length - 1]); // [BARU] ukuran, jenis, dan jarak pijakan beragam
+    diversifyPlatform(platforms[platforms.length - 1]);
   }
 
   function initGame() {
@@ -293,7 +292,9 @@
     tiltX = 0;
     targetTiltX = 0;
 
-    resetExtras(); // [BARU]
+    resetExtras(); 
+    hasSubmitted = false; // TAMBAHAN: Reset status submit
+    fetchLeaderboard();   // TAMBAHAN: Ambil data terbaru
 
     for (let i = 1; i <= 12; i++) {
       createPlatform(H - 50 - i * 95);
@@ -334,7 +335,7 @@
   }
 
   function update() {
-    updateExtras(); // [BARU] latar tempat, ekspresi, efek, kontrol goyang
+    updateExtras(); 
     if (gameOver) return;
 
     currentGravity = BASE_GRAVITY + (score * 0.002);
@@ -345,12 +346,9 @@
       currentBgIndex = newBgIndex;
     }
 
-    // --- SMOOTHING SENSOR (LOW-PASS FILTER) ---
-    // Membuat transisi gerakan lebih halus, tidak kaku/delay
     tiltX += (targetTiltX - tiltX) * 0.15; 
 
     if (gyroSupported && Math.abs(tiltX) > 0.05) {
-      // Kontrol Gyro
       player.vx = tiltX * currentMoveSpeed;
       if (tiltX > 0.1) player.facing = 1;
       if (tiltX < -0.1) player.facing = -1;
@@ -361,7 +359,6 @@
       player.vx = currentMoveSpeed; 
       player.facing = 1;
     } else {
-      // Jika tidak ada input sama sekali, berhenti
       if (!gyroSupported || Math.abs(tiltX) <= 0.05) {
         player.vx = 0;
       }
@@ -404,7 +401,7 @@
           
           player.vy = BASE_JUMP - (score * 0.005); 
           player.isJumping = true;
-          onBounce(p); // [BARU] ekspresi kaget + efek lompat
+          onBounce(p); 
           
           for(let j=0; j<4; j++) {
             particles.push({
@@ -439,6 +436,8 @@
         highScore = score;
         localStorage.setItem("jumpHi", highScore);
       }
+      // TAMBAHAN: Kirim pesan ke parent (index.html) untuk input nama
+      window.parent.postMessage({ type: 'GAME_OVER', game: GAME_ID, score: score }, '*');
     }
   }
 
@@ -457,7 +456,7 @@
       ctx.beginPath(); ctx.arc(W*0.2 + i*60, cy, currentBgIndex === 3 ? 1.5 : 30, 0, Math.PI*2); ctx.fill();
     }
 
-    drawPlaceScenery(); // [BARU] latar tempat
+    drawPlaceScenery(); 
 
     platforms.forEach(p => {
       ctx.shadowColor = "rgba(0,0,0,0.15)";
@@ -484,7 +483,7 @@
       ctx.beginPath(); ctx.moveTo(p.x + 4, p.y + 2); ctx.lineTo(p.x + p.w - 4, p.y + 2); ctx.stroke();
     });
 
-    drawPlatformDeco(); // [BARU] jenis & hiasan pijakan
+    drawPlatformDeco(); 
 
     particles.forEach(pt => {
       ctx.globalAlpha = pt.life;
@@ -494,13 +493,13 @@
     ctx.globalAlpha = 1;
 
     if (!gameOver) {
-      drawJumpEffects(); // [BARU]
+      drawJumpEffects(); 
       ctx.save();
-      applyPlayerSquash(); // [BARU] animasi peregangan saat lompat
+      applyPlayerSquash(); 
       drawCouple(player.x, player.y, player.facing, player.isJumping);
-      drawFaces(player.x, player.y, player.facing, expression); // [BARU] ekspresi wajah
+      drawFaces(player.x, player.y, player.facing, expression); 
       ctx.restore();
-      drawSurpriseMark(); // [BARU]
+      drawSurpriseMark(); 
     }
 
     ctx.fillStyle = currentBgIndex === 3 ? "#FFF" : "#8A6A2E";
@@ -511,21 +510,43 @@
     ctx.fillStyle = currentBgIndex === 3 ? "#CCC" : "#9E7A3E";
     ctx.font = "12px 'Montserrat', sans-serif";
     ctx.fillText("Tertinggi: " + highScore + " | Cuaca: " + BACKGROUNDS[currentBgIndex].name, 20, 60);
-    drawExtraHUD(); // [BARU] nama tempat & level
+    drawExtraHUD(); 
 
     if (gameOver) {
-      ctx.fillStyle = "rgba(255,255,255,0.9)";
-      ctx.fillRect(0, H/2 - 80, W, 160);
+      // UI GAME OVER LENGKAP DENGAN LEADERBOARD
+      ctx.fillStyle = "rgba(255,255,255,0.95)";
+      ctx.fillRect(W/2 - 170, H/2 - 110, 340, 220);
+      ctx.strokeStyle = "#C5A059"; ctx.lineWidth = 1.5; ctx.strokeRect(W/2 - 170, H/2 - 110, 340, 220);
+
+      ctx.fillStyle = "#8A6A2E"; ctx.font = "bold 24px 'Cormorant Garamond', serif"; ctx.textAlign = "center";
+      ctx.fillText("Jatuh Cinta Terlalu Dalam!", W/2, H/2 - 75);
+      ctx.font = "14px 'Montserrat', sans-serif"; ctx.fillStyle = "#555";
+      ctx.fillText("Skor Kamu: " + score, W/2, H/2 - 50);
+
+      ctx.font = "bold 12px 'Montserrat', sans-serif"; ctx.fillStyle = "#9E7A3E";
+      ctx.fillText("— Peringkat Teratas —", W/2, H/2 - 20);
       
-      ctx.fillStyle = "#8A6A2E";
-      ctx.font = "bold 26px 'Cormorant Garamond', serif";
-      ctx.textAlign = "center";
-      ctx.fillText("Jatuh Cinta Terlalu Dalam!", W/2, H/2 - 20);
-      
-      ctx.font = "14px 'Montserrat', sans-serif";
-      ctx.fillStyle = "#555";
-      ctx.fillText("Skor Akhir: " + score, W/2, H/2 + 15);
-      ctx.fillText("Ketuk layar untuk coba lagi", W/2, H/2 + 45);
+      ctx.font = "12px 'Montserrat', sans-serif"; ctx.fillStyle = "#555";
+      if (leaderboardData.length === 0) {
+        ctx.fillText("Belum ada data.", W/2, H/2);
+      } else {
+        leaderboardData.forEach((lb, i) => {
+          let yPos = H/2 + (i * 18);
+          ctx.textAlign = "left"; ctx.fillText(`${i+1}. ${lb.nama}`, W/2 - 100, yPos);
+          ctx.textAlign = "right"; ctx.fillText(`${lb.skor}`, W/2 + 100, yPos);
+        });
+      }
+
+      if (!hasSubmitted) {
+        ctx.textAlign = "center"; ctx.fillStyle = "#9E7A3E";
+        ctx.fillText("Kirim skor ke halaman Admin untuk masuk peringkat!", W/2, H/2 + 110);
+      } else {
+        ctx.textAlign = "center"; ctx.fillStyle = "#8A9A7B";
+        ctx.fillText("Skor berhasil dikirim!", W/2, H/2 + 110);
+      }
+
+      ctx.textAlign = "center"; ctx.font = "bold 13px 'Montserrat', sans-serif"; ctx.fillStyle = "#9E7A3E";
+      ctx.fillText("Ketuk layar untuk coba lagi", W/2, H/2 + 135);
     }
   }
 
@@ -538,14 +559,10 @@
     };
   }
 
-  // ===================================================================
-  // [BARU] FUNGSI TAMBAHAN
-  // ===================================================================
   function hash(n) { const s = Math.sin(n * 127.1 + 311.7) * 43758.5453; return s - Math.floor(s); }
   function wrapVal(v, span) { return ((v % span) + span) % span; }
   function circ(x, y, r) { ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, Math.PI * 2); }
 
-  // ---------- Reset & update tambahan ----------
   function resetExtras() {
     expression = "happy";
     surpriseTimer = 0;
@@ -561,11 +578,8 @@
 
   function updateExtras() {
     frameCount++;
-
-    // Kontrol goyang: pakai nilai terbaru langsung (tanpa smoothing lambat)
     if (preciseActive) { tiltX = preciseTilt; targetTiltX = preciseTilt; }
 
-    // Latar tempat mengikuti skor
     let idx = 0;
     for (let i = 0; i < PLACES.length; i++) { if (score >= PLACES[i].min) idx = i; }
     if (idx !== currentPlaceIndex) {
@@ -577,14 +591,12 @@
     if (placeFade < 1) placeFade = Math.min(1, placeFade + 0.02);
     if (placeToast > 0) placeToast--;
 
-    // Ekspresi kembali bahagia setelah kaget
     if (surpriseTimer > 0) {
       surpriseTimer--;
       if (surpriseTimer === 0) expression = "happy";
     }
     if (jumpAnimT > 0) jumpAnimT--;
 
-    // Pijakan naik-turun
     platforms.forEach(p => {
       if (p.type === "vmoving") {
         p.y += p.dy;
@@ -593,7 +605,6 @@
       }
     });
 
-    // Efek lompat ikut bergeser bersama kamera
     const camDelta = cameraY - lastCameraY;
     lastCameraY = cameraY;
     for (let i = rings.length - 1; i >= 0; i--) {
@@ -608,13 +619,12 @@
     }
   }
 
-  // ---------- Saat melompati pijakan ----------
   function onBounce(p) {
     expression = "surprised";
     surpriseTimer = 30;
 
     const spring = p.type === "spring";
-    if (spring) player.vy *= 1.35;   // pijakan pegas: lompat lebih tinggi
+    if (spring) player.vy *= 1.35;   
 
     jumpAnimTotal = spring ? 24 : 18;
     jumpAnimT = jumpAnimTotal;
@@ -637,7 +647,6 @@
     }
   }
 
-  // ---------- Variasi ukuran, jenis, dan jarak pijakan ----------
   function pickSizeClass(placeIdx) {
     const w = [1 + placeIdx * 0.8, 3 + placeIdx * 0.3, 4, Math.max(0.5, 3 - placeIdx * 0.4), Math.max(0.2, 1.2 - placeIdx * 0.2)];
     let total = 0;
@@ -651,7 +660,6 @@
     const place = PLACES[currentPlaceIndex];
     const ws = Math.max(0.75, Math.min(1.15, W / 400));
 
-    // Ukuran
     const sc = pickSizeClass(currentPlaceIndex);
     const center = p.x + p.w / 2;
     p.w = (sc.w[0] + Math.random() * (sc.w[1] - sc.w[0])) * ws;
@@ -659,7 +667,6 @@
     p.sizeName = sc.name;
     p.seed = Math.random();
 
-    // Jenis baru (hanya mengubah pijakan biasa)
     if (p.type === "normal") {
       const r = Math.random();
       let c = place.moveChance;
@@ -680,20 +687,17 @@
       }
     }
 
-    // Pijakan bergerak: makin tinggi level makin cepat
     if (p.type === "moving") {
       p.w = Math.min(p.w, W - 80);
       p.vx *= place.speed;
       if (Math.abs(p.vx) > 5.5) p.vx = p.vx > 0 ? 5.5 : -5.5;
     }
 
-    // Posisi tetap di dalam layar
     let nx = center - p.w / 2;
     if (p.type === "moving") nx = Math.max(20, Math.min(W - p.w - 20, nx));
     else nx = Math.max(0, Math.min(W - p.w, nx));
     p.x = nx;
 
-    // Jarak vertikal dijaga agar selalu masih terjangkau lompatan
     const prev = platforms[platforms.length - 2];
     if (prev) {
       const vyJ = Math.abs(BASE_JUMP - score * 0.005);
@@ -703,7 +707,6 @@
     }
   }
 
-  // ---------- Wajah (ekspresi) ----------
   function drawFace(cx, hy, r, expr) {
     const eyeY = hy + r * 0.22, mouthY = hy + r * 0.62;
     const dx = r * 0.38, sh = r * 0.12;
@@ -712,7 +715,6 @@
     ctx.lineCap = "round"; ctx.lineJoin = "round";
 
     if (expr === "surprised") {
-      // Mata membesar
       [-1, 1].forEach(function (s) {
         const ex = cx + s * dx + sh;
         ctx.fillStyle = "#FFFFFF"; ctx.strokeStyle = "#3B2F26"; ctx.lineWidth = lw * 0.6;
@@ -720,22 +722,18 @@
         ctx.fillStyle = "#3B2F26";
         ctx.beginPath(); ctx.arc(ex + sh * 0.4, eyeY, r * 0.11, 0, Math.PI * 2); ctx.fill();
       });
-      // Mulut "O"
       ctx.fillStyle = "#8E2F3A";
       ctx.beginPath(); ctx.ellipse(cx + sh, mouthY + r * 0.04, r * 0.13, r * 0.18, 0, 0, Math.PI * 2); ctx.fill();
     } else {
-      // Mata bahagia (melengkung ke atas)
       ctx.strokeStyle = "#3B2F26"; ctx.lineWidth = lw;
       [-1, 1].forEach(function (s) {
         const ex = cx + s * dx + sh;
         ctx.beginPath(); ctx.arc(ex, eyeY + r * 0.1, r * 0.16, Math.PI, Math.PI * 2); ctx.stroke();
       });
-      // Pipi merona
       ctx.fillStyle = "rgba(240,120,130,0.45)";
       [-1, 1].forEach(function (s) {
         ctx.beginPath(); ctx.arc(cx + s * r * 0.62 + sh, mouthY - r * 0.12, r * 0.17, 0, Math.PI * 2); ctx.fill();
       });
-      // Senyum lebar
       ctx.fillStyle = "#B8434B";
       ctx.beginPath();
       ctx.moveTo(cx + sh - r * 0.3, mouthY - r * 0.1);
@@ -745,7 +743,6 @@
     ctx.restore();
   }
 
-  // Posisi kepala sama persis dengan drawCouple (pangeran & putri)
   function drawFaces(x, y, facing, expr) {
     ctx.save();
     ctx.translate(x, y);
@@ -756,7 +753,6 @@
     ctx.restore();
   }
 
-  // Animasi peregangan / penyok badan saat melompat
   function applyPlayerSquash() {
     let sx = 1, sy = 1;
     if (jumpAnimT > 0) {
@@ -782,7 +778,6 @@
     ctx.closePath(); ctx.fill(); ctx.restore();
   }
 
-  // Cincin gelombang, bintang, dan garis kecepatan
   function drawJumpEffects() {
     ctx.save();
     rings.forEach(function (rg) {
@@ -807,7 +802,6 @@
     ctx.restore();
   }
 
-  // Tanda seru kecil di atas kepala saat kaget
   function drawSurpriseMark() {
     if (expression !== "surprised" || surpriseTimer <= 0) return;
     ctx.save();
@@ -819,7 +813,6 @@
     ctx.restore();
   }
 
-  // ---------- Latar tempat ----------
   function hillY(x, base, amp, freq, phase) { return base - amp * Math.sin(x * freq + phase); }
   function drawHills(base, amp, freq, phase, color) {
     ctx.fillStyle = color;
@@ -969,7 +962,6 @@
     if (placeFade < 1) drawScene(PLACES[prevPlaceIndex], 1 - placeFade);
     drawScene(PLACES[currentPlaceIndex], placeFade);
 
-    // Panel di belakang teks skor agar tetap terbaca di latar gelap
     let dark = 0;
     if (PLACES[currentPlaceIndex].dark) dark += placeFade;
     if (placeFade < 1 && PLACES[prevPlaceIndex].dark) dark += 1 - placeFade;
@@ -981,7 +973,6 @@
     ctx.restore();
   }
 
-  // ---------- Hiasan & jenis pijakan ----------
   function drawPlatformDeco() {
     const skin = PLACES[currentPlaceIndex].skin;
     ctx.save();
@@ -991,7 +982,6 @@
       const sd = p.seed === undefined ? 0.5 : p.seed;
       const cx = p.x + p.w * (0.2 + 0.6 * sd);
 
-      // Jenis: pijakan naik-turun (hijau mint, ada tanda panah)
       if (p.type === "vmoving") {
         ctx.fillStyle = "#CDEFE0"; ctx.beginPath(); ctx.roundRect(p.x, p.y, p.w, p.h, 6); ctx.fill();
         ctx.strokeStyle = "#5DA88A"; ctx.lineWidth = 1.5;
@@ -1002,7 +992,6 @@
         ctx.beginPath(); ctx.moveTo(mx + 6, my + 3); ctx.lineTo(mx + 3, my - 1); ctx.lineTo(mx + 9, my - 1); ctx.closePath(); ctx.fill();
       }
 
-      // Jenis: pijakan pegas (lompat lebih tinggi)
       if (p.type === "spring") {
         ctx.fillStyle = "#FFD6E0"; ctx.beginPath(); ctx.roundRect(p.x, p.y, p.w, p.h, 6); ctx.fill();
         ctx.strokeStyle = "#E58BA6"; ctx.lineWidth = 1.5;
@@ -1013,7 +1002,6 @@
         ctx.fillStyle = "#E5484D"; ctx.beginPath(); ctx.roundRect(sx - 9, p.y - 14, 18, 3.5, 2); ctx.fill();
       }
 
-      // Hiasan sesuai tempat
       if (skin === "flower") {
         ctx.strokeStyle = "#6FA56B"; ctx.lineWidth = 1.5;
         ctx.beginPath(); ctx.moveTo(cx, p.y); ctx.lineTo(cx, p.y - 6); ctx.stroke();
@@ -1053,7 +1041,6 @@
     ctx.restore();
   }
 
-  // ---------- Teks tambahan (tempat & level) ----------
   function drawExtraHUD() {
     const place = PLACES[currentPlaceIndex];
     ctx.save();
