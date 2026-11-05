@@ -11,12 +11,21 @@
     position: fixed; top: 10px; left: 0; right: 0; text-align: center;
     font-family: 'Montserrat', sans-serif; font-size: 11px; color: #9E7A3E;
     font-weight: 600; letter-spacing: 2px; pointer-events: none;
-    text-transform: uppercase; opacity: 0.8;
+    text-transform: uppercase; opacity: 0.8; z-index: 10;
+  }
+  /* Tombol izin sensor (khusus iOS) dipindah ke pojok bawah agar tidak menutupi layar */
+  #gyroBtn {
+    position: fixed; bottom: 20px; left: 20px; z-index: 99;
+    background: #FFF; color: #9E7A3E; border: 1px solid #C5A059;
+    padding: 8px 12px; border-radius: 20px; font-family: sans-serif;
+    font-size: 10px; font-weight: 600; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    cursor: pointer; display: none;
   }
 </style>
 </head>
 <body>
 <div id="hint">Miringkan HP atau Sentuh Layar</div>
+<button id="gyroBtn">Aktifkan Sensor</button>
 <canvas id="gameCanvas"></canvas>
 <script>
   const canvas = document.getElementById("gameCanvas");
@@ -55,6 +64,7 @@
   let moveLeft = false;
   let moveRight = false;
   let tiltX = 0; 
+  let targetTiltX = 0; // Untuk smoothing sensor
   let gyroSupported = false;
 
   const BACKGROUNDS = [
@@ -65,39 +75,47 @@
     { top: "#FFDAB9", bottom: "#F9F7F2", name: "Fajar" }        
   ];
 
-  function initGyro() {
-    if (window.DeviceOrientationEvent) {
-      window.addEventListener('deviceorientation', function(e) {
-        if (e.gamma !== null) {
-          gyroSupported = true;
-          
-          // PERBAIKAN: Membalik arah sensor (dikali -1)
-          let tilt = (e.gamma * -1) / 25; 
-          
-          if (tilt > 1) tilt = 1;
-          if (tilt < -1) tilt = -1;
-          tiltX = tilt;
-        }
-      });
-    }
-    
+  // --- SETUP SENSOR & IZIN ---
+  function requestGyroPermission() {
     if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-      const btn = document.createElement("button");
-      btn.innerText = "Aktifkan Sensor Gerak";
-      btn.style.cssText = "position:fixed; top:20%; left:50%; transform:translateX(-50%); padding:10px; z-index:999; font-family:sans-serif;";
+      // Khusus iOS 13+ yang butuh izin
+      const btn = document.getElementById("gyroBtn");
+      btn.style.display = "block"; // Tampilkan tombol
       btn.onclick = function() {
-        DeviceOrientationEvent.requestPermission().then(response => {
-          if (response == 'granted') {
-            initGyro();
-            btn.remove();
-          }
-        }).catch(console.error);
+        DeviceOrientationEvent.requestPermission()
+          .then(response => {
+            if (response == 'granted') {
+              btn.style.display = "none"; // Sembunyikan setelah diizinkan
+              attachGyroListener();
+            }
+          })
+          .catch(console.error);
       };
-      document.body.appendChild(btn);
+    } else {
+      // Android / PC langsung pasang listener
+      attachGyroListener();
     }
   }
-  initGyro();
 
+  function attachGyroListener() {
+    window.addEventListener('deviceorientation', function(e) {
+      if (e.gamma !== null) {
+        gyroSupported = true;
+        // Ambil nilai kemiringan (dibalik agar intuitif: miring kanan = kanan)
+        let rawTilt = (e.gamma * -1) / 20; // Sensitivitas disesuaikan (20 derajat)
+        
+        // Batasi nilai antara -1 dan 1
+        if (rawTilt > 1) rawTilt = 1;
+        if (rawTilt < -1) rawTilt = -1;
+        
+        targetTiltX = rawTilt;
+      }
+    });
+  }
+
+  requestGyroPermission();
+
+  // --- TOUCH FALLBACK ---
   function handleTouch(e) {
     e.preventDefault();
     if (e.touches.length > 0) {
@@ -115,6 +133,7 @@
   canvas.addEventListener("touchmove", handleTouch, { passive: false });
   canvas.addEventListener("touchend", handleTouchEnd, { passive: false });
 
+  // --- KEYBOARD FALLBACK ---
   function handleKey(e) {
     if (e.key === "ArrowLeft" || e.key === "a") moveLeft = e.type === "keydown";
     if (e.key === "ArrowRight" || e.key === "d") moveRight = e.type === "keydown";
@@ -153,6 +172,7 @@
     currentMoveSpeed = BASE_MOVE_SPEED;
     currentBgIndex = 0;
     tiltX = 0;
+    targetTiltX = 0;
 
     for (let i = 1; i <= 12; i++) {
       createPlatform(H - 50 - i * 95);
@@ -203,14 +223,26 @@
       currentBgIndex = newBgIndex;
     }
 
-    if (gyroSupported) {
+    // --- SMOOTHING SENSOR (LOW-PASS FILTER) ---
+    // Membuat transisi gerakan lebih halus, tidak kaku/delay
+    tiltX += (targetTiltX - tiltX) * 0.15; 
+
+    if (gyroSupported && Math.abs(tiltX) > 0.05) {
+      // Kontrol Gyro
       player.vx = tiltX * currentMoveSpeed;
       if (tiltX > 0.1) player.facing = 1;
       if (tiltX < -0.1) player.facing = -1;
+    } else if (moveLeft) {
+      player.vx = -currentMoveSpeed; 
+      player.facing = -1;
+    } else if (moveRight) {
+      player.vx = currentMoveSpeed; 
+      player.facing = 1;
     } else {
-      if (moveLeft) { player.vx = -currentMoveSpeed; player.facing = -1; }
-      else if (moveRight) { player.vx = currentMoveSpeed; player.facing = 1; }
-      else { player.vx = 0; }
+      // Jika tidak ada input sama sekali, berhenti
+      if (!gyroSupported || Math.abs(tiltX) <= 0.05) {
+        player.vx = 0;
+      }
     }
 
     player.vy += currentGravity;
