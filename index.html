@@ -77,10 +77,7 @@
       </div>
       <div class="hero-info" data-anim="fade">
         <p class="hero-date">Kamis,<br>24 Desember 2026</p>
-        <!-- Waktu diubah menjadi 11.00 - 13.00 -->
         <p class="hero-time">11.00 WIB — 13.00 WIB</p>
-
-        <!-- Info Akad & Resepsi dihapus -->
         <div class="gold-underline-short"></div>
       </div>
       <div class="countdown-wrapper" data-anim="fade">
@@ -330,7 +327,11 @@
     opened = true;
     if (!window.gsap) { revealMain(); return; }
 
-    var tl = gsap.timeline({ defaults: { ease: "power3.inOut" } });
+    // 1. Animasi Tarik Pita Lepas (CSS)
+    if (envelope) envelope.classList.add("ribbon-off");
+
+    // 2. Animasi Amplop Terbuka
+    var tl = gsap.timeline({ defaults: { ease: "power3.inOut" }, delay: 0.6 }); // Delay 0.6s agar pita sempat lepas
     tl.to(openBtn, { scale: 1.15, duration: 0.35, ease: "power2.out" })
       .to(openBtn, { scale: 0.9, duration: 0.2, ease: "power2.in" })
       .to(openBtn, { scale: 1.6, opacity: 0, filter: "blur(6px)", duration: 0.7, ease: "power2.in" })
@@ -346,7 +347,7 @@
 
     setTimeout(function () {
       gsap.to(cover, { opacity: 0, filter: "blur(14px)", scale: 1.08, duration: 1.2, ease: "power2.inOut", onComplete: revealMain });
-    }, 3400);
+    }, 4000); // Diperpanjang jadi 4 detik karena ada delay pita
   }
 
   if (openBtn) {
