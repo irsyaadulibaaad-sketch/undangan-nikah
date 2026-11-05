@@ -18,5 +18,27 @@
 <div id="hint">Tap / Spasi untuk melompat</div>
 <canvas id="c"></canvas>
 <script src="dino.js"></script>
+<!-- [BARU] Leaderboard -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../supabase.js"></script>
+<script src="leaderboard.js"></script>
+<script>
+  (function () {
+    // Jeda game saat papan peringkat dibuka (loop dibungkus, kode dino.js tidak diubah)
+    var paused = false, origLoop = loop;
+    loop = function () {
+      if (paused) { requestAnimationFrame(loop); return; }
+      origLoop();
+    };
+    Leaderboard.init({
+      game: "dino",
+      title: "The Journey",
+      isOver: function () { return state === "over"; },
+      getScore: function () { return score; },
+      restart: function () { jump(); },
+      setPaused: function (v) { paused = v; }
+    });
+  })();
+</script>
 </body>
 </html>

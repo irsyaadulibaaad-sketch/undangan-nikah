@@ -1088,5 +1088,24 @@
   initGame();
   loop();
 </script>
+<!-- [BARU] Leaderboard -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../supabase.js"></script>
+<script src="leaderboard.js"></script>
+<script>
+  (function () {
+    // Jeda game saat papan peringkat dibuka (update dibungkus, kode game tidak diubah)
+    var paused = false, origUpdate = update;
+    update = function () { if (paused) return; origUpdate(); };
+    Leaderboard.init({
+      game: "jump",
+      title: "Jump Sky",
+      isOver: function () { return gameOver; },
+      getScore: function () { return score; },
+      restart: function () { initGame(); },
+      setPaused: function (v) { paused = v; }
+    });
+  })();
+</script>
 </body>
 </html>
