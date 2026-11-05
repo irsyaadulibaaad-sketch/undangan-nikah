@@ -77,20 +77,10 @@
       </div>
       <div class="hero-info" data-anim="fade">
         <p class="hero-date">Kamis,<br>24 Desember 2026</p>
-        <p class="hero-time">09.00 WIB — 13.00 WIB</p>
+        <!-- Waktu diubah menjadi 11.00 - 13.00 -->
+        <p class="hero-time">11.00 WIB — 13.00 WIB</p>
 
-        <div style="margin-top: 25px; display: flex; justify-content: center; gap: 30px; font-family: var(--font-sans); font-size: 0.85rem; letter-spacing: 1px;">
-          <div style="text-align: center;">
-            <span style="display:block; color: var(--gold-dark); font-weight: 600; text-transform: uppercase; font-size: 0.7rem; margin-bottom: 4px;">Akad Nikah</span>
-            <span style="color: var(--text-muted);">09.00 WIB</span>
-          </div>
-          <div style="width: 1px; background: var(--gold-mid); opacity: 0.3;"></div>
-          <div style="text-align: center;">
-            <span style="display:block; color: var(--gold-dark); font-weight: 600; text-transform: uppercase; font-size: 0.7rem; margin-bottom: 4px;">Resepsi</span>
-            <span style="color: var(--text-muted);">11.00 WIB</span>
-          </div>
-        </div>
-
+        <!-- Info Akad & Resepsi dihapus -->
         <div class="gold-underline-short"></div>
       </div>
       <div class="countdown-wrapper" data-anim="fade">
@@ -209,7 +199,7 @@
       <div class="faq-list" data-anim="form">
         <div class="faq-item">
           <button type="button" class="faq-q">Kapan dan jam berapa acara dimulai?<span class="faq-arrow"></span></button>
-          <div class="faq-a"><p>Acara berlangsung pada <b>Kamis, 24 Desember 2026</b>, pukul <b>09.00 – 13.00 WIB</b>. Mohon hadir 15 menit lebih awal agar tidak ketinggalan momen.</p></div>
+          <div class="faq-a"><p>Acara berlangsung pada <b>Kamis, 24 Desember 2026</b>, pukul <b>11.00 – 13.00 WIB</b>. Mohon hadir 15 menit lebih awal agar tidak ketinggalan momen.</p></div>
         </div>
         <div class="faq-item">
           <button type="button" class="faq-q">Apa dress code acaranya?<span class="faq-arrow"></span></button>
@@ -385,12 +375,12 @@
     // EFEK SCROLL (Hanya untuk section selain Hero)
     document.querySelectorAll("section:not(.hero-section) .container").forEach(function (container) {
       gsap.to(container, {
-        scale: 0.85,       // Menyusut elegan
-        opacity: 0.2,      // Memudar halus
+        scale: 0.85,
+        opacity: 0.2,
         ease: "none",
         scrollTrigger: {
           trigger: container.parentElement, 
-          start: "top 20%", // Mulai mengecil saat section mendekati tengah layar
+          start: "top 20%",
           end: "bottom top", 
           scrub: 1.5,
           toggleActions: "play none none reverse" 
@@ -407,25 +397,16 @@ const directDoaContainer = document.getElementById("directDoaFormContainer");
 async function checkStatusTampilan() {
   const { data, error } = await supabaseClient.from("pengaturan").select("*").single();
   if (!error && data) {
-    // Cek Photobooth
-    if (data.photobooth_active) {
-      btnPhotobooth.style.display = "inline-block";
-    } else {
-      btnPhotobooth.style.display = "none";
-    }
-
-    // Cek Form Doa
-    if (data.doa_active) {
-      directDoaContainer.style.display = "block";
-    } else {
-      directDoaContainer.style.display = "none";
-    }
+    if (data.photobooth_active) btnPhotobooth.style.display = "inline-block";
+    else btnPhotobooth.style.display = "none";
+    
+    if (data.doa_active) directDoaContainer.style.display = "block";
+    else directDoaContainer.style.display = "none";
   }
 }
 
 checkStatusTampilan();
 
-// Pantau perubahan realtime
 supabaseClient.channel("pengaturan-rt")
   .on("postgres_changes", { event: "UPDATE", schema: "public", table: "pengaturan" }, (payload) => {
     if (payload.new.photobooth_active !== undefined) {
@@ -459,7 +440,7 @@ document.getElementById("directDoaForm").addEventListener("submit", async (e) =>
     msg.style.color = "#8A9A7B";
     msg.textContent = "Terima kasih! Doa Anda telah mekar di taman.";
     e.target.reset();
-    loadTaman(); // Panggil fungsi dari app.js untuk refresh bunga
+    loadTaman();
   }
 });
 
@@ -468,24 +449,20 @@ window.onload = function() {
   const faqButtons = document.querySelectorAll(".faq-q");
   
   faqButtons.forEach(btn => {
-    // Hapus event listener lama jika ada (mencegah dobel)
     btn.replaceWith(btn.cloneNode(true));
   });
 
-  // Pasang event listener baru
   document.querySelectorAll(".faq-q").forEach(btn => {
     btn.addEventListener("click", function() {
       const item = this.parentElement;
       const wasOpen = item.classList.contains("open");
       
-      // Tutup semua FAQ
       document.querySelectorAll(".faq-item.open").forEach(i => {
         i.classList.remove("open");
         const answer = i.querySelector(".faq-a");
         if (answer) answer.style.maxHeight = null;
       });
       
-      // Buka yang diklik
       if (!wasOpen) {
         item.classList.add("open");
         const answer = item.querySelector(".faq-a");
