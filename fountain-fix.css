@@ -1,22 +1,24 @@
 /* ==========================================================================
-   PERBAIKAN AIR MANCUR — Garden of Prayers
+   PERBAIKAN AIR MANCUR — Garden of Prayers  (v2)
    File TAMBAHAN: tidak mengubah/menghapus aturan apa pun di style.css.
    Muat SETELAH style.css.
-
-   1) Tiang air mancur dipindah ke TITIK TENGAH kolam.
-      Pusat kolam ada di 29px dari bawah (kolam tinggi 58px). Sebelumnya
-      alas tiang berada di ~18px, jadi tampak maju ke depan kolam.
-      Seluruh tumpukan (tiang, tier-2, tier-3, bola emas) digeser naik
-      11px sama rata, sehingga bentuknya persis sama, hanya posisinya tepat.
    ========================================================================== */
-.fountain .water-spout { bottom: 31px; }    /* was 20px */
-.fountain .tier-2      { bottom: 115px; }   /* was 104px */
-.fountain .tier-3      { bottom: 155px; }   /* was 144px */
-.fountain::after       { bottom: 180px; }   /* was 169px (bola emas puncak) */
 
-/* 2) Animasi air baru digambar oleh fountain-fx.js lewat <canvas>.
-      Kelas .fx-on hanya ditambahkan JS jika canvas berhasil dibuat,
-      jadi kalau JS gagal / reduced-motion, animasi CSS lama tetap jalan. */
+/* 1) TIANG DI TENGAH KOLAM
+   Penyebab utama: di HTML, .water-pool berada SETELAH .water-spout, sehingga
+   permukaan kolam menimpa bagian bawah tiang. Akibatnya tiang tampak berhenti
+   di tepi belakang kolam (seperti berdiri di luar kolam). Di sini urutan
+   lapisnya dibalik: tiang di atas kolam, dan alas tiang diletakkan tepat di
+   titik tengah kolam (pusat kolam = 29px dari bawah). */
+.fountain .water-pool  { z-index: 1; }
+.fountain .water-spout { z-index: 2; bottom: 31px; }   /* was 20px */
+.fountain .tier-2      { bottom: 115px; }              /* was 104px */
+.fountain .tier-3      { bottom: 155px; }              /* was 144px */
+.fountain::after       { bottom: 180px; }              /* was 169px (bola emas) */
+
+/* 2) Air digambar oleh fountain-fx.js lewat <canvas>. Kelas .fx-on hanya
+      ditambahkan JS bila canvas berhasil dibuat, jadi bila JS gagal atau
+      perangkat memakai "reduced motion", animasi CSS lama tetap tampil. */
 .fountain.fx-on .tier-2::after,
 .fountain.fx-on .tier-3::before,
 .fountain.fx-on .water-drop { display: none; }
