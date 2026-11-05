@@ -183,7 +183,7 @@ button { font-family: inherit; }
 .wax-seal { display: none !important; }
 
 /* ==========================================================================
-   SIMPUL PITA MERAH REALISTIS (TIDAK TERPOTONG)
+   SIMPUL PITA MERAH REALISTIS
    ========================================================================== */
 .ribbon-bow {
   position: absolute; top: 50%; left: 50%;
@@ -203,6 +203,7 @@ button { font-family: inherit; }
     inset -8px -8px 15px rgba(80, 0, 0, 0.7),
     inset 5px 5px 15px rgba(255, 150, 150, 0.5),
     0 12px 20px rgba(0,0,0,0.3);
+  transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
 .bow-loop::before {
   content: ''; position: absolute; inset: 0;
@@ -234,34 +235,44 @@ button { font-family: inherit; }
     inset 0 -5px 8px rgba(80, 0, 0, 0.8),
     inset 0 5px 8px rgba(255, 150, 150, 0.5),
     0 5px 10px rgba(0,0,0,0.3);
+  transition: all 0.4s ease;
 }
 
-/* Ekor Pita (UJUNG MEMBULAT, TIDAK TERPOTONG) */
+/* Ekor Pita */
 .bow-tail {
   position: absolute; top: 10px;
   width: 28px; height: 160px;
   background: 
     linear-gradient(90deg, rgba(255,255,255,0.1) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.2) 100%),
     linear-gradient(180deg, #D90000 0%, #FF4C4C 30%, #C00000 70%, #800000 100%);
-  border-radius: 0 0 14px 14px; /* Ujung membulat */
+  clip-path: polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%);
   box-shadow:
     inset -4px 0 8px rgba(80, 0, 0, 0.5),
     inset 4px 0 8px rgba(255, 150, 150, 0.3),
     0 15px 25px rgba(0,0,0,0.25);
+  transition: all 0.8s ease;
+}
+.bow-tail::before {
+  content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-bottom: 10px solid #FDFCF9; 
+  z-index: 2;
 }
 .bow-tail.l { left: -24px; transform: rotate(12deg);  transform-origin: top center; }
 .bow-tail.r { right: -24px; transform: rotate(-12deg); transform-origin: top center; }
 
 /* ==========================================================================
-   ANIMASI PITA MENGEMBANG DAN LEPAS (SMOOTH)
+   ANIMASI LEPAS PITA (MELAR KE SAMPING)
    ========================================================================== */
 .ribbon-off .ribbon-bow {
-  transform: scale(1.3) translateY(10px);
+  transform: scale(1.2) translateY(-20px);
   opacity: 0;
-  transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.2s ease-in;
+  transition: transform 1.2s cubic-bezier(0.6, -0.28, 0.735, 0.045), opacity 1s ease-in;
 }
 .ribbon-off .bow-loop { transform: scaleX(1.5) rotate(0deg); }
-.ribbon-off .bow-tail { transform: scaleY(1.2) translateY(20px); }
+.ribbon-off .bow-tail { transform: scaleY(1.3) translateY(20px); }
 
 .tap-hint {
   position: absolute; bottom: -50px; left: 50%; transform: translateX(-50%);
