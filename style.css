@@ -231,7 +231,7 @@ section { position: relative; padding: 170px 25px 130px; width: 100%; overflow: 
 /* ==========================================================================
    HERO
    ========================================================================== */
-.hero-section { padding-top: 190px; padding-bottom: 170px; }
+.hero-section { padding-top: 60px; padding-bottom: 170px; }
 .bismillah-wrapper { margin-bottom: 55px; }
 .bismillah { font-family: var(--font-serif); font-size: 1.5rem; color: var(--gold-dark); margin-bottom: 16px; font-weight: 400; opacity: 0.9; }
 .bismillah-line { width: 90px; height: 1px; background: linear-gradient(to right, transparent, var(--gold-mid), transparent); margin: 0 auto; opacity: 0.7; }
