@@ -224,24 +224,24 @@ supabaseClient.channel("doa-rt")
 
   // ---------- konstanta ----------
   const DPR = Math.min(window.devicePixelRatio || 1, 2);
-  const EW = env.offsetWidth || 340, EH = env.offsetHeight || 460; // ukuran amplop sebenarnya (HP = 300 x 420)
+  const EW = env.offsetWidth || 340, EH = env.offsetHeight || 460; // ukuran amplop sebenarnya
   
-  // PERBAIKAN: Lebar kanvas dikurangi agar pita tidak keluar dari batas amplop (sebelumnya + 380)
-  const CW = EW + 200, CH = EH + 140;             
-  const OX = (CW - EW) / 2, OY = (CH - EH) / 2;   // posisi amplop di dalam kanvas
+  // Lebar kanvas pas dengan amplop (ditambah sedikit untuk bayangan)
+  const CW = EW + 40, CH = EH + 40;             
+  const OX = 20, OY = 20;                         // Margin agar bayangan tidak terpotong
   const KX = EW / 2, KY = EH / 2;                 // pusat simpul = tengah amplop
   const W = 24;                                   // lebar pita
-  const REACH = 180;                              // PERBAIKAN: panjang tali lurus dikurangi (sebelumnya 250)
+  const REACH = 180;                              // panjang tali lurus
 
   // durasi (detik)
-  const T_PULL = 1.15;   // tarik + simpul terbuka
-  const T_HOLD = 0.18;   // tali lurus menegang
-  const T_REL = 0.95;    // tali ditarik lepas
-  const FEED_MAX = 900;  // total panjang tali yang ditarik keluar
+  const T_PULL = 1.15;   
+  const T_HOLD = 0.18;   
+  const T_REL = 0.95;    
+  const FEED_MAX = 900;  
   const FEED_POW = 1.6;
-  const FEED_READY = EW / 2 + REACH + 10; // tali sudah lepas dari amplop saat ini
+  const FEED_READY = EW / 2 + REACH + 10; 
   const T_READY = T_PULL + T_HOLD + T_REL * Math.pow(FEED_READY / FEED_MAX, 1 / FEED_POW);
-  window.ribbonUntieDuration = T_READY;           // dibaca oleh fungsi buka undangan (index.html)
+  window.ribbonUntieDuration = T_READY;           
 
   // ---------- util ----------
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
@@ -255,7 +255,7 @@ supabaseClient.channel("doa-rt")
     };
   }
 
-  // palet satin merah (gelap -> kilau)
+  // palet satin merah
   const PAL = [[0, 58, 4, 12], [.3, 128, 10, 24], [.55, 196, 24, 40], [.8, 240, 70, 80], [1, 255, 170, 172]];
   function pal(l) {
     l = clamp(l, 0, 1);
@@ -288,7 +288,6 @@ supabaseClient.channel("doa-rt")
   if (!ctx) { wrap.style.display = "none"; window.ribbonUntieDuration = 0.6; return; }
 
   // ---------- satu helai pita satin ----------
-  // pts: titik tengah; o.w(i): lebar; o.tw(i): faktor putaran 0..1; o.nS/o.nE: ujung bentuk V; o.sh: kekuatan bayangan
   function strip(pts, o) {
     const n = pts.length;
     const nx = [], ny = [], ang = [], tx = [], ty = [];
@@ -312,7 +311,6 @@ supabaseClient.channel("doa-rt")
     const notchE = o.nE ? { x: pts[n - 1].x - tx[n - 1] * nd(n - 1), y: pts[n - 1].y - ty[n - 1] * nd(n - 1) } : null;
     const notchS = o.nS ? { x: pts[0].x + tx[0] * nd(0), y: pts[0].y + ty[0] * nd(0) } : null;
 
-    // 1) siluet + bayangan jatuh ke kertas
     ctx.beginPath();
     ctx.moveTo(L[0].x, L[0].y);
     for (let i = 1; i < n; i++) ctx.lineTo(L[i].x, L[i].y);
@@ -329,7 +327,6 @@ supabaseClient.channel("doa-rt")
       ctx.restore();
     } else { ctx.fillStyle = "#6a0812"; ctx.fill(); }
 
-    // 2) potongan kain berwarna menurut cahaya
     for (let i = 0; i < n - 1; i++) {
       const col = pal((lum[i] + lum[i + 1]) / 2);
       ctx.beginPath();
@@ -341,8 +338,6 @@ supabaseClient.channel("doa-rt")
       ctx.fillStyle = col; ctx.strokeStyle = col; ctx.lineWidth = 0.8; ctx.fill(); ctx.stroke();
     }
 
-    // 3) gradasi melintang lebar pita (efek satin)
-    // sisi terang selalu menghadap sumber cahaya (kiri-atas), apa pun arah pita
     const sg = nx.map((v, i) => clamp(2.5 * (v * -0.45 + ny[i] * -0.89), -1, 1));
     const off = f => pts.map((p, i) => ({ x: p.x + nx[i] * f * wv[i] * sg[i], y: p.y + ny[i] * f * wv[i] * sg[i] }));
     const offSym = f => pts.map((p, i) => ({ x: p.x + nx[i] * f * wv[i], y: p.y + ny[i] * f * wv[i] }));
@@ -352,16 +347,14 @@ supabaseClient.channel("doa-rt")
       ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineJoin = "round"; ctx.lineCap = "butt"; ctx.stroke();
     };
     const wm = wv.reduce((a, b) => a + b, 0) / n;
-    poly(off(-0.34), "rgba(60,0,10,0.30)", wm * 0.30);        // sisi teduh
-    poly(off(0.30), "rgba(255,120,125,0.20)", wm * 0.26);      // sisi terang
-    // kilau memanjang, kuat-lemahnya mengikuti cahaya
+    poly(off(-0.34), "rgba(60,0,10,0.30)", wm * 0.30);
+    poly(off(0.30), "rgba(255,120,125,0.20)", wm * 0.26);
     const hl = off(0.12);
     for (let i = 0; i < n - 1; i++) {
       const a = clamp((lum[i] + lum[i + 1]) / 2 * 0.9, 0, 0.7);
       ctx.beginPath(); ctx.moveTo(hl[i].x, hl[i].y); ctx.lineTo(hl[i + 1].x, hl[i + 1].y);
       ctx.strokeStyle = "rgba(255,222,222," + a.toFixed(3) + ")"; ctx.lineWidth = wm * 0.11; ctx.lineCap = "round"; ctx.stroke();
     }
-    // 4) tepi pita (selvedge) + jahitan tipis
     poly(L, "rgba(45,0,8,0.55)", 1);
     poly(R, "rgba(45,0,8,0.55)", 1);
     poly(offSym(0.41), "rgba(255,170,170,0.20)", 0.8);
@@ -375,7 +368,6 @@ supabaseClient.channel("doa-rt")
   };
   const NT = 30;
 
-  // ekor pita: menjuntai -> ditarik lurus; ujung bergerak lebih dulu, bagian dekat simpul menyusul (seperti tali sungguhan)
   function tailPts(side, u, t, sway) {
     const pts = [], d = 0.5;
     const key = side > 0 ? HANG.R : HANG.L;
@@ -386,14 +378,13 @@ supabaseClient.channel("doa-rt")
       const e = ease(clamp((u - d * (1 - s)) / (1 - d), 0, 1));
       let x = lerp(H.x, side * REACH * s, e);
       let y = lerp(H.y, 0, e);
-      y += 17 * Math.sin(Math.PI * e) * Math.sin(Math.PI * s * 1.5);                 // gelombang saat dihentak
-      if (side > 0 && t < 0.22) { x -= 9 * Math.sin(clamp(t / 0.22, 0, 1) * Math.PI) * s * s; y -= 4 * Math.sin(clamp(t / 0.22, 0, 1) * Math.PI) * s * s; } // aba-aba tarik
+      y += 17 * Math.sin(Math.PI * e) * Math.sin(Math.PI * s * 1.5);
+      if (side > 0 && t < 0.22) { x -= 9 * Math.sin(clamp(t / 0.22, 0, 1) * Math.PI) * s * s; y -= 4 * Math.sin(clamp(t / 0.22, 0, 1) * Math.PI) * s * s; }
       pts.push({ x: KX + x, y: KY + y });
     }
     return pts;
   }
 
-  // kelokan (loop) pita: kurva tertutup dari simpul
   const LA = [{ x: 8, y: -2 }, { x: 28, y: -52 }, { x: 88, y: -66 }, { x: 100, y: -30 }];
   const LB = [{ x: 100, y: -30 }, { x: 112, y: 6 }, { x: 56, y: 24 }, { x: 8, y: 5 }];
   const NL = 18;
@@ -413,7 +404,6 @@ supabaseClient.channel("doa-rt")
     return pts;
   }
 
-  // simpul
   function drawKnot(x, y, sx, sy, rot, hole, alpha) {
     if (alpha < 0.02 || sx < 0.03 || sy < 0.03) return;
     ctx.save();
@@ -436,14 +426,13 @@ supabaseClient.channel("doa-rt")
     g.addColorStop(0, "#ff6168"); g.addColorStop(0.35, "#d11f33"); g.addColorStop(0.7, "#a10f21"); g.addColorStop(1, "#5a0610");
     rr(); ctx.fillStyle = g; ctx.fill();
     ctx.save(); rr(); ctx.clip();
-    // lipatan kain di simpul
     ctx.strokeStyle = "rgba(60,0,10,0.45)"; ctx.lineWidth = 1.6; ctx.lineCap = "round";
     for (let k = -1; k <= 1; k += 2) {
       ctx.beginPath(); ctx.moveTo(k * 6, -h / 2); ctx.quadraticCurveTo(k * 11, 0, k * 6, h / 2); ctx.stroke();
     }
     ctx.strokeStyle = "rgba(255,190,190,0.45)"; ctx.lineWidth = 1.3;
     ctx.beginPath(); ctx.moveTo(-w / 2 + 5, -h / 2 + 5); ctx.quadraticCurveTo(0, -h / 2 + 1, w / 2 - 5, -h / 2 + 5); ctx.stroke();
-    if (hole > 0.02) {                                  // simpul mengendur: lubang terlihat
+    if (hole > 0.02) {
       ctx.globalAlpha = alpha * hole;
       const hg = ctx.createRadialGradient(0, 0, 1, 0, 0, 12);
       hg.addColorStop(0, "#2a0307"); hg.addColorStop(1, "#6a0812");
@@ -453,7 +442,6 @@ supabaseClient.channel("doa-rt")
     ctx.restore();
   }
 
-  // ---------- jalur tarik lepas ----------
   const FX = EW + 60, FR = 60, ARC = Math.PI * FR / 2;
   function feedPt(sg) {
     if (sg <= FX) return { x: sg, y: KY };
@@ -467,13 +455,16 @@ supabaseClient.channel("doa-rt")
     return pts;
   }
 
-  // ---------- gambar satu frame ----------
   function draw(mode, t, sway) {
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, cv.width, cv.height);
     ctx.setTransform(DPR, 0, 0, DPR, OX * DPR, OY * DPR);
+    
+    // KLIPING KETAT: Hanya gambar di dalam area amplop (EW)
     ctx.save();
-    ctx.beginPath(); ctx.rect(0, -OY, CW - OX, CH); ctx.clip();   // sisi kiri: pita menembus ke belakang amplop
+    ctx.beginPath(); 
+    ctx.rect(0, -OY, EW, CH); 
+    ctx.clip();
 
     let wrapA = 1;
     if (mode === "release") {
@@ -486,13 +477,12 @@ supabaseClient.channel("doa-rt")
       const uR = uHold, uL = clamp((uHold - 0.18) / 0.82, 0, 1);
       wrapA = 1 - clamp((uHold - 0.25) / 0.35, 0, 1);
 
-      // tali yang membungkus amplop (sisi kanan menembus ke belakang di tepi amplop)
+      // tali yang membungkus amplop
       ctx.save();
       ctx.beginPath(); ctx.rect(0, -OY, EW + 6, CH); ctx.clip();
       strip(straightBand(), { nS: true, nE: true, sh: 0.38 });
       ctx.restore();
 
-      // getar halus saat tali menegang
       const vib = mode === "hold" ? 2.2 * Math.sin(t * 38) * Math.exp(-(t - T_PULL) * 9) : 0;
       const tL = tailPts(-1, uL, t, sway), tR = tailPts(1, uR, t, sway);
       if (vib) { for (let i = 0; i < NT; i++) { const s = i / (NT - 1); tL[i].y += vib * Math.sin(Math.PI * s); tR[i].y += vib * Math.sin(Math.PI * s); } }
@@ -500,14 +490,12 @@ supabaseClient.channel("doa-rt")
       strip(tL, { nE: true, sh: shL, ph: 1.3 });
       strip(tR, { nE: true, sh: shR, ph: 2.1 });
 
-      // kelokan menciut saat tali ditarik
       const cR = clamp((uHold - 0.08) / 0.55, 0, 1), cL = clamp((uHold - 0.3) / 0.55, 0, 1);
       const lpL = loopPts(-1, cL, sway), lpR = loopPts(1, cR, sway);
       const tw = n => i => Math.cos(1.0 * Math.sin(Math.PI * i / (n - 1)));
       if (lpL) strip(lpL, { tw: tw(lpL.length), sh: 0.34, ph: 3.2 });
       if (lpR) strip(lpR, { tw: tw(lpR.length), sh: 0.34, ph: 4.0 });
 
-      // simpul mengendur, berlubang, lalu mengempis jadi tali lurus
       const k = clamp((uHold - 0.35) / 0.65, 0, 1);
       const grow = Math.sin(clamp(k / 0.55, 0, 1) * Math.PI / 2);
       const collapse = ease(clamp((k - 0.5) / 0.5, 0, 1));
@@ -515,7 +503,6 @@ supabaseClient.channel("doa-rt")
       drawKnot(KX + 10 * collapse, KY, kx, ky, 0.14 * grow * (1 - collapse), clamp(grow * 1.2, 0, 1) * (1 - collapse), 1 - clamp((collapse - 0.7) / 0.3, 0, 1));
     }
 
-    // lengkung tepi amplop: pita menggelap saat membungkus ke belakang
     ctx.globalCompositeOperation = "source-atop";
     let g = ctx.createLinearGradient(0, 0, 26, 0);
     g.addColorStop(0, "rgba(25,0,5,0.62)"); g.addColorStop(1, "rgba(25,0,5,0)");
@@ -534,7 +521,6 @@ supabaseClient.channel("doa-rt")
     return pts;
   }
 
-  // ---------- idle: ekor bergoyang halus sebelum diketuk ----------
   let started = false, idleRaf = 0, idleT0 = performance.now(), idleFrame = 0;
   function idle(now) {
     if (started) return;
@@ -544,10 +530,6 @@ supabaseClient.channel("doa-rt")
   draw("idle", 0, 0);
   idleRaf = requestAnimationFrame(idle);
 
-  // ---------- urutan saat diketuk ----------
-  // 0 – 1.15s   ekor kanan ditarik, kelokan menciut, simpul mengendur lalu terbuka jadi tali lurus
-  // 1.15 – 1.33 tali lurus menegang
-  // 1.33 – 2.28 tali ditarik lepas ke kanan (lepas dari amplop di ±1.95s), baru undangan terbuka
   function start() {
     if (started) return;
     started = true;
@@ -569,7 +551,6 @@ supabaseClient.channel("doa-rt")
   env.addEventListener("click", untie);
   env.addEventListener("touchstart", untie, { passive: true });
 
-  // jika class ribbon-off ditambahkan dari tempat lain (mis. fungsi buka undangan), animasi tetap jalan
   new MutationObserver(function () {
     if (env.classList.contains("ribbon-off")) start();
   }).observe(env, { attributes: true, attributeFilter: ["class"] });
