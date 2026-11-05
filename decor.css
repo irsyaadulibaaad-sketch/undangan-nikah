@@ -1,0 +1,153 @@
+/* ==========================================================================
+   DEKORASI TAMBAHAN — Irsyaadul & Refalina   (decor.css)
+   File TAMBAHAN: tidak mengubah/menghapus aturan apa pun di style.css.
+   Muat SETELAH style.css (dan fountain-fix.css).
+
+   Prinsip:
+   - Semua dekorasi berada DI BELAKANG konten (.container z-index:2).
+   - Tekstur hanya di tepi layar (di-mask), tidak pernah di atas teks.
+   - Hanya transform/opacity yang dianimasikan → ringan di HP.
+   - Semua gambar adalah SVG (tanpa emoji).
+   ========================================================================== */
+
+.dc-layer {
+  position: absolute; inset: 0; z-index: 0;
+  pointer-events: none; overflow: hidden;
+}
+footer.dc-host { position: relative; overflow: hidden; isolation: isolate; }
+footer.dc-host > .dc-layer { z-index: -1; }
+.dc-off, .dc-off * { animation-play-state: paused !important; }
+
+/* ---------- Tekstur kertas halus (hanya di tepi, di belakang konten) ---------- */
+.dc-grain {
+  position: absolute; inset: 0; opacity: 0.07; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.36 0 0 0 0 0.2 0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E");
+  -webkit-mask-image: linear-gradient(90deg, #000 0, transparent 24%, transparent 76%, #000 100%);
+          mask-image: linear-gradient(90deg, #000 0, transparent 24%, transparent 76%, #000 100%);
+}
+
+/* ---------- Cahaya lembut ---------- */
+.dc-glow {
+  position: absolute; width: 340px; height: 340px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(244,217,140,0.24) 0%, rgba(244,217,140,0.08) 45%, transparent 68%);
+  animation: dcGlow 14s ease-in-out infinite alternate;
+}
+.dc-glow.g1 { top: -90px; left: -110px; }
+.dc-glow.g2 { bottom: 60px; right: -130px; animation-delay: -6s; background: radial-gradient(circle, rgba(244,184,201,0.20) 0%, rgba(244,184,201,0.06) 45%, transparent 68%); }
+@keyframes dcGlow {
+  from { transform: translate3d(0,0,0) scale(1); opacity: 0.7; }
+  to   { transform: translate3d(34px,26px,0) scale(1.18); opacity: 1; }
+}
+.dc-beam {
+  position: absolute; top: -5%; height: 110%; width: 190px;
+  background: linear-gradient(105deg, transparent 15%, rgba(201,164,92,0.085) 50%, transparent 85%);
+  transform: rotate(14deg); transform-origin: top center;
+  animation: dcBeam 9s ease-in-out infinite alternate;
+}
+.dc-beam.b1 { left: 14%; }
+.dc-beam.b2 { left: 62%; width: 130px; animation-delay: -4s; }
+@keyframes dcBeam { from { opacity: 0.25; transform: rotate(14deg) translateX(-14px); } to { opacity: 1; transform: rotate(14deg) translateX(18px); } }
+
+/* ---------- Ranting bunga di sudut ---------- */
+.dc-corner { position: absolute; top: -8px; width: clamp(108px, 28vw, 230px); opacity: 0.92; }
+.dc-corner.tl { left: -10px; transform-origin: 6% 0; }
+.dc-corner.tr { right: -10px; transform: scaleX(-1); transform-origin: 94% 0; }
+.dc-corner svg { display: block; width: 100%; height: auto; overflow: visible;
+  transform-origin: 3% 0; animation: dcSway 8s ease-in-out infinite alternate; }
+.dc-corner.tr svg { animation-delay: -3.5s; animation-duration: 9.5s; }
+@keyframes dcSway { from { transform: rotate(-2.6deg); } to { transform: rotate(2.4deg); } }
+.hero-section > .dc-layer .dc-corner { width: clamp(88px, 22vw, 200px); }
+.dc-corner .dc-bl { transform-box: fill-box; transform-origin: center; animation: dcBloom 6s ease-in-out infinite alternate; }
+@keyframes dcBloom { from { transform: scale(0.94) rotate(-4deg); } to { transform: scale(1.06) rotate(4deg); } }
+
+/* ---------- Sulur di sisi layar (hanya layar lebar, di margin kosong) ---------- */
+.dc-vine { display: none; position: absolute; top: 0; bottom: 0; width: 150px; opacity: 0.55;
+  background-repeat: repeat-y; background-size: 150px 440px;
+  -webkit-mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent);
+          mask-image: linear-gradient(transparent, #000 14%, #000 86%, transparent);
+  animation: dcVine 7s ease-in-out infinite alternate;
+}
+.dc-vine.vl { left: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 440'%3E%3Cpath d='M26 0 C70 55 -6 110 38 165 C82 220 4 275 46 330 C86 385 20 410 40 440' fill='none' stroke='%238FA37E' stroke-width='2' stroke-linecap='round'/%3E%3Cg fill='%2395A984'%3E%3Cpath d='M44 38 C54 28 70 30 76 38 C66 48 52 48 44 38Z'/%3E%3Cpath d='M18 92 C8 84 -4 88 -8 98 C4 104 14 102 18 92Z'/%3E%3Cpath d='M40 148 C52 138 68 140 74 150 C62 158 48 158 40 148Z'/%3E%3Cpath d='M20 205 C10 197 -2 201 -6 211 C6 217 16 215 20 205Z'/%3E%3Cpath d='M42 262 C54 252 70 254 76 264 C64 272 50 272 42 262Z'/%3E%3Cpath d='M22 318 C12 310 0 314 -4 324 C8 330 18 328 22 318Z'/%3E%3Cpath d='M40 372 C52 362 66 364 72 374 C60 382 48 382 40 372Z'/%3E%3C/g%3E%3Cg%3E%3Ccircle cx='66' cy='122' r='6' fill='%23F4B8C9'/%3E%3Ccircle cx='66' cy='122' r='2.2' fill='%23C9A45C'/%3E%3Ccircle cx='14' cy='236' r='5' fill='%23F7D0DB'/%3E%3Ccircle cx='14' cy='236' r='1.8' fill='%23C9A45C'/%3E%3Ccircle cx='62' cy='296' r='6' fill='%23F4B8C9'/%3E%3Ccircle cx='62' cy='296' r='2.2' fill='%23C9A45C'/%3E%3Ccircle cx='30' cy='60' r='2.6' fill='%23D9BB80'/%3E%3Ccircle cx='34' cy='186' r='2.6' fill='%23D9BB80'/%3E%3Ccircle cx='30' cy='352' r='2.6' fill='%23D9BB80'/%3E%3C/g%3E%3C/svg%3E"); }
+.dc-vine.vr { right: 0; transform: scaleX(-1); animation-delay: -3s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 440'%3E%3Cpath d='M30 0 C-10 60 70 118 30 170 C-8 224 66 280 28 334 C-6 384 52 408 34 440' fill='none' stroke='%238FA37E' stroke-width='2' stroke-linecap='round'/%3E%3Cg fill='%2395A984'%3E%3Cpath d='M16 40 C28 30 44 32 50 40 C40 50 26 50 16 40Z'/%3E%3Cpath d='M42 96 C32 88 20 92 16 102 C28 108 38 106 42 96Z'/%3E%3Cpath d='M12 150 C24 140 40 142 46 152 C34 160 20 160 12 150Z'/%3E%3Cpath d='M38 208 C28 200 16 204 12 214 C24 220 34 218 38 208Z'/%3E%3Cpath d='M14 266 C26 256 42 258 48 268 C36 276 22 276 14 266Z'/%3E%3Cpath d='M40 322 C30 314 18 318 14 328 C26 334 36 332 40 322Z'/%3E%3C/g%3E%3Cg%3E%3Ccircle cx='46' cy='140' r='5' fill='%23F7D0DB'/%3E%3Ccircle cx='46' cy='140' r='1.8' fill='%23C9A45C'/%3E%3Ccircle cx='22' cy='250' r='6' fill='%23F4B8C9'/%3E%3Ccircle cx='22' cy='250' r='2.2' fill='%23C9A45C'/%3E%3Ccircle cx='54' cy='356' r='5' fill='%23F7D0DB'/%3E%3Ccircle cx='54' cy='356' r='1.8' fill='%23C9A45C'/%3E%3Ccircle cx='34' cy='70' r='2.6' fill='%23D9BB80'/%3E%3Ccircle cx='28' cy='200' r='2.6' fill='%23D9BB80'/%3E%3Ccircle cx='32' cy='300' r='2.6' fill='%23D9BB80'/%3E%3C/g%3E%3C/svg%3E"); }
+@keyframes dcVine { from { opacity: 0.42; } to { opacity: 0.66; } }
+@media (min-width: 1000px) { .dc-vine { display: block; } }
+
+/* ---------- Kelopak yang jatuh perlahan ---------- */
+.dc-petal { position: absolute; top: -40px; left: var(--x, 50%);
+  animation: dcFall var(--d, 22s) linear infinite; animation-delay: var(--dl, 0s); will-change: transform; }
+.dc-petal svg { display: block; width: var(--w, 14px); height: auto; overflow: visible;
+  animation: dcDrift var(--sd, 5s) ease-in-out infinite alternate; animation-delay: var(--dl, 0s); }
+@keyframes dcFall {
+  0%   { transform: translate3d(0, 0, 0); opacity: 0; }
+  8%   { opacity: 0.95; }
+  90%  { opacity: 0.85; }
+  100% { transform: translate3d(var(--sw, 30px), var(--fall, 900px), 0); opacity: 0; }
+}
+@keyframes dcDrift {
+  from { transform: translateX(-16px) rotate(var(--r0, -40deg)) rotateY(0deg); }
+  to   { transform: translateX(16px)  rotate(var(--r1, 60deg))  rotateY(70deg); }
+}
+
+/* ---------- Kilau emas ---------- */
+.dc-spark { position: absolute; left: var(--x); top: var(--y); width: var(--w, 10px); height: var(--w, 10px);
+  animation: dcTwinkle var(--d, 3.6s) ease-in-out infinite; animation-delay: var(--dl, 0s); opacity: 0; }
+.dc-spark svg { display: block; width: 100%; height: 100%; overflow: visible; }
+@keyframes dcTwinkle {
+  0%, 100% { transform: scale(0.2) rotate(0deg); opacity: 0; }
+  50%      { transform: scale(1) rotate(45deg);  opacity: 0.95; }
+}
+
+/* ---------- Ornamen kecil di garis emas judul ---------- */
+.gold-underline, .gold-underline-light, .gold-underline-dark { position: relative; }
+.gold-underline::after, .gold-underline-light::after, .gold-underline-dark::after {
+  content: ''; position: absolute; left: 50%; top: 50%; width: 38px; height: 18px;
+  transform: translate(-50%, -50%);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 38 18'%3E%3Cpath d='M19 2.5 L24.5 9 L19 15.5 L13.5 9Z' fill='%23C9A45C'/%3E%3Cpath d='M19 6 L21.6 9 L19 12 L16.4 9Z' fill='%23FFF6DC'/%3E%3Ccircle cx='7.5' cy='9' r='1.5' fill='%23C9A45C'/%3E%3Ccircle cx='30.5' cy='9' r='1.5' fill='%23C9A45C'/%3E%3Cpath d='M11 9 Q8.5 4.5 3.5 5.5 Q6 9 11 9Z' fill='%2395A984'/%3E%3Cpath d='M27 9 Q29.5 4.5 34.5 5.5 Q32 9 27 9Z' fill='%2395A984'/%3E%3C/svg%3E") center / contain no-repeat;
+  animation: dcOrn 4.5s ease-in-out infinite;
+}
+@keyframes dcOrn { 0%, 100% { opacity: 0.75; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.12); } }
+
+/* ---------- Taman: kupu-kupu & serbuk cahaya (di dalam .css-garden) ---------- */
+.dc-fly { position: absolute; left: 0; z-index: 12; pointer-events: none;
+  animation: dcFlyR var(--dur, 30s) linear infinite; animation-delay: var(--dl, 0s); }
+.dc-fly.rev { animation-name: dcFlyL; }
+@keyframes dcFlyR { from { transform: translateX(-50px); } to { transform: translateX(var(--gw, 800px)); } }
+@keyframes dcFlyL { from { transform: translateX(var(--gw, 800px)); } to { transform: translateX(-50px); } }
+.dc-bob { display: block; animation: dcBob var(--bd, 3.4s) ease-in-out infinite alternate; }
+@keyframes dcBob { from { transform: translateY(-16px) rotate(-6deg); } to { transform: translateY(16px) rotate(6deg); } }
+.dc-fly.rev .dc-bf { transform: scaleX(-1); }
+.dc-bf { display: block; overflow: visible; filter: drop-shadow(0 3px 3px rgba(60,50,30,0.18)); }
+.dc-wing { transform-origin: 20px 15px; animation: dcFlap 0.34s ease-in-out infinite alternate; }
+@keyframes dcFlap { from { transform: scaleX(1); } to { transform: scaleX(0.22); } }
+
+.dc-mote { position: absolute; z-index: 9; pointer-events: none; left: var(--x); top: var(--y);
+  width: var(--w, 4px); height: var(--w, 4px); border-radius: 50%;
+  background: radial-gradient(circle, #FFF6D8 0%, rgba(244,217,140,0.85) 45%, rgba(244,217,140,0) 72%);
+  box-shadow: 0 0 8px 2px rgba(244,217,140,0.55);
+  animation: dcMote var(--d, 9s) ease-in-out infinite; animation-delay: var(--dl, 0s); opacity: 0; }
+@keyframes dcMote {
+  0%   { transform: translate3d(0, 10px, 0) scale(0.6); opacity: 0; }
+  30%  { opacity: 0.95; }
+  70%  { opacity: 0.8; }
+  100% { transform: translate3d(var(--dx, 14px), -64px, 0) scale(1.1); opacity: 0; }
+}
+
+/* ---------- Percikan kelopak saat layar disentuh ---------- */
+.dc-burst { position: fixed; inset: 0; z-index: 10001; pointer-events: none; overflow: hidden; }
+.dc-bp { position: absolute; width: var(--w, 12px); height: var(--w, 12px); margin: calc(var(--w, 12px) / -2) 0 0 calc(var(--w, 12px) / -2);
+  animation: dcBurst 0.95s cubic-bezier(.2,.7,.3,1) forwards; }
+.dc-bp svg { display: block; width: 100%; height: 100%; overflow: visible; }
+@keyframes dcBurst {
+  0%   { transform: translate(0,0) rotate(0deg) scale(0.4); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) rotate(var(--r)) scale(1); opacity: 0; }
+}
+
+/* ---------- Hormati pengaturan "kurangi gerakan" ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .dc-layer *, .dc-fly, .dc-mote, .dc-bp,
+  .gold-underline::after, .gold-underline-light::after, .gold-underline-dark::after { animation: none !important; }
+  .dc-petal, .dc-fly, .dc-mote, .dc-burst, .dc-beam { display: none !important; }
+  .dc-spark { opacity: 0.6; }
+}
