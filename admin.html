@@ -571,6 +571,12 @@
     const isPersonal = document.querySelector('input[name="bcType"]:checked').value === "personal";
     const guestName = bcGuestName.value.trim();
     
+    // Tentukan sapaan awal
+    let sapaan = "*Halo semuanya!* 👋";
+    if (isPersonal && guestName) {
+      sapaan = `*Halo, ${guestName}!* 👋`; // Ganti sapaan jika personal
+    }
+
     // Tentukan link
     let link = "https://irsyaad-refa.vercel.app/";
     if (isPersonal && guestName) {
@@ -581,7 +587,7 @@
 
     // Template Broadcast dengan Format Bold WA (*) dan Italic (_)
     const teksBC = 
-`*Halo semuanya!* 👋
+`${sapaan}
 
 Kabar bahagia datang dari kami. Kami mengundang teman-teman semua untuk merayakan hari bahagia pernikahan kami:
 
