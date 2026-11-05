@@ -19,7 +19,7 @@
 <style>
   /* CSS Tambahan untuk Tombol Auto Scroll */
   .autoscroll-btn {
-    position: fixed; bottom: 20px; right: 20px; z-index: 9999;
+    position: fixed; bottom: 80px; right: 20px; z-index: 9999; /* Posisi dinaikkan agar tidak menutupi teks */
     background: var(--bg-cream); color: var(--gold-dark);
     border: 1px solid var(--gold-mid); border-radius: 50px;
     padding: 10px 18px; font-family: var(--font-sans); font-size: 0.7rem;
@@ -355,7 +355,16 @@
     
     // Tampilkan tombol Auto Scroll setelah konten terbuka
     setTimeout(function() {
-      document.getElementById("autoScrollToggle").classList.add("show");
+      var btn = document.getElementById("autoScrollToggle");
+      if (btn) btn.classList.add("show");
+      
+      // MULAI AUTOSCROLL SETELAH 3 DETIK (saat tombol muncul)
+      setTimeout(function() {
+        if (typeof startAutoScroll === "function") {
+          startAutoScroll();
+        }
+      }, 3000);
+
     }, 2000);
   }
 
@@ -510,85 +519,81 @@ window.onload = function() {
   });
 };
 
-// ====== LOGIKA AUTO SCROLL (LANGSUNG ON & SEDIKIT DIPERCEPAT) ======
-(function() {
-  let autoScrollActive = true; // Langsung ON
-  let autoScrollInterval = null;
-  const btnToggle = document.getElementById("autoScrollToggle");
-  const textToggle = document.getElementById("autoScrollText");
+// ====== LOGIKA AUTO SCROLL (DIPERBAIKI) ======
+let autoScrollActive = true; 
+let autoScrollInterval = null;
+const btnToggle = document.getElementById("autoScrollToggle");
+const textToggle = document.getElementById("autoScrollText");
 
-  // Setel tampilan tombol langsung ke ON
-  if (btnToggle && textToggle) {
+// Setel tampilan tombol langsung ke ON
+if (btnToggle && textToggle) {
+  btnToggle.style.background = "var(--gold-dark)";
+  btnToggle.style.color = "#fff";
+  textToggle.textContent = "Auto Scroll: ON";
+}
+
+function toggleAutoScroll() {
+  autoScrollActive = !autoScrollActive;
+  
+  if (autoScrollActive) {
+    textToggle.textContent = "Auto Scroll: ON";
     btnToggle.style.background = "var(--gold-dark)";
     btnToggle.style.color = "#fff";
-    textToggle.textContent = "Auto Scroll: ON";
+    startAutoScroll();
+  } else {
+    textToggle.textContent = "Auto Scroll: OFF";
+    btnToggle.style.background = "var(--bg-cream)";
+    btnToggle.style.color = "var(--gold-dark)";
+    stopAutoScroll();
   }
+}
 
-  function toggleAutoScroll() {
-    autoScrollActive = !autoScrollActive;
-    
-    if (autoScrollActive) {
-      textToggle.textContent = "Auto Scroll: ON";
-      btnToggle.style.background = "var(--gold-dark)";
-      btnToggle.style.color = "#fff";
-      startAutoScroll();
-    } else {
-      textToggle.textContent = "Auto Scroll: OFF";
-      btnToggle.style.background = "var(--bg-cream)";
-      btnToggle.style.color = "var(--gold-dark)";
-      stopAutoScroll();
-    }
-  }
+function startAutoScroll() {
+  if (autoScrollInterval) clearInterval(autoScrollInterval);
+  // Pastikan tombol statusnya ON saat fungsi ini dipanggil
+  textToggle.textContent = "Auto Scroll: ON";
+  btnToggle.style.background = "var(--gold-dark)";
+  btnToggle.style.color = "#fff";
+  autoScrollActive = true;
 
-  function startAutoScroll() {
-    if (autoScrollInterval) clearInterval(autoScrollInterval);
-    autoScrollInterval = setInterval(() => {
-      // Jika sudah mencapai paling bawah, matikan
-      if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
-        autoScrollActive = false;
-        textToggle.textContent = "Auto Scroll: OFF";
-        btnToggle.style.background = "var(--bg-cream)";
-        btnToggle.style.color = "var(--gold-dark)";
-        clearInterval(autoScrollInterval);
-        return;
-      }
-      window.scrollBy(0, 2); // Kecepatan ditambah sedikit (2 pixel per interval)
-    }, 50); 
-  }
-
-  function stopAutoScroll() {
-    if (autoScrollInterval) {
-      clearInterval(autoScrollInterval);
-      autoScrollInterval = null;
-    }
-  }
-
-  // Hentikan auto scroll jika user menyentuh layar secara manual
-  window.addEventListener('wheel', stopAutoScrollIfActive, { passive: true });
-  window.addEventListener('touchmove', stopAutoScrollIfActive, { passive: true });
-
-  function stopAutoScrollIfActive() {
-    if (autoScrollActive) {
+  autoScrollInterval = setInterval(() => {
+    // Jika sudah mencapai paling bawah, matikan
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 10) {
       autoScrollActive = false;
       textToggle.textContent = "Auto Scroll: OFF";
       btnToggle.style.background = "var(--bg-cream)";
       btnToggle.style.color = "var(--gold-dark)";
-      stopAutoScroll();
+      clearInterval(autoScrollInterval);
+      return;
     }
+    window.scrollBy(0, 2); // Kecepatan ditambah sedikit (2 pixel per interval)
+  }, 50); 
+}
+
+function stopAutoScroll() {
+  if (autoScrollInterval) {
+    clearInterval(autoScrollInterval);
+    autoScrollInterval = null;
   }
+}
 
-  if (btnToggle) {
-    btnToggle.addEventListener("click", toggleAutoScroll);
+// Hentikan auto scroll jika user menyentuh layar secara manual
+window.addEventListener('wheel', stopAutoScrollIfActive, { passive: true });
+window.addEventListener('touchmove', stopAutoScrollIfActive, { passive: true });
+
+function stopAutoScrollIfActive() {
+  if (autoScrollActive) {
+    autoScrollActive = false;
+    textToggle.textContent = "Auto Scroll: OFF";
+    btnToggle.style.background = "var(--bg-cream)";
+    btnToggle.style.color = "var(--gold-dark)";
+    stopAutoScroll();
   }
+}
 
-  // Jalankan auto scroll setelah undangan dibuka (delay 3 detik agar animasi pembuka selesai)
-  setTimeout(function() {
-    if (autoScrollActive) {
-      startAutoScroll();
-    }
-  }, 3000);
-
-})();
+if (btnToggle) {
+  btnToggle.addEventListener("click", toggleAutoScroll);
+}
 </script>
 </body>
 </html>
