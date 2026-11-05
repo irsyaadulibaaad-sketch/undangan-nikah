@@ -255,8 +255,15 @@ supabaseClient.channel("doa-rt")
     };
   }
 
-  // palet satin merah
-  const PAL = [[0, 58, 4, 12], [.3, 128, 10, 24], [.55, 196, 24, 40], [.8, 240, 70, 80], [1, 255, 170, 172]];
+  // PALET SATIN EMAS MEWAH (senada dengan tema web)
+  const PAL = [
+    [0, 90, 65, 20],      // Emas gelap (bayangan)
+    [.3, 158, 122, 62],   // Emas tua (C9A45C)
+    [.55, 201, 164, 92],  // Emas utama (gold-mid)
+    [.8, 232, 200, 140],  // Emas terang (gold-bright)
+    [1, 255, 240, 200]    // Kilau cahaya
+  ];
+  
   function pal(l) {
     l = clamp(l, 0, 1);
     for (let i = 1; i < PAL.length; i++) {
@@ -265,7 +272,7 @@ supabaseClient.channel("doa-rt")
         return "rgb(" + Math.round(lerp(a[1], b[1], f)) + "," + Math.round(lerp(a[2], b[2], f)) + "," + Math.round(lerp(a[3], b[3], f)) + ")";
       }
     }
-    return "rgb(255,170,172)";
+    return "rgb(255,240,200)";
   }
 
   // ---------- kanvas ----------
@@ -323,9 +330,9 @@ supabaseClient.channel("doa-rt")
       ctx.save();
       ctx.shadowColor = "rgba(40,20,8," + sh + ")";
       ctx.shadowBlur = 9 * DPR; ctx.shadowOffsetY = 7 * DPR; ctx.shadowOffsetX = 2 * DPR;
-      ctx.fillStyle = "#6a0812"; ctx.fill();
+      ctx.fillStyle = "#7a5c26"; ctx.fill();
       ctx.restore();
-    } else { ctx.fillStyle = "#6a0812"; ctx.fill(); }
+    } else { ctx.fillStyle = "#7a5c26"; ctx.fill(); }
 
     for (let i = 0; i < n - 1; i++) {
       const col = pal((lum[i] + lum[i + 1]) / 2);
@@ -347,18 +354,18 @@ supabaseClient.channel("doa-rt")
       ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineJoin = "round"; ctx.lineCap = "butt"; ctx.stroke();
     };
     const wm = wv.reduce((a, b) => a + b, 0) / n;
-    poly(off(-0.34), "rgba(60,0,10,0.30)", wm * 0.30);
-    poly(off(0.30), "rgba(255,120,125,0.20)", wm * 0.26);
+    poly(off(-0.34), "rgba(60,40,10,0.30)", wm * 0.30);
+    poly(off(0.30), "rgba(255,220,150,0.20)", wm * 0.26);
     const hl = off(0.12);
     for (let i = 0; i < n - 1; i++) {
       const a = clamp((lum[i] + lum[i + 1]) / 2 * 0.9, 0, 0.7);
       ctx.beginPath(); ctx.moveTo(hl[i].x, hl[i].y); ctx.lineTo(hl[i + 1].x, hl[i + 1].y);
-      ctx.strokeStyle = "rgba(255,222,222," + a.toFixed(3) + ")"; ctx.lineWidth = wm * 0.11; ctx.lineCap = "round"; ctx.stroke();
+      ctx.strokeStyle = "rgba(255,250,230," + a.toFixed(3) + ")"; ctx.lineWidth = wm * 0.11; ctx.lineCap = "round"; ctx.stroke();
     }
-    poly(L, "rgba(45,0,8,0.55)", 1);
-    poly(R, "rgba(45,0,8,0.55)", 1);
-    poly(offSym(0.41), "rgba(255,170,170,0.20)", 0.8);
-    poly(offSym(-0.41), "rgba(255,170,170,0.20)", 0.8);
+    poly(L, "rgba(60,40,10,0.55)", 1);
+    poly(R, "rgba(60,40,10,0.55)", 1);
+    poly(offSym(0.41), "rgba(255,220,150,0.20)", 0.8);
+    poly(offSym(-0.41), "rgba(255,220,150,0.20)", 0.8);
   }
 
   // ---------- geometri ----------
@@ -420,22 +427,22 @@ supabaseClient.channel("doa-rt")
     rr();
     ctx.save();
     ctx.shadowColor = "rgba(40,20,8,0.4)"; ctx.shadowBlur = 8 * DPR; ctx.shadowOffsetY = 6 * DPR;
-    ctx.fillStyle = "#6a0812"; ctx.fill();
+    ctx.fillStyle = "#7a5c26"; ctx.fill();
     ctx.restore();
     const g = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
-    g.addColorStop(0, "#ff6168"); g.addColorStop(0.35, "#d11f33"); g.addColorStop(0.7, "#a10f21"); g.addColorStop(1, "#5a0610");
+    g.addColorStop(0, "#efd9a4"); g.addColorStop(0.35, "#c9a45c"); g.addColorStop(0.7, "#9e7a3e"); g.addColorStop(1, "#7a5c26");
     rr(); ctx.fillStyle = g; ctx.fill();
     ctx.save(); rr(); ctx.clip();
-    ctx.strokeStyle = "rgba(60,0,10,0.45)"; ctx.lineWidth = 1.6; ctx.lineCap = "round";
+    ctx.strokeStyle = "rgba(60,40,10,0.45)"; ctx.lineWidth = 1.6; ctx.lineCap = "round";
     for (let k = -1; k <= 1; k += 2) {
       ctx.beginPath(); ctx.moveTo(k * 6, -h / 2); ctx.quadraticCurveTo(k * 11, 0, k * 6, h / 2); ctx.stroke();
     }
-    ctx.strokeStyle = "rgba(255,190,190,0.45)"; ctx.lineWidth = 1.3;
+    ctx.strokeStyle = "rgba(255,220,150,0.45)"; ctx.lineWidth = 1.3;
     ctx.beginPath(); ctx.moveTo(-w / 2 + 5, -h / 2 + 5); ctx.quadraticCurveTo(0, -h / 2 + 1, w / 2 - 5, -h / 2 + 5); ctx.stroke();
     if (hole > 0.02) {
       ctx.globalAlpha = alpha * hole;
       const hg = ctx.createRadialGradient(0, 0, 1, 0, 0, 12);
-      hg.addColorStop(0, "#2a0307"); hg.addColorStop(1, "#6a0812");
+      hg.addColorStop(0, "#3e2c14"); hg.addColorStop(1, "#7a5c26");
       ctx.fillStyle = hg; ctx.beginPath(); ctx.ellipse(0, 1, 11, 8.5, 0, 0, Math.PI * 2); ctx.fill();
     }
     ctx.restore();
@@ -460,7 +467,6 @@ supabaseClient.channel("doa-rt")
     ctx.clearRect(0, 0, cv.width, cv.height);
     ctx.setTransform(DPR, 0, 0, DPR, OX * DPR, OY * DPR);
     
-    // KLIPING KETAT: Hanya gambar di dalam area amplop (EW)
     ctx.save();
     ctx.beginPath(); 
     ctx.rect(0, -OY, EW, CH); 
@@ -477,7 +483,6 @@ supabaseClient.channel("doa-rt")
       const uR = uHold, uL = clamp((uHold - 0.18) / 0.82, 0, 1);
       wrapA = 1 - clamp((uHold - 0.25) / 0.35, 0, 1);
 
-      // tali yang membungkus amplop
       ctx.save();
       ctx.beginPath(); ctx.rect(0, -OY, EW + 6, CH); ctx.clip();
       strip(straightBand(), { nS: true, nE: true, sh: 0.38 });
@@ -505,11 +510,11 @@ supabaseClient.channel("doa-rt")
 
     ctx.globalCompositeOperation = "source-atop";
     let g = ctx.createLinearGradient(0, 0, 26, 0);
-    g.addColorStop(0, "rgba(25,0,5,0.62)"); g.addColorStop(1, "rgba(25,0,5,0)");
+    g.addColorStop(0, "rgba(40,30,10,0.62)"); g.addColorStop(1, "rgba(40,30,10,0)");
     ctx.fillStyle = g; ctx.fillRect(0, KY - 40, 26, 80);
     if (wrapA > 0.01) {
       g = ctx.createLinearGradient(EW - 20, 0, EW + 6, 0);
-      g.addColorStop(0, "rgba(25,0,5,0)"); g.addColorStop(1, "rgba(25,0,5," + (0.6 * wrapA).toFixed(3) + ")");
+      g.addColorStop(0, "rgba(40,30,10,0)"); g.addColorStop(1, "rgba(40,30,10," + (0.6 * wrapA).toFixed(3) + ")");
       ctx.fillStyle = g; ctx.fillRect(EW - 20, KY - 40, 26, 80);
     }
     ctx.globalCompositeOperation = "source-over";
